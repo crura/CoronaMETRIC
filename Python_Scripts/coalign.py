@@ -6,14 +6,21 @@ import sunpy.map
 import matplotlib.colors
 import astropy.units as u
 from astropy.io import fits
+from pathlib import Path
 
-fits_dir = "/Users/crura/Desktop/Research/Magnetic_Field/Forward_MLSO_Projection.fits"
+path = __file__
+pathnew = Path(path)
+
+fits_dir = pathnew.parent.parent.joinpath('Data/PSI/Forward_MLSO_Projection.fits')
+path_fits_dir = Path(fits_dir)
+
+
 data = fits.getdata(fits_dir)
 head = fits.getheader(fits_dir)
 
 psimap = sunpy.map.Map(data, head)
 
-fits_dir_mlso = '/Users/crura/Desktop/Research/Magnetic_Field/Coalign/20170829_200801_kcor_l2_avg.fts'
+fits_dir_mlso = pathnew.parent.parent.joinpath('Data/MLSO/20170829_200801_kcor_l2_avg.fts')
 
 data = fits.getdata(fits_dir_mlso)
 head = fits.getheader(fits_dir_mlso)

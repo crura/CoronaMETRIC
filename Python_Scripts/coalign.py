@@ -27,6 +27,8 @@ head = fits.getheader(fits_dir_mlso)
 head['detector'] = ('KCor')
 mlsomap = sunpy.map.Map(data, head)
 
+psimap.plot_settings['norm'] = plt.Normalize(mlsomap.min(), mlsomap.max())
+
 fig = plt.figure(figsize=(12, 5))
 ax1 = fig.add_subplot(1, 2, 1, projection=psimap)
 psimap.plot(axes=ax1,norm=matplotlib.colors.LogNorm())

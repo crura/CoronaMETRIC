@@ -79,10 +79,10 @@ function get_fordump
   save,BY_2d,filename='/Users/crura/Desktop/Research/github/Image-Coalignment/Data/By_2d_Center.sav'
   save,BZ_2d,filename='/Users/crura/Desktop/Research/github/Image-Coalignment/Data/Bz_2d_Center.sav'
 
-  ;write_csv,'rotated_Bx_2dtest.csv',BX_2d
-  ;write_csv,'rotated_By_2dtest.csv',BY_2d
-  ;write_csv,'rotated_Bz_2dtest.csv',BZ_2d
-  ;write_csv,'rotated_Dens_2dtest.csv',Dens_2d_center
+  write_csv,'/Users/crura/Desktop/Research/github/Image-Coalignment/Data/Central_Parameters/rotated_Bx_2d.csv',BX_2d
+  write_csv,'/Users/crura/Desktop/Research/github/Image-Coalignment/Data/Central_Parameters/rotated_By_2d.csv',BY_2d
+  write_csv,'/Users/crura/Desktop/Research/github/Image-Coalignment/Data/Central_Parameters/rotated_Bz_2d.csv',BZ_2d
+  write_csv,'/Users/crura/Desktop/Research/github/Image-Coalignment/Data/Central_Parameters/rotated_Dens_2d.csv',Dens_2d_center
 
   ;write_csv,'rotated_x_2dtest.csv',X_2d
   ;write_csv,'rotated_y_2dtest.csv',Y_2d

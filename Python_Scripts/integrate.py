@@ -7,10 +7,15 @@ import matplotlib
 from tqdm import tqdm_notebook
 import pandas as pd
 import matplotlib as mpl
+import git
+
+repo = git.Repo('.', search_parent_directories=True)
+repo_path = repo.working_dir
 
 # Generate integrated electron density
-path = "/Users/crura/Desktop/Research/github/Image-Coalignment/Data/Rotated_Density_LOS/"
-parent_list = os.listdir("/Users/crura/Desktop/Research/github/Image-Coalignment/Data/Rotated_Density_LOS")
+input_path = os.path.join(repo_path,'Data/Rotated_Density_LOS')
+path = input_path + "/"
+parent_list = os.listdir(input_path)
 imagelist = []
 headlist = []
 for child in parent_list:
@@ -22,6 +27,10 @@ for child in parent_list:
     imagelist.append(image_data)
 
 image_sum = np.sum(imagelist, axis=0)
+
+outpath = 'Data/Integrated_Parameters'
+
+np.savetxt(os.path.join(repo_path,outpath,'Integrated_Electron_Density.csv'),image_sum.ravel(),delimiter=',')
 plt.imshow(image_sum,norm=matplotlib.colors.LogNorm(),cmap='gist_gray',origin='lower')
 plt.colorbar()
 plt.title('integrated electron density')

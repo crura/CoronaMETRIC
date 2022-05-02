@@ -96,7 +96,19 @@ outpath = 'Data/Integrated_Parameters'
 np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_Bz.csv'),image_sum_bz.ravel(),delimiter=',') # save the LOS integrated Bz as a 1D array in a csv file
 
 
-plt.imshow(image_sum_bz,cmap='gist_gray',origin='lower')
-plt.colorbar()
-plt.title('integrated LOS B_z')
-plt.show()
+
+# define n x n grid with spacing dy, dz
+dy = np.linspace(0,image_data_by.shape[0]-1, image_data_by.shape[0])
+dz = np.linspace(0,image_data_bz.shape[0]-1,image_data_bz.shape[0])
+# make plot large
+mpl.rcParams.update(mpl.rcParamsDefault)
+plt.quiver(dy,dz,image_sum_by,image_sum_bz) #Make B_x, B_y the x and y directions of each field vector
+# zoom in plot
+plt.axis('equal')
+plt.xlim(80,175)
+plt.ylim(80,175)
+# make title
+plt.title('Vector Plot of MLSO Rotated LOS-Integrated By , Bz')
+plt.xlabel('Y Position')
+plt.ylabel('Z Position')
+plt.savefig(os.path.join(repo_path,'Data/Integrated_Parameters/Plots/LOS_Integrated_By_Bz_Vector_Plot.png'))

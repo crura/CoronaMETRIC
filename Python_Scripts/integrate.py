@@ -95,8 +95,7 @@ outpath = 'Data/Integrated_Parameters'
 
 np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_Bz.csv'),image_sum_bz.ravel(),delimiter=',') # save the LOS integrated Bz as a 1D array in a csv file
 
-
-
+# generate Bz vs By vector plot showing LOS-Integrated B field line tracing
 # define n x n grid with spacing dy, dz
 dy = np.linspace(0,image_data_by.shape[0]-1, image_data_by.shape[0])
 dz = np.linspace(0,image_data_bz.shape[0]-1,image_data_bz.shape[0])
@@ -112,3 +111,33 @@ plt.title('Vector Plot of MLSO Rotated LOS-Integrated By , Bz')
 plt.xlabel('Y Position')
 plt.ylabel('Z Position')
 plt.savefig(os.path.join(repo_path,'Data/Integrated_Parameters/Plots/LOS_Integrated_By_Bz_Vector_Plot.png'))
+
+
+
+# generate Bz vs By vector plot showing Central B field line tracing
+
+center_input_path = os.path.join(repo_path,'Data/Central_Parameters')
+path_bx_central = os.path.join(center_input_path,'rotated_Bx_2d.csv')
+path_by_central = os.path.join(center_input_path,'rotated_By_2d.csv')
+path_bz_central = os.path.join(center_input_path,'rotated_Bz_2d.csv')
+
+bx_central_image_data=pd.read_csv(path_bx_central, sep=',',header=None).values
+by_central_image_data=pd.read_csv(path_by_central, sep=',',header=None).values
+bz_central_image_data=pd.read_csv(path_bz_central, sep=',',header=None).values
+
+
+# define n x n grid with spacing dy, dz
+dy = np.linspace(0,by_central_image_data.shape[0]-1, by_central_image_data.shape[0])
+dz = np.linspace(0,bz_central_image_data.shape[0]-1,bz_central_image_data.shape[0])
+# make plot large
+mpl.rcParams.update(mpl.rcParamsDefault)
+plt.quiver(dy,dz,by_central_image_data,bz_central_image_data) #Make B_x, B_y the x and y directions of each field vector
+# zoom in plot
+plt.axis('equal')
+plt.xlim(80,175)
+plt.ylim(80,175)
+# make title
+plt.title('Vector Plot of MLSO Rotated Central By , Bz')
+plt.xlabel('Y Position')
+plt.ylabel('Z Position')
+plt.savefig(os.path.join(repo_path,'Data/Central_Parameters/Plots/Central_By_Bz_Vector_Plot.png'))

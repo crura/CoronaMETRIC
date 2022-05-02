@@ -11,7 +11,9 @@ This package, given a PSI MAS model and a coronagraph input image generates coal
 - numpy
 - pandas
 - matplotlib
--
+- astropy
+- sunpy
+- gitpython
 
 ## IDL Dependencies
 

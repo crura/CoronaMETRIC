@@ -16,7 +16,7 @@
 ; Inputs:
 ;
 ;   OutFile: Path of the output file name.
-; 
+;
 ;   Im: A 2D array containing the image values.
 ;
 ;    x: 1D array of pixel coordinates in x [Rs] or [Degrees].
@@ -31,7 +31,7 @@
 ;
 ; Keywords: (should be self explanatory).
 ;
-; Compatibility Note: 
+; Compatibility Note:
 ;   - sunpy.map parses the Wavelength and WaveUnit fields in a specific way.
 ;     - Wavelength must be a number.
 ;     - WaveUnit must be a as a valid AstroPy unit ('' defaults to "one").
@@ -40,8 +40,8 @@
 ; HISTORY:
 ;  v1.0, 2020ish, Cooper Downs, Predictive Science Inc. (cdowns@predsci.com)
 ;     - First version I've shared externally.
-;     - This is based on several previous iterations since 2017 of CD's 
-;       SSW/IDL stuff for converting with PSI/MAS forward modeled data 
+;     - This is based on several previous iterations since 2017 of CD's
+;       SSW/IDL stuff for converting with PSI/MAS forward modeled data
 ;       products from HDF to FITS.
 ;
 ;----------------------------------------------------------------------
@@ -120,7 +120,7 @@ pro write_psi_image_as_fits, OutFile, Im, x, y, ObsDate, Lon, B0, $
    ; this R_SUN is in pixels (consistent with AIA documentation)
    R_SUN = Rs_arcsec/CDELT1
 
-   
+
    ; Compute HCI and HAE corrdinates for reference
    ; i'm pretty sure I don't need to supply KM unless transformations are non-linear
    if keyword_set(GetCoords) then begin
@@ -199,4 +199,3 @@ pro write_psi_image_as_fits, OutFile, Im, x, y, ObsDate, Lon, B0, $
    mwritefits, HdrOut, Im, OutFile=OutFile
 
 end
-

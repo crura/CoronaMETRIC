@@ -51,7 +51,7 @@ image_sum_bx = np.sum(imagelist_bx, axis=0)
 
 outpath = 'Data/Integrated_Parameters'
 
-np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_Bx.csv'),image_sum_bx.ravel(),delimiter=',') # save the integrated electron density as a 1D array in a csv file
+np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_Bx.csv'),image_sum_bx.ravel(),delimiter=',') # save the LOS integrated Bx as a 1D array in a csv file
 
 
 # Generate integrated By
@@ -72,10 +72,31 @@ image_sum_by = np.sum(imagelist_by, axis=0)
 
 outpath = 'Data/Integrated_Parameters'
 
-np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_By.csv'),image_sum_by.ravel(),delimiter=',') # save the integrated electron density as a 1D array in a csv file
+np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_By.csv'),image_sum_by.ravel(),delimiter=',') # save the LOS integrated By as a 1D array in a csv file
 
 
-plt.imshow(image_sum_by,cmap='gist_gray',origin='lower')
+# Generate integrated Bz
+input_path_bz = os.path.join(repo_path,'Data/Bz_Rotated')
+path_bz = input_path_bz + "/"
+parent_list_bz = os.listdir(input_path_bz)
+imagelist_bz = []
+headlist = []
+for child in parent_list_bz:
+
+
+    file = str(path_bz + child)
+    df_bz=pd.read_csv(file, sep=',',header=None)
+    image_data_bz = df_bz.values
+    imagelist_bz.append(image_data_bz)
+
+image_sum_bz = np.sum(imagelist_bz, axis=0)
+
+outpath = 'Data/Integrated_Parameters'
+
+np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_Bz.csv'),image_sum_bz.ravel(),delimiter=',') # save the LOS integrated Bz as a 1D array in a csv file
+
+
+plt.imshow(image_sum_bz,cmap='gist_gray',origin='lower')
 plt.colorbar()
-plt.title('integrated LOS B_y')
+plt.title('integrated LOS B_z')
 plt.show()

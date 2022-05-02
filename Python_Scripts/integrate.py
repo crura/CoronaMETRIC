@@ -12,6 +12,7 @@ import git
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_dir
 
+print('generating integrated electron density')
 # Generate integrated electron density
 input_path = os.path.join(repo_path,'Data/Rotated_Density_LOS')
 path = input_path + "/"
@@ -34,6 +35,7 @@ np.savetxt(os.path.join(repo_path,outpath,'Integrated_Electron_Density.csv'),ima
 
 
 # Generate integrated Bx
+print('generating LOS-integrated Bx')
 input_path_bx = os.path.join(repo_path,'Data/Bx_Rotated')
 path_bx = input_path_bx + "/"
 parent_list_bx = os.listdir(input_path_bx)
@@ -55,6 +57,7 @@ np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_Bx.csv'),image_sum_bx.
 
 
 # Generate integrated By
+print('generating LOS-integrated By')
 input_path_by = os.path.join(repo_path,'Data/By_Rotated')
 path_by = input_path_by + "/"
 parent_list_by = os.listdir(input_path_by)
@@ -76,6 +79,7 @@ np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_By.csv'),image_sum_by.
 
 
 # Generate integrated Bz
+print('generating LOS-integrated Bz')
 input_path_bz = os.path.join(repo_path,'Data/Bz_Rotated')
 path_bz = input_path_bz + "/"
 parent_list_bz = os.listdir(input_path_bz)
@@ -96,6 +100,7 @@ outpath = 'Data/Integrated_Parameters'
 np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_Bz.csv'),image_sum_bz.ravel(),delimiter=',') # save the LOS integrated Bz as a 1D array in a csv file
 
 # generate Bz vs By vector plot showing LOS-Integrated B field line tracing
+print('generating LOS Bz vs By vector plot')
 # define n x n grid with spacing dy, dz
 dy = np.linspace(0,image_data_by.shape[0]-1, image_data_by.shape[0])
 dz = np.linspace(0,image_data_bz.shape[0]-1,image_data_bz.shape[0])
@@ -115,7 +120,6 @@ plt.savefig(os.path.join(repo_path,'Data/Integrated_Parameters/Plots/LOS_Integra
 
 
 # generate Bz vs By vector plot showing Central B field line tracing
-
 center_input_path = os.path.join(repo_path,'Data/Central_Parameters')
 path_bx_central = os.path.join(center_input_path,'rotated_Bx_2d.csv')
 path_by_central = os.path.join(center_input_path,'rotated_By_2d.csv')
@@ -125,7 +129,7 @@ bx_central_image_data=pd.read_csv(path_bx_central, sep=',',header=None).values
 by_central_image_data=pd.read_csv(path_by_central, sep=',',header=None).values
 bz_central_image_data=pd.read_csv(path_bz_central, sep=',',header=None).values
 
-
+print('generating Central Bz vs By vector plot')
 # define n x n grid with spacing dy, dz
 dy = np.linspace(0,by_central_image_data.shape[0]-1, by_central_image_data.shape[0])
 dz = np.linspace(0,bz_central_image_data.shape[0]-1,bz_central_image_data.shape[0])

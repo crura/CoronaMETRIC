@@ -30,8 +30,30 @@ image_sum = np.sum(imagelist, axis=0)
 
 outpath = 'Data/Integrated_Parameters'
 
-np.savetxt(os.path.join(repo_path,outpath,'Integrated_Electron_Density.csv'),image_sum.ravel(),delimiter=',')
-plt.imshow(image_sum,norm=matplotlib.colors.LogNorm(),cmap='gist_gray',origin='lower')
+np.savetxt(os.path.join(repo_path,outpath,'Integrated_Electron_Density.csv'),image_sum.ravel(),delimiter=',') # save the integrated electron density as a 1D array in a csv file
+
+
+# Generate integrated Bx
+input_path_bx = os.path.join(repo_path,'Data/Bx_Rotated')
+path_bx = input_path_bx + "/"
+parent_list_bx = os.listdir(input_path_bx)
+imagelist_bx = []
+headlist = []
+for child in parent_list_bx:
+
+
+    file = str(path_bx + child)
+    df_bx=pd.read_csv(file, sep=',',header=None)
+    image_data_bx = df_bx.values
+    imagelist_bx.append(image_data_bx)
+
+image_sum_bx = np.sum(imagelist_bx, axis=0)
+
+outpath = 'Data/Integrated_Parameters'
+
+np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_Bx.csv'),image_sum_bx.ravel(),delimiter=',') # save the integrated electron density as a 1D array in a csv file
+
+plt.imshow(image_sum_bx,cmap='gist_gray',origin='lower')
 plt.colorbar()
-plt.title('integrated electron density')
+plt.title('integrated LOS B_x')
 plt.show()

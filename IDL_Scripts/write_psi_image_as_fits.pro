@@ -127,7 +127,22 @@ pro write_psi_image_as_fits, OutFile, Im, x, y, ObsDate, Lon, B0, $
      r = DSUN_OBS
      t = (90-B0)*!dtor
      p = Lon*!dtor
-     Carr_Vec = rtp2xyz([r,t,p])
+     Rtp_D = [r,t,p]
+     r_=0
+     t_=1
+     p_=2
+
+     x_=0
+     y_=1
+     z_=2
+
+     Xyz_D = dblarr(3)
+
+     Xyz_D[x_] = Rtp_D[r_]*cos(Rtp_D[p_])*sin(Rtp_D[t_])
+     Xyz_D[y_] = Rtp_D[r_]*sin(Rtp_D[p_])*sin(Rtp_D[t_])
+     Xyz_D[z_] = Rtp_D[r_]*cos(Rtp_D[t_])
+
+     Carr_Vec = xyz_D
 
      Coord = Carr_Vec
      convert_sunspice_coord, ObsDate, Coord, 'Carrington', 'HCI'

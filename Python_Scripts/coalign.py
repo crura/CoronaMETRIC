@@ -40,13 +40,11 @@ plt.show()
 
 
 # Import Coaligned Images
-psi_mlso_proj_pb =pd.read_csv('/Users/crura/Desktop/Research/Magnetic_Field/FORWARD_MLSO_Rotated_Data/PSI_PB_MLSO_Coalignment.csv', sep=',',header=None)
+psi_mlso_proj_pb =pd.read_csv(pathnew.parent.parent.joinpath('Data/Output/FORWARD_MLSO_Rotated_Data/PSI_MLSO_Coalignment.csv'), sep=',',header=None)
 
 
 psi_mlso_proj_pb_values = psi_mlso_proj_pb.values
 
-
-fits_dir_mlso = '/Users/crura/Desktop/Research/Magnetic_Field/Coalign/20170829_200801_kcor_l2_avg.fts'
 
 # add KCor as detector to fits file header
 from astropy.io import fits
@@ -68,5 +66,5 @@ ax2 = fig.add_subplot(1, 2, 2, projection=mlsomap)
 mlsomap.plot(axes=ax2)
 ax2.title.set_text('MLSO K-COR Observation 2017-08-29')
 ax1.title.set_text('PSI/FORWARD Synthetic Polarized Brightness Eclipse Model')
-plt.savefig('/Users/crura/Desktop/Research/Presentations/URD_22_Pictures/Model_Comparison.png')
+plt.savefig(pathnew.parent.parent.joinpath('Data/Output/FORWARD_MLSO_Rotated_Data/Plots/Model_Comparison.png'))
 plt.show()

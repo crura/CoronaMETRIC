@@ -7,6 +7,7 @@ crlt_obs = 7.1530000
 occlt = 1.0600000
 range = 6.0799999
 
+save,crln_obs,crlt_obs,occlt,range,filename='model_parameters.sav'
 ; read, crlt_obs, 'enter carrington latitude (B angle): '
 ; read, crln_obs, 'enter carrington longitude (CMER) : '
 ; read, occlt, 'enter occulting disk radius (R_Sun): '

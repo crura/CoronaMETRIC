@@ -1,15 +1,17 @@
 
-function get_2D_coord ;, Nxy, dx, dy, R_occult
+;restore, 'model_parameters.sav'
+function get_2D_coord,R_occult,range ;, Nxy, dx, dy, R_occult
 ;
 ; V. Uritsky 2021
 ;
-  R_occult = 1.06 ; this is what OCCULT is set to in generate_forward_model.pro
-  dx = 12.16/256.0 & dy = dx ; 12.16 is rsun range which is abs(rsun xmax) + abs(rsun xmin) of forward model
+  ;R_occult = OCCLT ; this is what OCCULT is set to in generate_forward_model.pro
+  im_range = range * 2
+  dx = RANGE/256.0 & dy = dx ; 12.16 is rsun range which is abs(rsun xmax) + abs(rsun xmin) of forward model
   Nxy = 256
 
   X0 = 0  & Y0 = 0; Sun's disk center
 
-  X = findgen(Nxy)*(12.16/Nxy) - 6.08 + dx/2  ; grid node positions, centered, 6.08 is rsun of forward model
+  X = findgen(Nxy)*((im_range)/Nxy) - RANGE + dx/2  ; grid node positions, centered, 6.08 is rsun of forward model
   Y = X
 
   i_arr = [0.0] & j_arr = i_arr
@@ -29,13 +31,13 @@ End
 
 ;------------------------------------------------------------
 
-function convert_psi_array, arr_1d
+function convert_psi_array, arr_1d, OCCLT, RANGE
 ;
 ; V. Uritsky 2021
 ;
 
 
- map = get_2D_coord()
+ map = get_2D_coord(OCCLT,RANGE)
 
  arr_2d = dblarr(map.Nxy, map.Nxy)
 
@@ -48,11 +50,38 @@ End
 ;------------------------------------------------------------
 
 
+;-------------------------------------------------------------------------------
+; Quick pro to take R, Theta, Phi and give xyz coords
+;-------------------------------------------------------------------------------
+
+function rtp2xyz, Rtp_D
+
+r_=0
+t_=1
+p_=2
+
+x_=0
+y_=1
+z_=2
+
+Xyz_D = dblarr(3)
+
+Xyz_D[x_] = Rtp_D[r_]*cos(Rtp_D[p_])*sin(Rtp_D[t_])
+Xyz_D[y_] = Rtp_D[r_]*sin(Rtp_D[p_])*sin(Rtp_D[t_])
+Xyz_D[z_] = Rtp_D[r_]*cos(Rtp_D[t_])
+
+return, xyz_D
+
+end
+
+
+
 function get_fordump
 
 
   ;spawn, 'cp /Users/crura/SSW/packages/forward/datadump /Users/crura/Desktop/Research/github/Image-Coalignment/Data'
   restore, '/Users/crura/SSW/packages/forward/datadump',/v
+  restore, 'model_parameters.sav'
   BX = BROBS*sin(THETA3DUSE)*cos(PHI3DUSE) + BTHOBS*cos(THETA3DUSE)*cos(PHI3DUSE) - BPHOBS*sin(PHI3DUSE)
   BY = BROBS*sin(THETA3DUSE)*sin(PHI3DUSE) + BTHOBS*cos(THETA3DUSE)*sin(PHI3DUSE) + BPHOBS*cos(PHI3DUSE)
   BZ = BROBS*cos(THETA3DUSE) - BTHOBS*sin(THETA3DUSE)
@@ -63,15 +92,15 @@ function get_fordump
 
   help,BX[78,*]
 
-  BX_2d =  convert_psi_array(BX[39,*])
-  BY_2d = convert_psi_array(BY[39,*])
-  BZ_2d = convert_psi_array(BZ[39,*])
+  BX_2d =  convert_psi_array(BX[39,*],OCCLT, RANGE)
+  BY_2d = convert_psi_array(BY[39,*],OCCLT, RANGE)
+  BZ_2d = convert_psi_array(BZ[39,*],OCCLT, RANGE)
 
-  X_2d =  convert_psi_array(X[39,*])
-  Y_2d = convert_psi_array(Y[39,*])
-  Z_2d = convert_psi_array(Z[39,*])
+  X_2d =  convert_psi_array(X[39,*],OCCLT, RANGE)
+  Y_2d = convert_psi_array(Y[39,*],OCCLT, RANGE)
+  Z_2d = convert_psi_array(Z[39,*],OCCLT, RANGE)
 
-  Dens_2d_center = convert_psi_array(DENSOBS[39,*])
+  Dens_2d_center = convert_psi_array(DENSOBS[39,*],OCCLT, RANGE)
 
   save,Dens_2d_center,filename='/Users/crura/Desktop/Research/github/Image-Coalignment/Data/Electron_Density_Center.sav'
 
@@ -105,12 +134,12 @@ function get_fordump
   ;endif
 
 
-  rho_new = convert_psi_array(DENSOBS)
-  thetanew = convert_psi_array(THETA3DUSE)
-  phinew = convert_psi_array(PHI3DUSE)
-  BXnew =  convert_psi_array(BX)
-  BYnew = convert_psi_array(BY)
-  BZnew = convert_psi_array(BZ)
+  rho_new = convert_psi_array(DENSOBS,OCCLT, RANGE)
+  thetanew = convert_psi_array(THETA3DUSE,OCCLT, RANGE)
+  phinew = convert_psi_array(PHI3DUSE,OCCLT, RANGE)
+  BXnew =  convert_psi_array(BX,OCCLT, RANGE)
+  BYnew = convert_psi_array(BY,OCCLT, RANGE)
+  BZnew = convert_psi_array(BZ,OCCLT, RANGE)
 
 
   for j=0, 255 do $
@@ -132,10 +161,10 @@ function get_fordump
 
    for i =0,78 do begin
     jstring = STRTRIM(i,2)
-    rho_xyzproj = convert_psi_array(DENSOBS[i,*])
-    BX_2d =  convert_psi_array(BX[i,*])
-    BY_2d = convert_psi_array(BY[i,*])
-    BZ_2d = convert_psi_array(BZ[i,*])
+    rho_xyzproj = convert_psi_array(DENSOBS[i,*],OCCLT, RANGE)
+    BX_2d =  convert_psi_array(BX[i,*],OCCLT, RANGE)
+    BY_2d = convert_psi_array(BY[i,*],OCCLT, RANGE)
+    BZ_2d = convert_psi_array(BZ[i,*],OCCLT, RANGE)
     spath = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/Rotated_Density_LOS/Frame_' + jstring + '.csv'
     spath1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/Bx_Rotated/Frame_' + jstring + '.csv'
     spath2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/By_Rotated/Frame_' + jstring + '.csv'

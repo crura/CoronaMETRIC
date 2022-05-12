@@ -61,7 +61,7 @@ function get_fordump
   Y =R3DUSE*sin(THETA3DUSE)*sin(PHI3DUSE) + THETA3DUSE*cos(THETA3DUSE)*sin(PHI3DUSE) + PHI3DUSE*cos(PHI3DUSE)
   Z =R3DUSE*cos(THETA3DUSE) - THETA3DUSE*sin(THETA3DUSE)
 
-  help,BX[78,*]
+  ;help,BX[78,*]
 
   BX_2d =  convert_psi_array(BX[39,*])
   BY_2d = convert_psi_array(BY[39,*])
@@ -148,6 +148,6 @@ function get_fordump
    endfor
 
  ;write_csv,'DENSROTATED.csv',rho_xyzproj
- return,X_2d
+ return,0
 
 End

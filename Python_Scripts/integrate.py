@@ -8,7 +8,15 @@ from tqdm import tqdm_notebook
 import pandas as pd
 import matplotlib as mpl
 import git
+from scipy.io import readsav
 
+idl_save = readsav('/Users/crura/model_parameters.sav')
+crln_obs = idl_save['crln_obs']
+crlt_obs = idl_save['crlt_obs']
+occlt = idl_save['occlt']
+r_sun_range = idl_save['range']
+
+params = str(crln_obs) + '_' +  str(crlt_obs)
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_dir
 
@@ -115,7 +123,7 @@ plt.ylim(80,175)
 plt.title('Vector Plot of MLSO Rotated LOS-Integrated By , Bz')
 plt.xlabel('Y Position')
 plt.ylabel('Z Position')
-plt.savefig(os.path.join(repo_path,'Data/Integrated_Parameters/Plots/LOS_Integrated_By_Bz_Vector_Plot.png'))
+plt.savefig(os.path.join(repo_path,'Data/Integrated_Parameters/Plots/LOS_Integrated_By_Bz_Vector_Plot' + params + '.png'))
 plt.close()
 
 
@@ -145,14 +153,14 @@ plt.ylim(80,175)
 plt.title('Vector Plot of MLSO Rotated Central By , Bz')
 plt.xlabel('Y Position')
 plt.ylabel('Z Position')
-plt.savefig(os.path.join(repo_path,'Data/Central_Parameters/Plots/Central_By_Bz_Vector_Plot.png'))
+plt.savefig(os.path.join(repo_path,'Data/Central_Parameters/Plots/Central_By_Bz_Vector_Plot' + params + '.png'))
 plt.close()
 
 
 plt.imshow(image_sum,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
 plt.colorbar(label='log scale electron density')
 plt.title('LOS Integrated Electron Density')
-plt.savefig(os.path.join(repo_path,'Data/Integrated_Parameters/Plots/LOS_Integrated_Electron_Density.png'))
+plt.savefig(os.path.join(repo_path,'Data/Integrated_Parameters/Plots/LOS_Integrated_Electron_Density' + params + '.png'))
 plt.close()
 
 path_dens_central = os.path.join(center_input_path,'rotated_Dens_2d.csv')
@@ -161,7 +169,7 @@ arrDens_central = dfDens_central.values
 plt.imshow(arrDens_central,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
 plt.colorbar(label='log scale electron density')
 plt.title('Central Electron Density')
-plt.savefig(os.path.join(repo_path,'Data/Central_Parameters/Plots/Central_Electron_Density.png'))
+plt.savefig(os.path.join(repo_path,'Data/Central_Parameters/Plots/Central_Electron_Density' + params + '.png'))
 plt.close()
 
 path_dens_forward = os.path.join(repo_path,'Data/Forward_PB_data.csv')
@@ -170,5 +178,5 @@ arrDens_forward = dfDens_forward.values
 plt.imshow(arrDens_forward,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
 plt.colorbar(label='log scale electron density')
 plt.title('Forward Electron Density')
-plt.savefig(os.path.join(repo_path,'Data/Forward_Parameters/Plots/Forward_Electron_Density.png'))
+plt.savefig(os.path.join(repo_path,'Data/Forward_Parameters/Plots/Forward_Electron_Density_' + params + '.png'))
 plt.close()

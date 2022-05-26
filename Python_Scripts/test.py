@@ -1,6 +1,8 @@
-from integrate import arrDens_central, params
+from integrate import arrDens_central, params, image_sum
 from scipy.io import readsav
 import unittest
+import matplotlib.pyplot as plt
+import matplotlib
 
 class TestDataConsistency(unittest.TestCase):
 
@@ -19,7 +21,14 @@ class TestDataConsistency(unittest.TestCase):
     def test_electron_density_center(self):
         for i in range(arrDens_central.shape[0]):
             for j in range(arrDens_central.shape[0]):
+                # assert arrays are equivalent to within six decimal places
                 self.assertAlmostEqual(self.output_dens_2d_center[i][j],arrDens_central[i][j],6)
+
+    def test_electron_density_integrated(self):
+        for i in range(image_sum.shape[0]):
+            for j in range(image_sum.shape[0]):
+                # assert arrays are equivalent to within six decimal places
+                self.assertAlmostEqual(self.output_dens_integrated_2d[i][j],image_sum[i][j],6)
 
 if __name__ == '__main__':
     unittest.main()

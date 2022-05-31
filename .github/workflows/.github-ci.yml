@@ -33,4 +33,4 @@ jobs:
       - name: Run a multi-line script
         run: |
           tcsh
-          setenv SSW /Users/crura/SSW
+          tcsh -c "setenv SSW /Users/crura/SSW"

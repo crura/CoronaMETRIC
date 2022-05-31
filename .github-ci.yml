@@ -1,0 +1,5 @@
+build-idl (tcsh):
+  stage: build
+  runs-on: self-hosted
+  script:
+    - echo "hello world"

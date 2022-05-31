@@ -35,7 +35,7 @@ jobs:
         env:
           ACTIONS_RUNNER_HOOK_JOB_STARTED: /Users/crura/Documents/bin/ssw
         run: |
-          /Users/crura/Documents/bin/ssw | ssw_path
+          /Users/crura/Documents/bin/ssw -e ssw_path
           # tcsh -c "setenv SSW /Users/crura/SSW"
           # tcsh -c "source /Users/crura/SSW/gen/setup/setup.ssw \loud"
           # tcsh -c "setenv IDL_DIR /Applications/harris/idl88"

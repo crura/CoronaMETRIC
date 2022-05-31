@@ -13,6 +13,8 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+  ACTIONS_RUNNER_HOOK_JOB_STARTED=
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -31,8 +33,10 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
+        env:
+          ACTIONS_RUNNER_HOOK_JOB_STARTED: /Users/crura/Documents/bin/ssw
         run: |
-          /Users/crura/Documents/bin/ssw
+          ssw_path
           # tcsh -c "setenv SSW /Users/crura/SSW"
           # tcsh -c "source /Users/crura/SSW/gen/setup/setup.ssw \loud"
           # tcsh -c "setenv IDL_DIR /Applications/harris/idl88"

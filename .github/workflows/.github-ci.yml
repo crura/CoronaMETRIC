@@ -52,6 +52,14 @@ jobs:
           echo "ssw_path, '/Users/crura/SSW/trace'" &&
           echo "ssw_path, '//Users/crura/SSW/vobs'" &&
           echo "ssw_path, '/Users/crura/SSW/packages'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/idlroutines/download.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/packages/forward/idl/DEFAULTS/for_settingdefaults.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/util/default.pro'" &&
+          echo ".compile -v '/Users/crura/IDLWorkspace/Default/linspace.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/Magnetic_Field/write_psi_image_as_fits.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/Magnetic_Field/write_psi_fits.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/Magnetic_Field/write_psi_mlso_fits.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/Magnetic_Field/rtp2xyz.pro'" &&
           cat) |
           /Users/crura/Documents/bin/ssw
           # tcsh -c "setenv SSW /Users/crura/SSW"

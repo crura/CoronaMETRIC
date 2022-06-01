@@ -77,4 +77,6 @@ jobs:
 
       - name: run integration code
 
-        run: python Python_Scripts/integrate.py
+        run: |
+          conda activate test_env &&
+          python Python_Scripts/integrate.py

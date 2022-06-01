@@ -67,3 +67,14 @@ jobs:
           echo "get_fordump()" &&
           cat) |
           /Users/crura/Documents/bin/ssw
+
+  python-build:
+    needs: build
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: run integration code
+
+        run: pwd

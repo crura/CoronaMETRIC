@@ -77,4 +77,4 @@ jobs:
 
       - name: run integration code
 
-        run: pwd
+        run: python Python_Scripts/integrate.py

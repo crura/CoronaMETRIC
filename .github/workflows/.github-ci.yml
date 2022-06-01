@@ -60,6 +60,9 @@ jobs:
           echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_fits.pro'" &&
           echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_mlso_fits.pro'" &&
           echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/rtp2xyz.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/generate_forward_model.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/get_fordump.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/image_coalignment.pro'" &&
           cat) |
           /Users/crura/Documents/bin/ssw
           # tcsh -c "setenv SSW /Users/crura/SSW"

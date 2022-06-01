@@ -63,7 +63,7 @@ jobs:
           echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/generate_forward_model.pro'" &&
           echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/get_fordump.pro'" &&
           echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/image_coalignment.pro'" &&
-          echo "generate_forward_model()"" &&
+          echo "generate_forward_model()" &&
           echo "get_fordump()" &&
           cat) |
           /Users/crura/Documents/bin/ssw

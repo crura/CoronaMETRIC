@@ -40,18 +40,18 @@ jobs:
           echo ".compile -v '/Users/crura/SSW/gen/idl/system/strrep_logenv.pro'" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/string/prstr.pro'" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/genutil/uniqo.pro'" &&
-          echo "ssw_path, "/Users/crura/SSW/gen"" &&
-          echo "ssw_path, "/Users/crura/SSW/hinode"" &&
-          echo "ssw_path, "/Users/crura/SSW/offline"" &&
-          echo "ssw_path, "/Users/crura/SSW/proba2"" &&
-          echo "ssw_path, "/Users/crura/SSW/sdo"" &&
-          echo "ssw_path, "/Users/crura/SSW/site"" &&
-          echo "ssw_path, "/Users/crura/SSW/so"" &&
-          echo "ssw_path, "/Users/crura/SSW/soho"" &&
-          echo "ssw_path, "/Users/crura/SSW/stereo"" &&
-          echo "ssw_path, "/Users/crura/SSW/trace"" &&
-          echo "ssw_path, "//Users/crura/SSW/vobs"" &&
-          echo "ssw_path, "/Users/crura/SSW/packages"" &&
+          echo "ssw_path, '/Users/crura/SSW/gen'" &&
+          echo "ssw_path, '/Users/crura/SSW/hinode'" &&
+          echo "ssw_path, '/Users/crura/SSW/offline'" &&
+          echo "ssw_path, '/Users/crura/SSW/proba2'" &&
+          echo "ssw_path, '/Users/crura/SSW/sdo'" &&
+          echo "ssw_path, '/Users/crura/SSW/site'" &&
+          echo "ssw_path, '/Users/crura/SSW/so'" &&
+          echo "ssw_path, '/Users/crura/SSW/soho'" &&
+          echo "ssw_path, '/Users/crura/SSW/stereo'" &&
+          echo "ssw_path, '/Users/crura/SSW/trace'" &&
+          echo "ssw_path, '//Users/crura/SSW/vobs'" &&
+          echo "ssw_path, '/Users/crura/SSW/packages'" &&
           cat) |
           /Users/crura/Documents/bin/ssw
           # tcsh -c "setenv SSW /Users/crura/SSW"

@@ -35,7 +35,9 @@ jobs:
         env:
           ACTIONS_RUNNER_HOOK_JOB_STARTED: /Users/crura/Documents/bin/ssw
         run: |
-          (echo "ssw_path" && echo ".compile -v '/Users/crura/SSW/gen/idl/system/strrep_logenv.pro'" &&
+          (echo ".compile -v '/Users/crura/SSW/gen/idl/string/strjustify.pro'" &&
+          echo "ssw_path" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/system/strrep_logenv.pro'" &&
           cat) |
           /Users/crura/Documents/bin/ssw
           # tcsh -c "setenv SSW /Users/crura/SSW"

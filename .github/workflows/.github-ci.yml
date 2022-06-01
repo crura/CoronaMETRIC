@@ -78,6 +78,7 @@ jobs:
       - name: run integration code
 
         run: |
+          source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
           conda init bash &&
           conda activate test_env &&
           python Python_Scripts/integrate.py

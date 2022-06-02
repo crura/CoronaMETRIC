@@ -71,7 +71,11 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: my-artifact
-          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
+          path: |
+            /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Rotated_Density_LOS
+            /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Bx_Rotated
+            /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/By_Rotated
+            /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Bz_Rotated
 
   python-build:
     needs: build
@@ -82,8 +86,12 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: my-artifact
-          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
+          name: my-artifacts
+          path: |
+            /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Rotated_Density_LOS
+            /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Bx_Rotated
+            /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/By_Rotated
+            /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Bz_Rotated
 
       - name: run integration code
 

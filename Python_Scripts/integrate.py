@@ -24,6 +24,8 @@ params = str(crlt_obs_print,'utf-8') + '_' +  str(crln_obs_print,'utf-8')
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_dir
 
+print(repo_path,repo.working_tree_dir)
+
 print('generating integrated electron density')
 # Generate integrated electron density
 input_path = os.path.join(repo_path,'Data/Rotated_Density_LOS')

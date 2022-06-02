@@ -30,6 +30,27 @@ jobs:
       - name: Run a one-line script
         run: echo Hello, world!
 
+      - name: Delete Old Artifacts
+        uses: actions/github-script@v6
+        id: artifact
+        with:
+          script: |
+            const res = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
+
+            res.data.artifacts
+              .forEach(({ id }) => {
+                github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: id,
+                })
+              })
+Copy
+
+
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         env:
@@ -112,7 +133,7 @@ jobs:
         with:
           name: my-artifact
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
-          
+
       - uses: actions/download-artifact@v3
         with:
           name: python-artifact

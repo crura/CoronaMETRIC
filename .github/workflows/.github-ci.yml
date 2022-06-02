@@ -48,7 +48,6 @@ jobs:
                   artifact_id: id,
                 })
               })
-Copy
 
 
       # Runs a set of commands using the runners shell

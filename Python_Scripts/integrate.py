@@ -22,9 +22,7 @@ r_sun_range = idl_save['range']
 
 params = str(crlt_obs_print,'utf-8') + '_' +  str(crln_obs_print,'utf-8')
 repo = git.Repo('.', search_parent_directories=True)
-repo_path = repo.working_dir
-
-print(repo_path,repo.working_tree_dir)
+repo_path = repo.working_tree_dir
 
 print('generating integrated electron density')
 # Generate integrated electron density

@@ -68,12 +68,22 @@ jobs:
           cat) |
           /Users/crura/Documents/bin/ssw
 
+      - uses: actions/upload-artifact@cicd_configuration
+        with:
+          name: my-artifact
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
+
   python-build:
     needs: build
     runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@cicd_configuration
+        with:
+          name: my-artifact
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
 
       - name: run integration code
 

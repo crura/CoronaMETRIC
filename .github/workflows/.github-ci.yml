@@ -68,7 +68,7 @@ jobs:
           cat) |
           /Users/crura/Documents/bin/ssw
 
-      - uses: actions/upload-artifact@cicd_configuration
+      - uses: actions/upload-artifact@v3
         with:
           name: my-artifact
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
@@ -80,7 +80,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/download-artifact@cicd_configuration
+      - uses: actions/download-artifact@v3
         with:
           name: my-artifact
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data

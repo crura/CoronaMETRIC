@@ -78,12 +78,12 @@ function get_fordump
 
   save,BX_2d,filename= git_repo + '/Data/Bx_2d_Center.sav'
   save,BY_2d,filename= git_repo + '/Data/By_2d_Center.sav'
-  save,BZ_2d,filename= git repo + '/Data/Bz_2d_Center.sav'
+  save,BZ_2d,filename= git_repo + '/Data/Bz_2d_Center.sav'
 
-  write_csv, git repo + '/Data/Central_Parameters/rotated_Bx_2d.csv',BX_2d
-  write_csv, git repo + '/Data/Central_Parameters/rotated_By_2d.csv',BY_2d
-  write_csv, git repo + '/Data/Central_Parameters/rotated_Bz_2d.csv',BZ_2d
-  write_csv, git repo + '/Data/Central_Parameters/rotated_Dens_2d.csv',Dens_2d_center
+  write_csv, git_repo + '/Data/Central_Parameters/rotated_Bx_2d.csv',BX_2d
+  write_csv, git_repo + '/Data/Central_Parameters/rotated_By_2d.csv',BY_2d
+  write_csv, git_repo + '/Data/Central_Parameters/rotated_Bz_2d.csv',BZ_2d
+  write_csv, git_repo + '/Data/Central_Parameters/rotated_Dens_2d.csv',Dens_2d_center
 
   ;write_csv,'rotated_x_2dtest.csv',X_2d
   ;write_csv,'rotated_y_2dtest.csv',Y_2d
@@ -137,10 +137,10 @@ function get_fordump
     BX_2d =  convert_psi_array(BX[i,*])
     BY_2d = convert_psi_array(BY[i,*])
     BZ_2d = convert_psi_array(BZ[i,*])
-    spath =  git repo + '/Data/Rotated_Density_LOS/Frame_' + jstring + '.csv'
-    spath1 =  git repo + '/Data/Bx_Rotated/Frame_' + jstring + '.csv'
-    spath2 =  git repo + '/Data/By_Rotated/Frame_' + jstring + '.csv'
-    spath3 =  git repo + '/Data/Bz_Rotated/Frame_' + jstring + '.csv'
+    spath =  git_repo + '/Data/Rotated_Density_LOS/Frame_' + jstring + '.csv'
+    spath1 =  git_repo + '/Data/Bx_Rotated/Frame_' + jstring + '.csv'
+    spath2 =  git_repo + '/Data/By_Rotated/Frame_' + jstring + '.csv'
+    spath3 =  git_repo + '/Data/Bz_Rotated/Frame_' + jstring + '.csv'
     write_csv,spath,rho_xyzproj
     write_csv,spath1,BX_2d
     write_csv,spath2,BY_2d

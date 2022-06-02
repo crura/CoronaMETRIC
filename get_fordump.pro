@@ -131,6 +131,10 @@ function get_fordump
 
    densarr = fltarr(256,256)
 
+   spawn, 'rm -r ' + git_repo + '/Data/Rotated_Density_LOS; mkdir ' + git_repo + '/Data/Rotated_Density_LOS'
+   spawn, 'rm -r ' + git_repo + '/Data/Bx_Rotated; mkdir ' + git_repo + '/Data/Bx_Rotated'
+   spawn, 'rm -r ' + git_repo + '/Data/By_Rotated; mkdir ' + git_repo + '/Data/By_Rotated'
+   spawn, 'rm -r ' + git_repo + '/Data/Bz_Rotated; mkdir ' + git_repo + '/Data/Bz_Rotated'
    for i =0,78 do begin
     jstring = STRTRIM(i,2)
     rho_xyzproj = convert_psi_array(DENSOBS[i,*])

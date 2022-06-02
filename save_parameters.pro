@@ -1,13 +1,14 @@
 function save_parameters
 
-  restore,'/Users/crura/Desktop/Research/github/Image-Coalignment/Data/Electron_Density_Center.sav',/v
-  restore,'/Users/crura/Desktop/Research/github/Image-Coalignment/Data/Bx_2d_Center.sav',/v
-  restore,'/Users/crura/Desktop/Research/github/Image-Coalignment/Data/By_2d_Center.sav',/v
-  restore,'/Users/crura/Desktop/Research/github/Image-Coalignment/Data/Bz_2d_Center.sav',/v
-  restore, '/Users/crura/SSW/packages/forward/datadump',/v
-  restore, 'model_parameters.sav',/v
-
   spawn, 'git rev-parse --show-toplevel', git_repo
+
+  restore, git_repo + '/Data/Electron_Density_Center.sav',/v
+  restore, git_repo + '/Data/Bx_2d_Center.sav',/v
+  restore, git_repo + '/Data/By_2d_Center.sav',/v
+  restore, git_repo + '/Data/Bz_2d_Center.sav',/v
+  restore, '/Users/crura/SSW/packages/forward/datadump',/v
+  restore, git_repo + '/model_parameters.sav',/v
+
 
   out_string = strcompress(string(CRLT_OBS),/remove_all) + '_' + strcompress(string(CRLN_OBS),/remove_all) + '.sav'
   out_path = git_repo + '/Data'

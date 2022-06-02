@@ -92,3 +92,70 @@ jobs:
           conda init bash &&
           conda activate test_env &&
           python Python_Scripts/integrate.py
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: python-artifact
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Integrated_Parameters
+
+  save-parameters:
+    # The type of runner that the job will run on
+    needs: python-build
+    runs-on: self-hosted
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: python-artifact
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Integrated_Parameters
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        env:
+          ACTIONS_RUNNER_HOOK_JOB_STARTED: /Users/crura/Documents/bin/ssw
+        run: |
+          (echo "ssw_path" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/string/strjustify.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/system/strrep_logenv.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/string/prstr.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/genutil/uniqo.pro'" &&
+          echo "ssw_path, '/Users/crura/SSW/gen'" &&
+          echo "ssw_path, '/Users/crura/SSW/hinode'" &&
+          echo "ssw_path, '/Users/crura/SSW/offline'" &&
+          echo "ssw_path, '/Users/crura/SSW/proba2'" &&
+          echo "ssw_path, '/Users/crura/SSW/sdo'" &&
+          echo "ssw_path, '/Users/crura/SSW/site'" &&
+          echo "ssw_path, '/Users/crura/SSW/so'" &&
+          echo "ssw_path, '/Users/crura/SSW/soho'" &&
+          echo "ssw_path, '/Users/crura/SSW/stereo'" &&
+          echo "ssw_path, '/Users/crura/SSW/trace'" &&
+          echo "ssw_path, '//Users/crura/SSW/vobs'" &&
+          echo "ssw_path, '/Users/crura/SSW/packages'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/idlroutines/download.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/packages/forward/idl/DEFAULTS/for_settingdefaults.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/util/default.pro'" &&
+          echo ".compile -v '/Users/crura/IDLWorkspace/Default/linspace.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_image_as_fits.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_fits.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_mlso_fits.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/rtp2xyz.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/generate_forward_model.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/get_fordump.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/image_coalignment.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/save_parameters.pro'" &&
+          echo "save_parameters()" &&
+          cat) |
+          /Users/crura/Documents/bin/ssw
+
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: my-artifact
+      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data

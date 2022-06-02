@@ -49,6 +49,10 @@ jobs:
                 })
               })
 
+      - name: Delete Artifact
+        uses: GeekyEggo/delete-artifact@v1.0.0
+
+
 
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script

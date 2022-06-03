@@ -12,7 +12,7 @@ range = 6.0799999
 
 crlt_obs_print = strcompress(string(CRLT_OBS),/remove_all)
 crln_obs_print = strcompress(string(CRLN_OBS),/remove_all)
-save,crln_obs,crlt_obs,occlt,range,crlt_obs_print,crln_obs_print,filename=git_repo + '/model_parameters.sav'
+save,crln_obs,crlt_obs,occlt,range,crlt_obs_print,crln_obs_print,filename=git_repo + '/Data/model_parameters.sav'
 ; read, crlt_obs, 'enter carrington latitude (B angle): '
 ; read, crln_obs, 'enter carrington longitude (CMER) : '
 ; read, occlt, 'enter occulting disk radius (R_Sun): '

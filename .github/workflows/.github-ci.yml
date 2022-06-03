@@ -147,6 +147,11 @@ jobs:
           name: python-artifact
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Integrated_Parameters
 
+      - uses: actions/download-artifact@v3
+        with:
+          name: model-parameters
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/model_parameters.sav
+
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: echo Hello, world!

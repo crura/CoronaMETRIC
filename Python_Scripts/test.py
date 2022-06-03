@@ -4,6 +4,7 @@ import unittest
 import matplotlib.pyplot as plt
 import matplotlib
 import git
+import os
 
 class TestDataConsistency(unittest.TestCase):
 

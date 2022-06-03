@@ -1,4 +1,4 @@
-# This is a basic workflow to help you get started with Actions
+output-data# This is a basic workflow to help you get started with Actions
 
 name: CI
 
@@ -120,7 +120,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: python-artifact
+          name: python-plots
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Integrated_Parameters
 
   save-parameters:
@@ -140,7 +140,7 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: python-artifact
+          name: python-plots
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Integrated_Parameters
 
       # - uses: actions/download-artifact@v3
@@ -189,7 +189,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: parameters-artifact
+          name: output-data
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
 
       # - uses: actions/upload-artifact@v3
@@ -206,7 +206,7 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: parameters-artifact
+          name: output-data
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
 
       - uses: actions/download-artifact@v3

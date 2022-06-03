@@ -3,11 +3,14 @@ from scipy.io import readsav
 import unittest
 import matplotlib.pyplot as plt
 import matplotlib
+import git
 
 class TestDataConsistency(unittest.TestCase):
 
     def setUp(self):
-        self.idl_save_output = readsav('/Users/crura/Desktop/Research/github/Image-Coalignment/Data/{}.sav'.format(params))
+        repo = git.Repo('.', search_parent_directories=True)
+        repo_path = repo.working_tree_dir
+        self.idl_save_output = readsav(os.path.join(repo_path,'Data/{}.sav'.format(params)))
         self.output_dens_2d_center = self.idl_save_output['dens_2d_center']
         self.output_dens_integrated_2d = self.idl_save_output['dens_integrated_2d']
         self.output_forward_pb_image = self.idl_save_output['forward_pb_image']

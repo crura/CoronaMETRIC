@@ -11,7 +11,9 @@ import git
 from scipy.io import readsav
 import unittest
 
-
+repo = git.Repo('.', search_parent_directories=True)
+repo_path = repo.working_tree_dir
+idl_save = readsav(os.path.join(repo_path,'Data/model_parameters.sav'))
 idl_save = readsav('/Users/crura/model_parameters.sav')
 crln_obs = idl_save['crln_obs']
 crlt_obs = idl_save['crlt_obs']

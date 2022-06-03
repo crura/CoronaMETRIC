@@ -184,7 +184,33 @@ jobs:
           cat) |
           /Users/crura/Documents/bin/ssw
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: parameters-artifact
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
+
       # - uses: actions/upload-artifact@v3
       #   with:
       #     name: my-artifact
       #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
+
+  unit-test:
+    needs: save-parameters
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: parameters-artifact
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
+
+      - name: perform unit tests
+
+        run: |
+          source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
+          conda init bash &&
+          conda activate test_env &&
+          cd Python_Scripts
+          python -m unittest

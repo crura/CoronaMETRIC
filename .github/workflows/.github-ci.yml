@@ -97,6 +97,11 @@ jobs:
           name: my-artifact
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: model-parameters
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/model_parameters.sav
+
   python-build:
     needs: build
     runs-on: self-hosted
@@ -205,6 +210,11 @@ jobs:
         with:
           name: parameters-artifact
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: model-parameters
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/model_parameters.sav
 
       - name: perform unit tests
 

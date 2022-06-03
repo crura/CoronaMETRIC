@@ -29,10 +29,10 @@ function save_parameters
   bx_integrated = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_LOS_Bx.csv')
   bx_2d_integrated = reform(bx_integrated.field1,256,256)
 
-  by_integrated = read_csv(git_repo + 'Data/Integrated_Parameters/Integrated_LOS_By.csv')
+  by_integrated = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_LOS_By.csv')
   by_2d_integrated = reform(by_integrated.field1,256,256)
 
-  bz_integrated = read_csv(git_repo + 'Data/Integrated_Parameters/Integrated_LOS_Bz.csv')
+  bz_integrated = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_LOS_Bz.csv')
   bz_2d_integrated = reform(bz_integrated.field1,256,256)
 
   restore, '/Users/crura/SSW/packages/forward/output.sav',/v

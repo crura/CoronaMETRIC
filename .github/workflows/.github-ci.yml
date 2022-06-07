@@ -1,0 +1,224 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ cicd_configuration ]
+  pull_request:
+    branches: [ cicd_configuration ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  IDL-build:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # - name: Delete Old Artifacts
+      #   uses: actions/github-script@v6
+      #   id: artifact
+      #   with:
+      #     script: |
+      #       const res = await github.rest.actions.listArtifactsForRepo({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #       })
+      #
+      #       res.data.artifacts
+      #         .forEach(({ id }) => {
+      #           github.rest.actions.deleteArtifact({
+      #             owner: context.repo.owner,
+      #             repo: context.repo.repo,
+      #             artifact_id: id,
+      #           })
+      #         })
+      #
+      # - name: Delete Artifact
+      #   uses: GeekyEggo/delete-artifact@v1.0.0
+
+
+
+      # Runs a set of commands using the runners shell
+      - name: Generate forward model and data slices
+        env:
+          ACTIONS_RUNNER_HOOK_JOB_STARTED: /Users/crura/Documents/bin/ssw
+        run: |
+          (echo "ssw_path" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/string/strjustify.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/system/strrep_logenv.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/string/prstr.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/genutil/uniqo.pro'" &&
+          echo "ssw_path, '/Users/crura/SSW/gen'" &&
+          echo "ssw_path, '/Users/crura/SSW/hinode'" &&
+          echo "ssw_path, '/Users/crura/SSW/offline'" &&
+          echo "ssw_path, '/Users/crura/SSW/proba2'" &&
+          echo "ssw_path, '/Users/crura/SSW/sdo'" &&
+          echo "ssw_path, '/Users/crura/SSW/site'" &&
+          echo "ssw_path, '/Users/crura/SSW/so'" &&
+          echo "ssw_path, '/Users/crura/SSW/soho'" &&
+          echo "ssw_path, '/Users/crura/SSW/stereo'" &&
+          echo "ssw_path, '/Users/crura/SSW/trace'" &&
+          echo "ssw_path, '//Users/crura/SSW/vobs'" &&
+          echo "ssw_path, '/Users/crura/SSW/packages'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/idlroutines/download.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/packages/forward/idl/DEFAULTS/for_settingdefaults.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/util/default.pro'" &&
+          echo ".compile -v '/Users/crura/IDLWorkspace/Default/linspace.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_image_as_fits.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_fits.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_mlso_fits.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/rtp2xyz.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/generate_forward_model.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/get_fordump.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/image_coalignment.pro'" &&
+          echo "generate_forward_model()" &&
+          echo "get_fordump()" &&
+          cat) |
+          /Users/crura/Documents/bin/ssw
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: my-artifact
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
+
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: model-parameters
+      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/model_parameters.sav
+
+  Python-build:
+    needs: IDL-build
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: my-artifact
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
+
+      - name: Integrate Data Slices and Generate LOS Data
+
+        run: |
+          source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
+          conda init bash &&
+          conda activate test_env &&
+          python Python_Scripts/integrate.py
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: python-plots
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Integrated_Parameters
+
+  save-parameters:
+    # The type of runner that the job will run on
+    needs: Python-build
+    runs-on: self-hosted
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: my-artifact
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: python-plots
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Integrated_Parameters
+
+      # - uses: actions/download-artifact@v3
+      #   with:
+      #     name: model-parameters
+      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/model_parameters.sav
+
+
+      # Runs a set of commands using the runners shell
+      - name: Save Model Parameters
+        env:
+          ACTIONS_RUNNER_HOOK_JOB_STARTED: /Users/crura/Documents/bin/ssw
+        run: |
+          (echo "ssw_path" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/string/strjustify.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/system/strrep_logenv.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/string/prstr.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/genutil/uniqo.pro'" &&
+          echo "ssw_path, '/Users/crura/SSW/gen'" &&
+          echo "ssw_path, '/Users/crura/SSW/hinode'" &&
+          echo "ssw_path, '/Users/crura/SSW/offline'" &&
+          echo "ssw_path, '/Users/crura/SSW/proba2'" &&
+          echo "ssw_path, '/Users/crura/SSW/sdo'" &&
+          echo "ssw_path, '/Users/crura/SSW/site'" &&
+          echo "ssw_path, '/Users/crura/SSW/so'" &&
+          echo "ssw_path, '/Users/crura/SSW/soho'" &&
+          echo "ssw_path, '/Users/crura/SSW/stereo'" &&
+          echo "ssw_path, '/Users/crura/SSW/trace'" &&
+          echo "ssw_path, '//Users/crura/SSW/vobs'" &&
+          echo "ssw_path, '/Users/crura/SSW/packages'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/idlroutines/download.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/packages/forward/idl/DEFAULTS/for_settingdefaults.pro'" &&
+          echo ".compile -v '/Users/crura/SSW/gen/idl/util/default.pro'" &&
+          echo ".compile -v '/Users/crura/IDLWorkspace/Default/linspace.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_image_as_fits.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_fits.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_mlso_fits.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/rtp2xyz.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/generate_forward_model.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/get_fordump.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/image_coalignment.pro'" &&
+          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/save_parameters.pro'" &&
+          echo "save_parameters()" &&
+          cat) |
+          /Users/crura/Documents/bin/ssw
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: output-data
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
+
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: my-artifact
+      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
+
+  unit-test:
+    needs: save-parameters
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: output-data
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: my-artifact
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
+
+      - name: Perform Unit Tests
+
+        run: |
+          source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
+          conda init bash &&
+          conda activate test_env &&
+          cd Python_Scripts
+          python -m unittest

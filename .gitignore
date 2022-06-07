@@ -3,6 +3,9 @@ datadump
 Data/Bx_Rotated
 Data/By_Rotated
 Data/Bz_Rotated
+Data/Central_Parameters
+Data/Forward_Parameters
+Data/Integrated_Parameters
 Data/Rotated_Density_LOS
 Data/Bx_2d_Center.sav
 Data/By_2d_Center.sav
@@ -15,3 +18,6 @@ Data/Forward_Parameters/*.csv
 Data/7.15300_183.443.sav
 Data/7.15300_243.443.sav
 Data/Forward_PB_data.csv
+Data/*.sav
+Python_Scripts/__pycache__
+Output

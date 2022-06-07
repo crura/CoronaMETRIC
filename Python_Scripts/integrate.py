@@ -11,8 +11,9 @@ import git
 from scipy.io import readsav
 import unittest
 
-
-idl_save = readsav('/Users/crura/model_parameters.sav')
+repo = git.Repo('.', search_parent_directories=True)
+repo_path = repo.working_tree_dir
+idl_save = readsav(os.path.join(repo_path,'Data/model_parameters.sav'))
 crln_obs = idl_save['crln_obs']
 crlt_obs = idl_save['crlt_obs']
 crln_obs_print = idl_save['crln_obs_print']
@@ -22,7 +23,7 @@ r_sun_range = idl_save['range']
 
 params = str(crlt_obs_print,'utf-8') + '_' +  str(crln_obs_print,'utf-8')
 repo = git.Repo('.', search_parent_directories=True)
-repo_path = repo.working_dir
+repo_path = repo.working_tree_dir
 
 print('generating integrated electron density')
 # Generate integrated electron density

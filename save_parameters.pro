@@ -13,7 +13,7 @@ function save_parameters
   out_string = strcompress(string(CRLT_OBS),/remove_all) + '_' + strcompress(string(CRLN_OBS),/remove_all) + '.sav'
   out_path = git_repo + '/Output'
 ; need to generate if statement to execute this if Output directory does not exist
-  spawn, 'mkdir -p' + out_path
+  spawn, 'mkdir -p ' + out_path
   str = [out_path,out_string]
   save_path = str.join('/')
 

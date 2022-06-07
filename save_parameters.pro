@@ -22,9 +22,6 @@ function save_parameters
   BZ_2d_center = BZ_2d
 
 
-
-
-
   dens_integrated = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_Electron_Density.csv')
   dens_integrated_2d = reform(dens_integrated.field1,256,256)
 

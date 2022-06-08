@@ -42,14 +42,14 @@ plt.show()
 
 
 
-# Import Coaligned Images
-psi_mlso_proj_pb =pd.read_csv(pathnew.parent.parent.joinpath('Output/FORWARD_MLSO_Rotated_Data/PSI_MLSO_Coalignment.csv'), sep=',',header=None)
-psi_mlso_proj_pb_values = psi_mlso_proj_pb.values
-print(psi_mlso_proj_pb_values.shape)
+# Import Coaligned Integrated Electron Density
+integrated_dens_coaligned =pd.read_csv(pathnew.parent.parent.joinpath('Output/FORWARD_MLSO_Rotated_Data/PSI_MLSO_Integrated_Electron_Density_Coalignment.csv'), sep=',',header=None)
+integrated_dens_coaligned_values = integrated_dens_coaligned.values
+print(integrated_dens_coaligned_values.shape)
 
 # add KCor as detector to fits file header
 from astropy.io import fits
-data = psi_mlso_proj_pb_values
+data = integrated_dens_coaligned_values
 head = fits.getheader(fits_dir_mlso)
 #mlsomap.fits_header.insert('Detector', 'kcor')
 head['Observatory'] = ('PSI-MAS')
@@ -99,6 +99,56 @@ original_by_2d_center = original_data['by_2d_center']
 original_by_2d_integrated = original_data['by_2d_integrated']
 original_bz_2d_center = original_data['bz_2d_center']
 original_bz_2d_integrated = original_data['bz_2d_integrated']
+
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+f = plt.figure()
+f.set_figheight(10)
+f.set_figwidth(10)
+mpl.rcParams.update(mpl.rcParamsDefault)
+ax1 = plt.subplot(1, 2, 1)
+
+im1 = ax1.imshow(original_dens_integrated_2d,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
+divider = make_axes_locatable(ax1)
+cax = divider.append_axes('left', size='5%', pad=0.35)
+f.colorbar(im1,cax=cax)
+cax.yaxis.set_ticks_position('left')
+ax2 = plt.subplot(1, 2, 2)
+im2 = ax2.imshow(integrated_dens_coaligned_values,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
+divider = make_axes_locatable(ax2)
+cax = divider.append_axes('right', size='5%', pad=0.35)
+f.colorbar(im2, cax=cax, orientation='vertical');
+ax1.set_title('Integrated Electron Density Original')
+ax2.set_title('Integrated Electron Density Reshaped')
+plt.show()
+plt.close()
+
+
+# Import Coaligned Central Electron Density
+central_dens_coaligned =pd.read_csv(pathnew.parent.parent.joinpath('Output/FORWARD_MLSO_Rotated_Data/PSI_MLSO_Central_Electron_Density_Coalignment.csv'), sep=',',header=None)
+central_dens_coaligned_values = central_dens_coaligned.values
+
+f = plt.figure()
+f.set_figheight(10)
+f.set_figwidth(10)
+mpl.rcParams.update(mpl.rcParamsDefault)
+ax1 = plt.subplot(1, 2, 1)
+
+im1 = ax1.imshow(original_dens_2d_center,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
+divider = make_axes_locatable(ax1)
+cax = divider.append_axes('left', size='5%', pad=0.35)
+f.colorbar(im1,cax=cax)
+cax.yaxis.set_ticks_position('left')
+ax2 = plt.subplot(1, 2, 2)
+im2 = ax2.imshow(central_dens_coaligned_values,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
+divider = make_axes_locatable(ax2)
+cax = divider.append_axes('right', size='5%', pad=0.35)
+f.colorbar(im2, cax=cax, orientation='vertical');
+ax1.set_title('Central Electron Density Original')
+ax2.set_title('Central Electron Density Reshaped')
+plt.show()
+plt.close()
+
+
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 f = plt.figure()

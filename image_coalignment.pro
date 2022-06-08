@@ -50,7 +50,7 @@ function image_coalignment, directory
   DATE='2017-08-30T02:23:16.968Z' ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs
   BANG=crlt_obs
-  output = git_repo + '/Output/Forward_MLSO_Projection.fits'
+  output = git_repo + '/Output/Integrated_Electron_Density_MLSO_Projection.fits'
   data = dens_2d
 
   WRITE_PSI_IMAGE_AS_FITS,output,data,x_array,y_array,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
@@ -98,6 +98,30 @@ function image_coalignment, directory
   output_bz_los = git_repo + '/Output/Forward_Bz_LOS_MLSO_Projection.fits'
   WRITE_PSI_IMAGE_AS_FITS,output_bz_los,bz_los_2d,x_array,y_array,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
 
+  ; Construct and write fits image for PSI Central Electron Density
+  rsun_range = range + range
+  dx = rsun_range/256
+  ; convert x,y arrays to rsun
+  x_array = linspace(0,255,256) * dx
+  y_array= linspace(0,255,256) * dx
+
+  ; dens = read_csv(git_repo + '/Data/Central_Parameters/rotated_Dens_2d.csv')
+  ; dens_2d = reform(dens.field1,256,256)
+  restore, git_repo + '/Data/Electron_Density_Center.sav',/v
+  dens_2d = Dens_2d_center
+
+  DATE='2017-08-30T02:23:16.968Z' ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
+  CMER=crln_obs
+  BANG=crlt_obs
+  output = git_repo + '/Output/Central_Electron_Density_MLSO_Projection.fits'
+  WRITE_PSI_IMAGE_AS_FITS,output,dens_2d,x_array,y_array,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
+
+  ; Construct and write fits image for PSI Bx LOS field
+  bz_los_1d = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_LOS_Bz.csv')
+  bz_los_2d = reform(bz_los_1d.field1,256,256)
+  output_bz_los = git_repo + '/Output/Forward_Bz_LOS_MLSO_Projection.fits'
+  WRITE_PSI_IMAGE_AS_FITS,output_bz_los,bz_los_2d,x_array,y_array,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
+
 
 
 
@@ -110,28 +134,41 @@ function image_coalignment, directory
   coord = wcs_get_coord( wcs_mlso )
 
 
-  psi_im = readfits(git_repo + '/Output/Forward_MLSO_Projection.fits')
-  psi_head = headfits(git_repo + '/Output/Forward_MLSO_Projection.fits')
+  psi_integrated_dens_im = readfits(git_repo + '/Output/Integrated_Electron_Density_MLSO_Projection.fits')
+  psi_integrated_dens_head = headfits(git_repo + '/Output/Integrated_Electron_Density_MLSO_Projection.fits')
 
-  wcs_psi = fitshead2wcs( psi_head )
+  wcs_psi = fitshead2wcs( psi_integrated_dens_head )
 
   pixel = wcs_get_pixel( wcs_psi, coord)
-  new_psi = reform( interpolate( psi_im, pixel[0,*,*], pixel[1,*,*] ))
+  new_psi = reform( interpolate( psi_integrated_dens_im, pixel[0,*,*], pixel[1,*,*] ))
   spawn, 'mkdir -p ' + git_repo + '/Output/FORWARD_MLSO_Rotated_Data'
-  spath = git_repo + '/Output/FORWARD_MLSO_Rotated_Data/PSI_MLSO_Coalignment' + '.csv'
+  spath = git_repo + '/Output/FORWARD_MLSO_Rotated_Data/PSI_MLSO_Integrated_Electron_Density_Coalignment' + '.csv'
+  write_csv,spath,new_psi
+
+
+  ; Coalign PSI Central Electron density with MLSO image
+  psi_central_im = readfits(git_repo + '/Output/Central_Electron_Density_MLSO_Projection.fits')
+  psi_central_head = headfits(git_repo + '/Output/Central_Electron_Density_MLSO_Projection.fits')
+
+  wcs_psi = fitshead2wcs( psi_central_head )
+
+  pixel = wcs_get_pixel( wcs_psi, coord)
+  new_psi = reform( interpolate( psi_central_im, pixel[0,*,*], pixel[1,*,*] ))
+  spawn, 'mkdir -p ' + git_repo + '/Output/FORWARD_MLSO_Rotated_Data'
+  spath = git_repo + '/Output/FORWARD_MLSO_Rotated_Data/PSI_MLSO_Central_Electron_Density_Coalignment' + '.csv'
   write_csv,spath,new_psi
 
 
   ; Coalign PSI Forward PB Image with MLSO image
-  ;psi_pb_im = readfits('/Users/crura/Desktop/Research/Magnetic_Field/Forward_PB_MLSO_Projection.fits')
-  ;psi_pb_head = headfits('/Users/crura/Desktop/Research/Magnetic_Field/Forward_PB_MLSO_Projection.fits')
-
-  ;wcs_psi_pb = fitshead2wcs( psi_pb_head )
-
-  ;pixel_pb = wcs_get_pixel( wcs_psi_pb, coord)
-  ;new_psi_pb = reform( interpolate( psi_pb_im, pixel_pb[0,*,*], pixel_pb[1,*,*] ))
-  ;spath_pb = '/Users/crura/Desktop/Research/Magnetic_Field/FORWARD_MLSO_Rotated_Data/PSI_PB_MLSO_Coalignment' + '.csv'
-  ;write_csv,spath_pb,new_psi_pb
+  ; psi_pb_im = readfits('/Users/crura/Desktop/Research/Magnetic_Field/Forward_PB_MLSO_Projection.fits')
+  ; psi_pb_head = headfits('/Users/crura/Desktop/Research/Magnetic_Field/Forward_PB_MLSO_Projection.fits')
+  ;
+  ; wcs_psi_pb = fitshead2wcs( psi_pb_head )
+  ;
+  ; pixel_pb = wcs_get_pixel( wcs_psi_pb, coord)
+  ; new_psi_pb = reform( interpolate( psi_pb_im, pixel_pb[0,*,*], pixel_pb[1,*,*] ))
+  ; spath_pb = git_repo + 'Output/FORWARD_MLSO_Rotated_Data/PSI_PB_MLSO_Coalignment' + '.csv'
+  ; write_csv,spath_pb,new_psi_pb
 
 
   ; Coalign PSI Forward B_x Central 2d Plane of Sky cut with MLSO image

@@ -79,10 +79,10 @@ bx_central_coaligned = b_central_idl_saved['bx_central_coaligned']
 by_central_coaligned = b_central_idl_saved['by_central_coaligned']
 bz_central_coaligned = b_central_idl_saved['bz_central_coaligned']
 
-b_los_idl_saved = readsav(os.path.join(repo_path,'Output/LOS_B_Field_MLSO_Coaligned.sav'))
-bx_los_coaligned = b_los_idl_saved['bx_los_coaligned']
-by_los_coaligned = b_los_idl_saved['by_los_coaligned']
-bz_los_coaligned = b_los_idl_saved['bz_los_coaligned']
+b_integrated_idl_saved = readsav(os.path.join(repo_path,'Output/LOS_B_Field_MLSO_Coaligned.sav'))
+bx_integrated_coaligned = b_integrated_idl_saved['bx_integrated_coaligned']
+by_integrated_coaligned = b_integrated_idl_saved['by_integrated_coaligned']
+bz_integrated_coaligned = b_integrated_idl_saved['bz_integrated_coaligned']
 
 idl_save = readsav(os.path.join(repo_path,'Data/model_parameters.sav'))
 crln_obs_print = idl_save['crln_obs_print']
@@ -149,6 +149,31 @@ plt.show()
 plt.close()
 
 
+
+# Import Coaligned Forward PB
+forward_pb_coaligned =pd.read_csv(pathnew.parent.parent.joinpath('Output/FORWARD_MLSO_Rotated_Data/PSI_PB_MLSO_Coalignment.csv'), sep=',',header=None)
+forward_pb_coaligned_values = forward_pb_coaligned.values
+
+f = plt.figure()
+f.set_figheight(10)
+f.set_figwidth(10)
+mpl.rcParams.update(mpl.rcParamsDefault)
+ax1 = plt.subplot(1, 2, 1)
+
+im1 = ax1.imshow(original_forward_pb_image,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
+divider = make_axes_locatable(ax1)
+cax = divider.append_axes('left', size='5%', pad=0.35)
+f.colorbar(im1,cax=cax)
+cax.yaxis.set_ticks_position('left')
+ax2 = plt.subplot(1, 2, 2)
+im2 = ax2.imshow(forward_pb_coaligned_values,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
+divider = make_axes_locatable(ax2)
+cax = divider.append_axes('right', size='5%', pad=0.35)
+f.colorbar(im2, cax=cax, orientation='vertical');
+ax1.set_title('Forward PB Original')
+ax2.set_title('Forward PB Reshaped')
+plt.show()
+plt.close()
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 f = plt.figure()
@@ -230,7 +255,7 @@ cax = divider.append_axes('left', size='5%', pad=0.35)
 f.colorbar(im1,cax=cax)
 cax.yaxis.set_ticks_position('left')
 ax2 = plt.subplot(1, 2, 2)
-im2 = ax2.imshow(bx_los_coaligned,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
+im2 = ax2.imshow(bx_integrated_coaligned,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
 divider = make_axes_locatable(ax2)
 cax = divider.append_axes('right', size='5%', pad=0.35)
 f.colorbar(im2, cax=cax, orientation='vertical');
@@ -251,7 +276,7 @@ cax = divider.append_axes('left', size='5%', pad=0.35)
 f.colorbar(im1,cax=cax)
 cax.yaxis.set_ticks_position('left')
 ax2 = plt.subplot(1, 2, 2)
-im2 = ax2.imshow(by_los_coaligned,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
+im2 = ax2.imshow(by_integrated_coaligned,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
 divider = make_axes_locatable(ax2)
 cax = divider.append_axes('right', size='5%', pad=0.35)
 f.colorbar(im2, cax=cax, orientation='vertical');
@@ -273,7 +298,7 @@ cax = divider.append_axes('left', size='5%', pad=0.35)
 f.colorbar(im1,cax=cax)
 cax.yaxis.set_ticks_position('left')
 ax2 = plt.subplot(1, 2, 2)
-im2 = ax2.imshow(bz_los_coaligned,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
+im2 = ax2.imshow(bz_integrated_coaligned,norm=matplotlib.colors.LogNorm(),cmap='magma',origin='lower')
 divider = make_axes_locatable(ax2)
 cax = divider.append_axes('right', size='5%', pad=0.35)
 f.colorbar(im2, cax=cax, orientation='vertical');

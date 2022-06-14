@@ -2,6 +2,7 @@ function image_coalignment, directory
   ;restore, '/Users/crura/Desktop/Research/Magnetic_Field/Forward_PB_data.sav',/v
   spawn, 'git rev-parse --show-toplevel', git_repo
   restore, git_repo + '/Data/model_parameters.sav',/v
+  spawn, 'mkdir -p ' + git_repo + '/Output'
   ;.compile -v '/Users/crura/SSW/gen/idl/util/default.pro'
   ;.compile -v '/Users/crura/IDLWorkspace/Default/linspace.pro'
   ;.compile -v '/Users/crura/Desktop/Research/Magnetic_Field/write_psi_image_as_fits.pro'

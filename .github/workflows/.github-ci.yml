@@ -183,6 +183,7 @@ jobs:
           echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/get_fordump.pro'" &&
           echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/image_coalignment.pro'" &&
           echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/save_parameters.pro'" &&
+          echo "image_coalignment()" &&
           echo "save_parameters()" &&
           cat) |
           /Users/crura/Documents/bin/ssw

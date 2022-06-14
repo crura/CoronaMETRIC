@@ -123,10 +123,10 @@ jobs:
           name: python-plots
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Integrated_Parameters
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: output-data-1
-          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: output-data-1
+      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
 
   save-parameters:
     # The type of runner that the job will run on
@@ -148,10 +148,10 @@ jobs:
           name: python-plots
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Integrated_Parameters
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: output-data-1
-          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
+      # - uses: actions/download-artifact@v3
+      #   with:
+      #     name: output-data-1
+      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
 
       # - uses: actions/download-artifact@v3
       #   with:

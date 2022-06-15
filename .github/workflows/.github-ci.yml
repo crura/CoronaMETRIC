@@ -26,27 +26,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # - name: Delete Old Artifacts
-      #   uses: actions/github-script@v6
-      #   id: artifact
-      #   with:
-      #     script: |
-      #       const res = await github.rest.actions.listArtifactsForRepo({
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #       })
-      #
-      #       res.data.artifacts
-      #         .forEach(({ id }) => {
-      #           github.rest.actions.deleteArtifact({
-      #             owner: context.repo.owner,
-      #             repo: context.repo.repo,
-      #             artifact_id: id,
-      #           })
-      #         })
-      #
-      # - name: Delete Artifact
-      #   uses: GeekyEggo/delete-artifact@v1.0.0
 
 
 
@@ -93,10 +72,6 @@ jobs:
           name: my-artifact
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
 
-      # - uses: actions/upload-artifact@v3
-      #   with:
-      #     name: model-parameters
-      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/model_parameters.sav
 
   Python-build:
     needs: IDL-build
@@ -123,10 +98,6 @@ jobs:
           name: python-plots
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Integrated_Parameters
 
-      # - uses: actions/upload-artifact@v3
-      #   with:
-      #     name: output-data-1
-      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
 
   save-parameters:
     # The type of runner that the job will run on
@@ -148,15 +119,6 @@ jobs:
           name: python-plots
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Integrated_Parameters
 
-      # - uses: actions/download-artifact@v3
-      #   with:
-      #     name: output-data-1
-      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
-
-      # - uses: actions/download-artifact@v3
-      #   with:
-      #     name: model-parameters
-      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/model_parameters.sav
 
 
       # Runs a set of commands using the runners shell
@@ -203,10 +165,6 @@ jobs:
           name: output-data
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
 
-      # - uses: actions/upload-artifact@v3
-      #   with:
-      #     name: my-artifact
-      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
 
   unit-test:
     needs: save-parameters

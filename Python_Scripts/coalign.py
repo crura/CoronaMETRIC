@@ -15,6 +15,10 @@ import os
 path = __file__
 pathnew = Path(path)
 
+repo = git.Repo('.', search_parent_directories=True)
+repo_path = repo.working_tree_dir
+idl_save = readsav(os.path.join(repo_path,'Data/model_parameters.sav'))
+
 fits_dir = pathnew.parent.parent.joinpath('Data/PSI/Forward_MLSO_Projection.fits')
 path_fits_dir = Path(fits_dir)
 
@@ -24,7 +28,7 @@ head = fits.getheader(fits_dir)
 
 psimap = sunpy.map.Map(data, head)
 
-fits_dir_mlso = pathnew.parent.parent.joinpath('Data/MLSO/20170829_200801_kcor_l2_avg_2.fts')
+fits_dir_mlso = pathnew.parent.parent.joinpath(str(idl_save['fits_directory'],'utf-8'))
 
 data = fits.getdata(fits_dir_mlso)
 head = fits.getheader(fits_dir_mlso)

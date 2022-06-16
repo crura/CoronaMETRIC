@@ -32,6 +32,7 @@ function image_coalignment, directory
 
   ; Construct and write fits image for PSI integrated electron density
 
+  out_string = strcompress(string(CRLT_OBS),/remove_all) + '_' + strcompress(string(CRLN_OBS),/remove_all)
   rsun_range = range + range
   dx = rsun_range/256
   ; convert x,y arrays to rsun
@@ -156,8 +157,8 @@ function image_coalignment, directory
 
 
   ; Coalign PSI Integrated Electron density with MLSO image
-  mlso_im = readfits(git_repo + '/Data/MLSO/20170829_200801_kcor_l2_avg_2.fts')
-  mlso_head = headfits(git_repo + '/Data/MLSO/20170829_200801_kcor_l2_avg_2.fts')
+  mlso_im = readfits(fits_directory)
+  mlso_head = headfits(fits_directory)
   wcs_mlso = fitshead2wcs( mlso_head )
   coord = wcs_get_coord( wcs_mlso )
 
@@ -288,6 +289,70 @@ function image_coalignment, directory
 
   save,bx_central_coaligned,by_central_coaligned,bz_central_coaligned,filename=git_repo + '/Output/Central_B_Field_MLSO_Coaligned.sav'
   save,bx_integrated_coaligned,by_integrated_coaligned,bz_integrated_coaligned,filename=git_repo + '/Output/LOS_B_Field_MLSO_Coaligned.sav'
+
+  x_array_new = linspace(0,1023,1024) * dx
+  y_array_new= linspace(0,1023,1024) * dx
+
+  DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
+  CMER=crln_obs
+  BANG=crlt_obs
+  output = git_repo + '/Output/' + out_string + '_By.fits'
+  WRITE_PSI_IMAGE_AS_FITS,output,by_central_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
+
+  x_array_new = linspace(0,1023,1024) * dx
+  y_array_new= linspace(0,1023,1024) * dx
+
+  DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
+  CMER=crln_obs
+  BANG=crlt_obs
+  output = git_repo + '/Output/' + out_string + '_By_LOS.fits'
+  WRITE_PSI_IMAGE_AS_FITS,output,by_integrated_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
+
+  x_array_new = linspace(0,1023,1024) * dx
+  y_array_new= linspace(0,1023,1024) * dx
+
+  DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
+  CMER=crln_obs
+  BANG=crlt_obs
+  output = git_repo + '/Output/' + out_string + '_Bz.fits'
+  WRITE_PSI_IMAGE_AS_FITS,output,bz_central_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
+
+  x_array_new = linspace(0,1023,1024) * dx
+  y_array_new= linspace(0,1023,1024) * dx
+
+  DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
+  CMER=crln_obs
+  BANG=crlt_obs
+  output = git_repo + '/Output/' + out_string + '_Bz_LOS.fits'
+  WRITE_PSI_IMAGE_AS_FITS,output,bz_integrated_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
+
+  x_array_new = linspace(0,1023,1024) * dx
+  y_array_new= linspace(0,1023,1024) * dx
+
+  DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
+  CMER=crln_obs
+  BANG=crlt_obs
+  output = git_repo + '/Output/' + out_string + '_ne.fits'
+  WRITE_PSI_IMAGE_AS_FITS,output,psi_central_dens_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
+
+  x_array_new = linspace(0,1023,1024) * dx
+  y_array_new= linspace(0,1023,1024) * dx
+
+  DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
+  CMER=crln_obs
+  BANG=crlt_obs
+  output = git_repo + '/Output/' + out_string + '_ne_LOS.fits'
+  WRITE_PSI_IMAGE_AS_FITS,output,psi_integrated_dens_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
+
+  x_array_new = linspace(0,1023,1024) * dx
+  y_array_new= linspace(0,1023,1024) * dx
+
+  DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
+  CMER=crln_obs
+  BANG=crlt_obs
+  output = git_repo + '/Output/' + out_string + '_pB.fits'
+  WRITE_PSI_IMAGE_AS_FITS,output,psi_integrated_dens_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
+
 
   ;spawn, 'mkdir -p ' git_repo + '/Output/Coaligned_Parameters/'
   out_string = strcompress(string(CRLT_OBS),/remove_all) + '_' + strcompress(string(CRLN_OBS),/remove_all) + '.sav'

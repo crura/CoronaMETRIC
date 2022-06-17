@@ -290,8 +290,12 @@ function image_coalignment, directory
   save,bx_central_coaligned,by_central_coaligned,bz_central_coaligned,filename=git_repo + '/Output/Central_B_Field_MLSO_Coaligned.sav'
   save,bx_integrated_coaligned,by_integrated_coaligned,bz_integrated_coaligned,filename=git_repo + '/Output/LOS_B_Field_MLSO_Coaligned.sav'
 
-  x_array_new = linspace(0,1023,1024) * dx
-  y_array_new= linspace(0,1023,1024) * dx
+  dx_new = rsun_range/1024
+  x_array_new = linspace(0,1023,1024) * dx_new
+  y_array_new= linspace(0,1023,1024) * dx_new
+
+  head_fits_mlso = headfits(fits_directory)
+  sxaddpar,head_fits_mlso,'TELESCOP','PSI-MAS Forward Model' ;Modify value of TELESCOP
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs
@@ -299,8 +303,10 @@ function image_coalignment, directory
   output = git_repo + '/Output/' + out_string + '_By.fits'
   WRITE_PSI_IMAGE_AS_FITS,output,by_central_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
 
-  x_array_new = linspace(0,1023,1024) * dx
-  y_array_new= linspace(0,1023,1024) * dx
+  writefits, output, by_central_coaligned, head_fits_mlso
+
+  x_array_new = linspace(0,1023,1024) * dx_new
+  y_array_new= linspace(0,1023,1024) * dx_new
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs
@@ -308,8 +314,10 @@ function image_coalignment, directory
   output = git_repo + '/Output/' + out_string + '_By_LOS.fits'
   WRITE_PSI_IMAGE_AS_FITS,output,by_integrated_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
 
-  x_array_new = linspace(0,1023,1024) * dx
-  y_array_new= linspace(0,1023,1024) * dx
+  writefits, output, by_integrated_coaligned, head_fits_mlso
+
+  x_array_new = linspace(0,1023,1024) * dx_new
+  y_array_new= linspace(0,1023,1024) * dx_new
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs
@@ -317,8 +325,10 @@ function image_coalignment, directory
   output = git_repo + '/Output/' + out_string + '_Bz.fits'
   WRITE_PSI_IMAGE_AS_FITS,output,bz_central_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
 
-  x_array_new = linspace(0,1023,1024) * dx
-  y_array_new= linspace(0,1023,1024) * dx
+  writefits, output, bz_central_coaligned, head_fits_mlso
+
+  x_array_new = linspace(0,1023,1024) * dx_new
+  y_array_new= linspace(0,1023,1024) * dx_new
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs
@@ -326,8 +336,10 @@ function image_coalignment, directory
   output = git_repo + '/Output/' + out_string + '_Bz_LOS.fits'
   WRITE_PSI_IMAGE_AS_FITS,output,bz_integrated_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
 
-  x_array_new = linspace(0,1023,1024) * dx
-  y_array_new= linspace(0,1023,1024) * dx
+  writefits, output, bz_integrated_coaligned, head_fits_mlso
+
+  x_array_new = linspace(0,1023,1024) * dx_new
+  y_array_new= linspace(0,1023,1024) * dx_new
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs
@@ -335,8 +347,10 @@ function image_coalignment, directory
   output = git_repo + '/Output/' + out_string + '_ne.fits'
   WRITE_PSI_IMAGE_AS_FITS,output,psi_central_dens_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
 
-  x_array_new = linspace(0,1023,1024) * dx
-  y_array_new= linspace(0,1023,1024) * dx
+  writefits, output, psi_central_dens_coaligned, head_fits_mlso
+
+  x_array_new = linspace(0,1023,1024) * dx_new
+  y_array_new= linspace(0,1023,1024) * dx_new
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs
@@ -344,15 +358,18 @@ function image_coalignment, directory
   output = git_repo + '/Output/' + out_string + '_ne_LOS.fits'
   WRITE_PSI_IMAGE_AS_FITS,output,psi_integrated_dens_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
 
-  x_array_new = linspace(0,1023,1024) * dx
-  y_array_new= linspace(0,1023,1024) * dx
+  writefits, output, psi_integrated_dens_coaligned, head_fits_mlso
+
+  x_array_new = linspace(0,1023,1024) * dx_new
+  y_array_new= linspace(0,1023,1024) * dx_new
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs
   BANG=crlt_obs
   output = git_repo + '/Output/' + out_string + '_pB.fits'
-  WRITE_PSI_IMAGE_AS_FITS,output,psi_integrated_dens_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
+  WRITE_PSI_IMAGE_AS_FITS,output,psi_forward_pb_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/ForceXyRs,/GetCoords,ObsDistanceAU=1
 
+  writefits, output, psi_forward_pb_coaligned, head_fits_mlso
 
   ;spawn, 'mkdir -p ' git_repo + '/Output/Coaligned_Parameters/'
   out_string = strcompress(string(CRLT_OBS),/remove_all) + '_' + strcompress(string(CRLN_OBS),/remove_all) + '.sav'

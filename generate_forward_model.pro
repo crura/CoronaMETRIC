@@ -13,6 +13,7 @@ occlt = 1.0600000
 range = 6.0799999
 date_obs = SXPAR(head,'DATE-OBS')
 
+
 crlt_obs_print = strcompress(string(CRLT_OBS),/remove_all)
 crln_obs_print = strcompress(string(CRLN_OBS),/remove_all)
 ; read, crlt_obs, 'enter carrington latitude (B angle): '

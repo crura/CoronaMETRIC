@@ -180,12 +180,12 @@ pro write_psi_image_as_fits, OutFile, Im, x, y, ObsDate, Lon, B0, $
       'CUNIT1', 'arcsec', $
       'CRVAL1', 0d0, $
       'CDELT1', CDELT1, $
-      'CRPIX1', 128, $;128
+      'CRPIX1', n_elements(x) /2 , $;128
       'CTYPE2', 'HPLT-TAN', $
       'CUNIT2', 'arcsec', $
       'CRVAL2', 0d0, $
       'CDELT2', CDELT2, $
-      'CRPIX2', 128, $;128
+      'CRPIX2', n_elements(x) /2, $;128
       'CROTA2', double(-pAngle), $
       'R_SUN', R_SUN, $
       'DSUN_REF', DSUN_REF, $

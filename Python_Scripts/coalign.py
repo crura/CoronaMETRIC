@@ -18,6 +18,10 @@ pathnew = Path(path)
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
 idl_save = readsav(os.path.join(repo_path,'Data/model_parameters.sav'))
+date_obs =idl_save['DATE_OBS']
+crln_obs_print = idl_save['crln_obs_print']
+crlt_obs_print = idl_save['crlt_obs_print']
+params = str(crlt_obs_print,'utf-8') + '_' +  str(crln_obs_print,'utf-8')
 
 fits_dir = pathnew.parent.parent.joinpath('Data/PSI/Forward_MLSO_Projection.fits')
 path_fits_dir = Path(fits_dir)
@@ -69,9 +73,9 @@ ax1.set_title('PSI-Forward Model')
 psi_coalign_map_pb.plot(axes=ax1,norm=matplotlib.colors.LogNorm())
 ax2 = fig.add_subplot(1, 2, 2, projection=mlsomap)
 mlsomap.plot(axes=ax2)
-ax2.title.set_text('MLSO K-COR Observation 2017-08-29')
-ax1.title.set_text('PSI/FORWARD Synthetic Polarized Brightness Eclipse Model')
-plt.savefig(pathnew.parent.parent.joinpath('Data/Output/FORWARD_MLSO_Rotated_Data/Plots/Model_Comparison.png'))
+ax2.title.set_text('MLSO K-COR Observation {}'.format(str(date_obs,'utf-8') + 'Z'))
+ax1.title.set_text('PSI/FORWARD Polarized Brightness Eclipse Model ' + params)
+plt.savefig(pathnew.parent.parent.joinpath('Data/Output/FORWARD_MLSO_Rotated_Data/Plots/Model_Comparison_{}.png'.format(params)))
 plt.show()
 
 repo = git.Repo('.', search_parent_directories=True)

@@ -21,7 +21,11 @@ err_mlso_central_deg = err_mlso_central[np.where(err_mlso_central > 0)]*180/np.p
 err_forward_central_deg = err_forward_central[np.where(err_forward_central > 0)]*180/np.pi
 err_random_deg = err_random[np.where(err_random > 0)]*180/np.pi
 
+import subprocess
+subprocess.run(["mkdir","Output/Plots","-p"])
+
 import seaborn as sns
+import os
 sns.distplot(err_mlso_central_deg,hist=True,label='MLSO')
 sns.distplot(err_forward_central_deg,hist=True,label='FORWARD')
 sns.distplot(err_random_deg,hist=False,label='Random')
@@ -31,6 +35,7 @@ plt.title('MLSO vs FORWARD Feature Tracing Performance')
 plt.xlim(0,90)
 plt.ylim(0,0.06)
 plt.legend()
+plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance.png'))
 plt.show()
 
 # Generate plots for LOS arrays
@@ -46,4 +51,5 @@ plt.title('MLSO vs FORWARD LOS Feature Tracing Performance')
 plt.xlim(0,90)
 plt.ylim(0,0.06)
 plt.legend()
+plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance_LOS.png'))
 plt.show()

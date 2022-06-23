@@ -35,9 +35,12 @@ plt.title('MLSO vs FORWARD Feature Tracing Performance')
 plt.xlim(0,90)
 plt.ylim(0,0.06)
 plt.legend()
+plt.text(20,0.045,"MLSO average discrepancy: " + str(np.round(np.average(err_mlso_central_deg),5)) +" " + u"\u00B1" +" " + str(np.round(np.std(err_mlso_central_deg),5)))
+plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_central_deg),5)) +" " + u"\u00B1" +" " + str(np.round(np.std(err_forward_central_deg),5)))
+plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)) +" " + u"\u00B1" +" " + str(np.round(np.std(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance.png'))
 plt.show()
-
+print(np.min(err_forward_central_deg))
 # Generate plots for LOS arrays
 err_mlso_los_deg = err_mlso_los[np.where(err_mlso_los > 0)]*180/np.pi
 err_forward_los_deg = err_forward_los[np.where(err_forward_los > 0)]*180/np.pi
@@ -50,6 +53,9 @@ plt.ylabel('Probability Density')
 plt.title('MLSO vs FORWARD LOS Feature Tracing Performance')
 plt.xlim(0,90)
 plt.ylim(0,0.06)
+plt.text(20,0.045,"MLSO average discrepancy: " + str(np.round(np.average(err_mlso_los_deg),5)) +" " + u"\u00B1" +" " + str(np.round(np.std(err_mlso_los_deg),5)))
+plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_los_deg),5)) +" " + u"\u00B1" +" " + str(np.round(np.std(err_forward_los_deg),5)))
+plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)) +" " + u"\u00B1" +" " + str(np.round(np.std(err_random_deg),5)))
 plt.legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance_LOS.png'))
 plt.show()

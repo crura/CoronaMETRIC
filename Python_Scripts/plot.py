@@ -40,6 +40,7 @@ plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_f
 plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance.png'))
 plt.show()
+plt.close()
 print(np.min(err_forward_central_deg))
 # Generate plots for LOS arrays
 err_mlso_los_deg = err_mlso_los[np.where(err_mlso_los > 0)]*180/np.pi
@@ -59,3 +60,77 @@ plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_r
 plt.legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance_LOS.png'))
 plt.show()
+plt.close()
+
+# retrieve probability density data from seaborne distplots
+dist_values_mlso_central = sns.distplot(err_mlso_central_deg).get_lines()[0].get_data()[1]
+plt.close()
+dist_values_forward_central = sns.distplot(err_forward_central_deg).get_lines()[0].get_data()[1]
+plt.close()
+
+dist_values_mlso_los = sns.distplot(err_mlso_los_deg).get_lines()[0].get_data()[1]
+plt.close()
+dist_values_forward_los = sns.distplot(err_forward_los_deg).get_lines()[0].get_data()[1]
+plt.close()
+
+dist_values_random = sns.distplot(err_random_deg).get_lines()[0].get_data()[1]
+plt.close()
+
+import numpy as np
+from scipy.stats import norm
+from matplotlib import pyplot as plt
+# creating the data distribution
+# x = np.arange(-5, 5, 1)
+# p = norm.pdf(x, 0, 2)
+# q = norm.pdf(x, 2, 2)
+#define KL Divergence
+"""KL Divergence(P|Q)"""
+def KL_div(p_probs, q_probs):
+    KL_div = p_probs * np.log(p_probs / q_probs)
+    return np.sum(KL_div)
+
+#define JS Divergence
+def JS_Div(p, q):
+    p = np.asarray(p)
+    q = np.asarray(q)
+    # normalize
+    p /= p.sum()
+    q /= q.sum()
+    m = (p + q) / 2
+    return (KL_div(p, m) + KL_div(q, m)) / 2
+
+
+print("")
+#compute JS Divergence
+result_JSD_MLSO_FORWARD_LOS= JS_Div(dist_values_mlso_los, dist_values_forward_los)
+print("JS Divergence between MLSO LOS and PSI/FORWARD LOS",result_JSD_MLSO_FORWARD_LOS)
+result_JSD_MLSO_FORWARD_Central= JS_Div(dist_values_mlso_central, dist_values_forward_central)
+print("JS Divergence between MLSO Central and PSI/FORWARD Central",result_JSD_MLSO_FORWARD_Central)
+
+result_JSD12= JS_Div(dist_values_mlso_los, dist_values_random)
+print("JS Divergence between MLSO LOS and Random",result_JSD12)
+result_JSD21= JS_Div(dist_values_mlso_central, dist_values_random)
+print("JS Divergence between MLSO Central and Random",result_JSD21)
+
+result_JSD12= JS_Div(dist_values_forward_los, dist_values_random)
+print("JS Divergence between PSI/FORWARD LOS and Random",result_JSD12)
+result_JSD21= JS_Div(dist_values_forward_central, dist_values_random)
+print("JS Divergence between PSI/FORWARD Central and Random",result_JSD21)
+
+print("")
+
+#compute KL Divergence
+KL_Div_mlso_forward_central = KL_div(dist_values_mlso_central,dist_values_forward_central)
+print("KL Divergence between MLSO Central and PSI/FORWARD Central",KL_Div_mlso_forward_central)
+KL_Div_mlso_forward_los = KL_div(dist_values_mlso_los, dist_values_forward_los)
+print("KL Divergence between MLSO LOS and PSI/FORWARD LOS",KL_Div_mlso_forward_los)
+
+KL_Div_mlso_central_random = KL_div(dist_values_mlso_central,dist_values_random)
+print("KL Divergence between MLSO Central and Random",KL_Div_mlso_central_random)
+KL_Div_mlso_los_random = KL_div(dist_values_mlso_los, dist_values_random)
+print("KL Divergence between MLSO LOS and Random",KL_Div_mlso_los_random)
+
+KL_Div_forward_central_random = KL_div(dist_values_forward_central,dist_values_random)
+print("KL Divergence between PSI/FORWARD Central and Random",KL_Div_forward_central_random)
+KL_Div_forward_los_random = KL_div(dist_values_forward_los, dist_values_random)
+print("KL Divergence between PSI/FORWARD LOS and Random",KL_Div_forward_los_random)

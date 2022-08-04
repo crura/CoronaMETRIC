@@ -3,6 +3,7 @@ from scipy.io import readsav
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import git
+from matplotlib.patches import Circle
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -99,6 +100,158 @@ ax[1].legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance_Combined.png'))
 plt.show()
 plt.close()
+
+
+from astropy.io import fits
+import sunpy
+import sunpy.map
+fits_dir_bz_los_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_Bz_LOS.fits'
+data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+head_bz_los_coaligned['detector'] = ('KCor')
+# print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+
+fits_dir_by_los_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_By_LOS.fits'
+data_by_los_coaligned = fits.getdata(fits_dir_by_los_coaligned)
+head_by_los_coaligned = fits.getheader(fits_dir_by_los_coaligned)
+head_by_los_coaligned['Observatory'] = ('PSI-MAS')
+head_by_los_coaligned['detector'] = ('KCor')
+# print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+by_los_coaligned_map = sunpy.map.Map(data_by_los_coaligned, head_by_los_coaligned)
+
+ny, nz = 1024,1024
+dy = np.linspace(-int(ny/2), int(ny/2), ny)
+dz = np.linspace(-int(nz/2), int(nz/2), nz)
+R_SUN = head_bz_los_coaligned['R_SUN']
+widths = np.linspace(0,500,by_los_coaligned_map.data.size)
+skip_val = 14
+skip = (slice(None, None, skip_val), slice(None, None, skip_val))
+skip1 = slice(None, None, skip_val)
+fig, ((ax1, ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3, 2, figsize =(10, 10))
+ax1.quiver(dy[skip1],dz[skip1],by_los_coaligned_map.data[skip],bz_los_coaligned_map.data[skip],linewidths=widths)
+ax1.set_aspect('equal')
+ax1.add_patch(Circle((0,0), R_SUN, color='black',zorder=100))
+ax1.set_title('6.89000_303.470 LOS $B_z$ vs $B_y$ Field Vector Plot')
+
+fits_dir_bz_los_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_Bz_LOS.fits'
+data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+head_bz_los_coaligned['detector'] = ('KCor')
+# print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+
+fits_dir_by_los_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By_LOS.fits'
+data_by_los_coaligned = fits.getdata(fits_dir_by_los_coaligned)
+head_by_los_coaligned = fits.getheader(fits_dir_by_los_coaligned)
+head_by_los_coaligned['Observatory'] = ('PSI-MAS')
+head_by_los_coaligned['detector'] = ('KCor')
+# print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+by_los_coaligned_map = sunpy.map.Map(data_by_los_coaligned, head_by_los_coaligned)
+
+R_SUN = head_bz_los_coaligned['R_SUN']
+
+ax2.quiver(dy[skip1],dz[skip1],by_los_coaligned_map.data[skip],bz_los_coaligned_map.data[skip],linewidths=widths)
+ax2.set_aspect('equal')
+ax2.add_patch(Circle((0,0), R_SUN, color='black',zorder=100))
+ax2.set_title('7.05600_236.978 LOS $B_z$ vs $B_y$ Field Vector Plot')
+
+fits_dir_bz_los_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_Bz_LOS.fits'
+data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+head_bz_los_coaligned['detector'] = ('KCor')
+# print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+
+fits_dir_by_los_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By_LOS.fits'
+data_by_los_coaligned = fits.getdata(fits_dir_by_los_coaligned)
+head_by_los_coaligned = fits.getheader(fits_dir_by_los_coaligned)
+head_by_los_coaligned['Observatory'] = ('PSI-MAS')
+head_by_los_coaligned['detector'] = ('KCor')
+# print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+by_los_coaligned_map = sunpy.map.Map(data_by_los_coaligned, head_by_los_coaligned)
+
+R_SUN = head_bz_los_coaligned['R_SUN']
+
+ax3.quiver(dy[skip1],dz[skip1],by_los_coaligned_map.data[skip],bz_los_coaligned_map.data[skip],linewidths=widths)
+ax3.set_aspect('equal')
+ax3.add_patch(Circle((0,0), R_SUN, color='black',zorder=100))
+ax3.set_title('7.15300_183.443 $B_z$ vs $B_y$ Field Vector Plot')
+
+fits_dir_bz_los_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_Bz_LOS.fits'
+data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+head_bz_los_coaligned['detector'] = ('KCor')
+# print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+
+fits_dir_by_los_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By_LOS.fits'
+data_by_los_coaligned = fits.getdata(fits_dir_by_los_coaligned)
+head_by_los_coaligned = fits.getheader(fits_dir_by_los_coaligned)
+head_by_los_coaligned['Observatory'] = ('PSI-MAS')
+head_by_los_coaligned['detector'] = ('KCor')
+# print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+by_los_coaligned_map = sunpy.map.Map(data_by_los_coaligned, head_by_los_coaligned)
+
+R_SUN = head_bz_los_coaligned['R_SUN']
+
+ax4.quiver(dy[skip1],dz[skip1],by_los_coaligned_map.data[skip],bz_los_coaligned_map.data[skip],linewidths=widths)
+ax4.set_aspect('equal')
+ax4.add_patch(Circle((0,0), R_SUN, color='black',zorder=100))
+ax4.set_title('7.22000_126.906 $B_z$ vs $B_y$ Field Vector Plot')
+
+fits_dir_bz_los_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_Bz_LOS.fits'
+data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+head_bz_los_coaligned['detector'] = ('KCor')
+# print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+
+fits_dir_by_los_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_By_LOS.fits'
+data_by_los_coaligned = fits.getdata(fits_dir_by_los_coaligned)
+head_by_los_coaligned = fits.getheader(fits_dir_by_los_coaligned)
+head_by_los_coaligned['Observatory'] = ('PSI-MAS')
+head_by_los_coaligned['detector'] = ('KCor')
+# print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+by_los_coaligned_map = sunpy.map.Map(data_by_los_coaligned, head_by_los_coaligned)
+
+R_SUN = head_bz_los_coaligned['R_SUN']
+
+ax5.quiver(dy[skip1],dz[skip1],by_los_coaligned_map.data[skip],bz_los_coaligned_map.data[skip],linewidths=widths)
+ax5.set_aspect('equal')
+ax5.add_patch(Circle((0,0), R_SUN, color='black',zorder=100))
+ax5.set_title('7.23800_11.5530 $B_z$ vs $B_y$ Field Vector Plot')
+
+fits_dir_bz_los_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_Bz_LOS.fits'
+data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+head_bz_los_coaligned['detector'] = ('KCor')
+# print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+
+fits_dir_by_los_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By_LOS.fits'
+data_by_los_coaligned = fits.getdata(fits_dir_by_los_coaligned)
+head_by_los_coaligned = fits.getheader(fits_dir_by_los_coaligned)
+head_by_los_coaligned['Observatory'] = ('PSI-MAS')
+head_by_los_coaligned['detector'] = ('KCor')
+# print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+by_los_coaligned_map = sunpy.map.Map(data_by_los_coaligned, head_by_los_coaligned)
+
+R_SUN = head_bz_los_coaligned['R_SUN']
+
+ax6.quiver(dy[skip1],dz[skip1],by_los_coaligned_map.data[skip],bz_los_coaligned_map.data[skip],linewidths=widths)
+ax6.set_aspect('equal')
+ax6.add_patch(Circle((0,0), R_SUN, color='black',zorder=100))
+ax6.set_title('7.24700_77.0150 $B_z$ vs $B_y$ Field Vector Plot')
+mpl.rcParams.update(mpl.rcParamsDefault)
+plt.tight_layout()
+plt.show()
 
 # retrieve probability density data from seaborne distplots
 dist_values_mlso_central = sns.distplot(err_mlso_central_deg).get_lines()[0].get_data()[1]

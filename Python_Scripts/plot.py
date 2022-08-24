@@ -31,6 +31,36 @@ subprocess.run(["mkdir","Output/Plots","-p"])
 
 import seaborn as sns
 import os
+
+from scipy.stats import gaussian_kde
+xmin_mlso_central = -14.5
+xmax_mlso_central = 104.0
+
+
+kde0_mlso_central_deg = gaussian_kde(err_mlso_central_deg)
+x_1_mlso_central_deg = np.linspace(xmin_mlso_central, xmax_mlso_central, 200)
+kde0_x_mlso_central_deg = kde0_mlso_central_deg(x_1_mlso_central_deg)
+plt.plot(x_1_mlso_central_deg, kde0_x_mlso_central_deg, color='b', label='mlso central KDE scipy')
+
+xmin_forward_central = -17.24
+xmax_forward_central = 106.13
+
+kde0_forward_central_deg = gaussian_kde(err_forward_central_deg)
+x_1_forward_central_deg = np.linspace(xmin_forward_central, xmax_forward_central, 200)
+kde0_x_forward_central_deg = kde0_forward_central_deg(x_1_forward_central_deg)
+plt.plot(x_1_forward_central_deg, kde0_x_forward_central_deg, color='b', label='forward central KDE scipy')
+
+xmin_random = -18.395
+xmax_random = 108.39
+
+kde0_random_deg = gaussian_kde(err_random_deg)
+x_1_random_deg = np.linspace(xmin_random, xmax_random, 200)
+kde0_x_random_deg = kde0_random_deg(x_1_random_deg)
+plt.plot(x_1_random_deg, kde0_x_random_deg, color='b', label='random KDE scipy')
+
+
+
+
 sns.distplot(err_mlso_central_deg,hist=True,label='MLSO',bins=30)
 sns.distplot(err_forward_central_deg,hist=True,label='FORWARD',bins=30)
 sns.distplot(err_random_deg,hist=False,label='Random')
@@ -50,6 +80,29 @@ print(np.min(err_forward_central_deg))
 # Generate plots for LOS arrays
 err_mlso_los_deg = err_mlso_los[np.where(err_mlso_los > 0)]*180/np.pi
 err_forward_los_deg = err_forward_los[np.where(err_forward_los > 0)]*180/np.pi
+
+
+xmin_mlso_los = -13.9
+xmax_mlso_los = 103.9
+
+kde0_mlso_los_deg = gaussian_kde(err_mlso_los_deg)
+x_1_mlso_los_deg = np.linspace(xmin_mlso_los, xmax_mlso_los, 200)
+kde0_x_mlso_los_deg = kde0_mlso_los_deg(x_1_mlso_los_deg)
+plt.plot(x_1_mlso_los_deg, kde0_x_mlso_los_deg, color='b', label='mlso los KDE scipy')
+
+xmin_forward_los = -19.893
+xmax_forward_los = 109.395
+
+kde0_forward_los_deg = gaussian_kde(err_forward_los_deg)
+x_1_forward_los_deg = np.linspace(xmin_forward_los, xmax_forward_los, 200)
+kde0_x_forward_los_deg = kde0_forward_los_deg(x_1_forward_los_deg)
+plt.plot(x_1_forward_los_deg, kde0_x_forward_los_deg, color='b', label='forward los KDE scipy')
+
+
+kde0_random_deg = gaussian_kde(err_random_deg)
+x_1_random_deg = np.linspace(xmin_random, xmax_random, 200)
+kde0_x_random_deg = kde0_random_deg(x_1_random_deg)
+plt.plot(x_1_random_deg, kde0_x_random_deg, color='b', label='random KDE scipy')
 
 sns.distplot(err_mlso_los_deg,hist=True,label='MLSO LOS',bins=30)
 sns.distplot(err_forward_los_deg,hist=True,label='FORWARD LOS',bins=30)
@@ -92,6 +145,7 @@ err_forward_los_deg = err_forward_los[np.where(err_forward_los > 0)]*180/np.pi
 sns.distplot(err_mlso_los_deg,hist=True,label='MLSO K-COR',bins=30,ax=ax[1])
 sns.distplot(err_forward_los_deg,hist=True,label='PSI/FORWARD pB',bins=30,ax=ax[1])
 sns.distplot(err_random_deg,hist=False,label='Random',ax=ax[1])
+# sns.kdeplot(err_mlso_los_deg,label='KDE')
 ax[1].set_xlabel('Angle Discrepancy')
 ax[1].set_ylabel('Probability Density')
 ax[1].set_title('QRaFT Feature Tracing Performance Against LOS Integrated $B$ Field')
@@ -104,6 +158,30 @@ ax[1].legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance_Combined.png'))
 plt.show()
 plt.close()
+
+from sklearn.neighbors import KernelDensity
+import numpy as np
+
+
+n =int(len(err_mlso_los_deg)/3)
+Y = err_mlso_los_deg
+hi, bins, patches = plt.hist(Y,bins=n-1,range=(0,90))
+x = np.concatenate((bins[:-1],hi))
+x_train = x[:,np.newaxis]
+kde = KernelDensity(kernel="gaussian", bandwidth=0.75).fit(x_train)
+log_dens = kde.score_samples(x_train)
+
+
+
+#
+# n =int(len(err_mlso_los_deg)/3)
+# x_vals = np.linspace(0,90,n)
+# Y = err_mlso_los_deg
+# hi, bins = np.histogram(x_vals, Y,bins=n)
+# X = np.concatenate((Y,x_vals))[:, np.newaxis]
+# kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(X)
+# plt.plot(kde.score_samples(X))
+# plt.show()
 
 def create_six_fig_plot(files_z, files_y, outpath):
     file1_z, file2_z, file3_z, file4_z, file5_z, file6_z = files_z
@@ -283,6 +361,8 @@ def create_six_fig_plot(files_z, files_y, outpath):
     plt.show()
     plt.close()
 
+    return fig
+
 Bz1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_Bz_LOS.fits'
 By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_By_LOS.fits'
 Bz2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_Bz_LOS.fits'
@@ -297,9 +377,32 @@ Bz6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.
 By6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_By_LOS.fits'
 file_list_Bz_LOS = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
 file_list_By_LOS = [By1, By2, By3, By4, By5, By6]
-create_six_fig_plot(file_list_Bz_LOS,file_list_By_LOS,os.path.join(repo_path,'Output/Plots/LOS_B_Field_Vector_Plots.png'))
+fig1 = create_six_fig_plot(file_list_Bz_LOS,file_list_By_LOS,os.path.join(repo_path,'Output/Plots/LOS_B_Field_Vector_Plots.png'))
+fig2 = create_six_fig_plot(file_list_Bz_LOS,file_list_By_LOS,os.path.join(repo_path,'Output/Plots/LOS_B_Field_Vector_Plots.png'))
+
+backend = mpl.get_backend()
+mpl.use('agg')
 
 
+c1 = fig1.canvas
+c2 = fig2.canvas
+
+c1.draw()
+c2.draw()
+
+a1 = np.array(c1.buffer_rgba())
+a2 = np.array(c2.buffer_rgba())
+a = np.hstack((a1,a2))
+
+
+mpl.use(backend)
+fig,ax = plt.subplots(figsize=(15, 15),dpi=100)
+fig.subplots_adjust(0, 0, 1, 1)
+ax.set_axis_off()
+ax.matshow(a)
+plt.subplots_adjust(bottom=0.05, top=0.95)
+plt.show()
+plt.close()
 
 fits_dir_bz_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_Bz.fits'
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
@@ -535,3 +638,184 @@ KL_Div_forward_central_random = KL_div(dist_values_forward_central,dist_values_r
 print("KL Divergence between PSI/FORWARD Central and Random",KL_Div_forward_central_random)
 KL_Div_forward_los_random = KL_div(dist_values_forward_los, dist_values_random)
 print("KL Divergence between PSI/FORWARD LOS and Random",KL_Div_forward_los_random)
+
+print("")
+
+print("MLSO average discrepancy: " + str(np.round(np.average(err_mlso_central_deg),5)))
+print("FORWARD average discrepancy: " + str(np.round(np.average(err_forward_central_deg),5)))
+print("Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
+
+print("MLSO LOS average discrepancy: " + str(np.round(np.average(err_mlso_los_deg),5)))
+print("FORWARD LOS average discrepancy: " + str(np.round(np.average(err_forward_los_deg),5)))
+print("Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
+print("")
+
+print("KDE Results: ")
+print("")
+#compute JS Divergence
+result_JSD_MLSO_FORWARD_LOS= JS_Div(kde0_x_mlso_los_deg, kde0_x_forward_los_deg)
+print("JS Divergence between MLSO LOS and PSI/FORWARD LOS",result_JSD_MLSO_FORWARD_LOS)
+result_JSD_MLSO_FORWARD_Central= JS_Div(kde0_x_mlso_central_deg, kde0_x_forward_central_deg)
+print("JS Divergence between MLSO Central and PSI/FORWARD Central",result_JSD_MLSO_FORWARD_Central)
+
+result_JSD12= JS_Div(kde0_x_mlso_los_deg, kde0_x_random_deg)
+print("JS Divergence between MLSO LOS and Random",result_JSD12)
+result_JSD21= JS_Div(kde0_x_mlso_central_deg, kde0_x_random_deg)
+print("JS Divergence between MLSO Central and Random",result_JSD21)
+
+result_JSD12= JS_Div(kde0_x_forward_los_deg, kde0_x_random_deg)
+print("JS Divergence between PSI/FORWARD LOS and Random",result_JSD12)
+result_JSD21= JS_Div(kde0_x_forward_central_deg, dist_values_random)
+print("JS Divergence between PSI/FORWARD Central and Random",result_JSD21)
+
+print("")
+
+#compute KL Divergence
+KL_Div_mlso_forward_central = KL_div(kde0_x_mlso_central_deg, kde0_x_forward_central_deg)
+print("KL Divergence between MLSO Central and PSI/FORWARD Central",KL_Div_mlso_forward_central)
+KL_Div_mlso_forward_los = KL_div(kde0_x_mlso_los_deg, kde0_x_forward_los_deg)
+print("KL Divergence between MLSO LOS and PSI/FORWARD LOS",KL_Div_mlso_forward_los)
+
+KL_Div_mlso_central_random = KL_div(kde0_x_mlso_central_deg, kde0_x_random_deg)
+print("KL Divergence between MLSO Central and Random",KL_Div_mlso_central_random)
+KL_Div_mlso_los_random = KL_div(kde0_x_mlso_los_deg, kde0_x_random_deg)
+print("KL Divergence between MLSO LOS and Random",KL_Div_mlso_los_random)
+
+KL_Div_forward_central_random = KL_div(kde0_x_forward_central_deg, dist_values_random)
+print("KL Divergence between PSI/FORWARD Central and Random",KL_Div_forward_central_random)
+KL_Div_forward_los_random = KL_div(kde0_x_forward_los_deg, kde0_x_random_deg)
+print("KL Divergence between PSI/FORWARD LOS and Random",KL_Div_forward_los_random)
+
+print("")
+print("Funzies")
+
+result_JSD_MLSO_FORWARD_LOS= JS_Div(kde0_x_mlso_los_deg, dist_values_mlso_los)
+print("JS Divergence between MLSO LOS KDE to SNS.DISTPLOT",result_JSD_MLSO_FORWARD_LOS)
+result_JSD_MLSO_FORWARD_Central= JS_Div(kde0_x_mlso_central_deg, dist_values_mlso_central)
+print("JS Divergence between MLSO Central KDE to SNS.DISTPLOT",result_JSD_MLSO_FORWARD_Central)
+
+from scipy.integrate import quad
+import scipy.stats
+
+
+mean = np.average(err_mlso_los_deg)
+std = np.std(err_mlso_los_deg)
+
+"""
+def normal_distribution_function(x):
+    value = scipy.stats.norm.pdf(x,mean,std)
+    return value
+x1 = mean + std
+x2 = mean + 2.0 * std
+
+
+x_min = 0
+x_max = 90
+
+x = np.linspace(x_min, x_max, 100)
+
+y = scipy.stats.norm.pdf(x,mean,std)
+
+plt.plot(x,y, color='black')
+
+res, err = quad(normal_distribution_function, x1, x2)
+
+
+print('Normal Distribution (mean,std):',mean,std)
+print('Integration bewteen {} and {} --> '.format(x1,x2),res)
+
+#----------------------------------------------------------------------------------------#
+# plot integration surface
+
+ptx = np.linspace(x1, x2, 10)
+pty = scipy.stats.norm.pdf(ptx,mean,std)
+
+distribution_names = dict({'name': 'Dionysia' ,'age': 28,'location': 'Athens'})
+
+plt.fill_between(ptx, pty, color='#0b559f', alpha=1.0)
+
+#----------------------------------------------------------------------------------------#
+
+plt.grid()
+
+plt.xlim(x_min,x_max)
+plt.ylim(0,max(y))
+
+plt.title('How to integrate a normal distribution in python ?',fontsize=10)
+
+plt.xlabel('x')
+plt.ylabel('Normal Distribution')
+
+plt.savefig("integrate_normal_distribution.png")
+plt.show()
+plt.close()
+"""
+
+def integrate_distribution(dist, x1, x2, x_min, x_max):
+
+
+    mean = np.average(dist)
+    std = np.std(dist)
+
+
+    kde0 = gaussian_kde(dist)
+    # x_1_mlso_central_deg = np.linspace(xmin_mlso_central, xmax_mlso_central, 200)
+
+
+    x = np.linspace(x_min, x_max, 200)
+    y = kde0(x)
+
+    plt.plot(x,y, color='black')
+
+    res, err = quad(kde0_forward_central_deg, x1, x2)
+    print(' Distribution (mean,std):',mean,std)
+    print('Integration bewteen {} and {} --> '.format(x1,x2),res)
+
+    #----------------------------------------------------------------------------------------#
+    # plot integration surface
+
+    ptx = np.linspace(x1, x2, 200)
+    pty = kde0(ptx)
+    plt.fill_between(ptx, pty, color='#0b559f', alpha=1.0)
+
+    plt.grid()
+    #
+    plt.xlim(x_min,x_max)
+    # plt.ylim(0,max(y))
+
+    dist_name = 'No Name'
+
+    if dist.all() == err_mlso_central_deg.all():
+        dist_name = 'MLSO Central'
+    if dist.all() == err_forward_central_deg.all():
+        dist_name = 'PSI/FORWARD Central'
+    if dist.all() == err_mlso_los_deg.all():
+        dist_name = 'MLSO LOS'
+    if dist.all() == err_forward_los_deg.all():
+        dist_name = 'PSI/FORWARD LOS'
+
+
+    plt.title('Probability Density Integral for {} between points {}, {}: {}'.format(dist_name,x1,x2,res),fontsize=10)
+
+    plt.xlabel('x')
+    plt.ylabel('Normal Distribution')
+
+    plt.savefig("integrate_normal_distribution.png")
+    plt.show()
+    plt.close()
+
+    return res
+
+integrate_distribution(err_mlso_central_deg,-14.5,0,xmin_mlso_central, xmax_mlso_central)
+
+#
+# # new bandwith STUFF
+# bandwidth = 0.5
+# kde0 = gaussian_kde(err_mlso_los_deg, bw_method=bandwidth)
+# dist_values_mlso_los = sns.kdeplot(err_mlso_los_deg,bw_adjust=bandwidth).get_lines()[0].get_data()[1]
+# dist_values_mlso_los_norm = dist_values_mlso_los / dist_values_mlso_los.max()
+# kde0_x_norm = kde0_x / kde0_x.max()
+# plt.plot(x_1,kde0_x_norm,label='scipy')
+# plt.plot(x_1, dist_values_mlso_los_norm, label='seaborne')
+# plt.legend()
+# plt.show()

@@ -8,6 +8,7 @@ from astropy.wcs import WCS
 from astropy.io import fits
 import sunpy
 import sunpy.map
+import matplotlib
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -162,7 +163,7 @@ plt.close()
 from sklearn.neighbors import KernelDensity
 import numpy as np
 
-
+"""
 n =int(len(err_mlso_los_deg)/3)
 Y = err_mlso_los_deg
 hi, bins, patches = plt.hist(Y,bins=n-1,range=(0,90))
@@ -170,9 +171,384 @@ x = np.concatenate((bins[:-1],hi))
 x_train = x[:,np.newaxis]
 kde = KernelDensity(kernel="gaussian", bandwidth=0.75).fit(x_train)
 log_dens = kde.score_samples(x_train)
+"""
+
+
+fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170820_180657_kcor_l2_avg.fts'
+
+data1 = fits.getdata(fits_dir_mlso)
+head1 = fits.getheader(fits_dir_mlso)
+head1['detector'] = ('KCor')
+mlsomap = sunpy.map.Map(data1, head1)
+# psimap.plot_settings['norm'] = plt.Normalize(mlsomap.min(), mlsomap.max())
+
+fig1 = plt.figure(figsize=(10, 10))
+ax1 = fig1.add_subplot(3, 2, 1, projection=mlsomap)
+mlsomap.plot(axes=ax1,title=False)
+R_SUN = head1['R_SUN']
+ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170825_185258_kcor_l2_avg.fts'
+
+data2 = fits.getdata(fits_dir_mlso)
+head2 = fits.getheader(fits_dir_mlso)
+head2['detector'] = ('KCor')
+mlsomap = sunpy.map.Map(data2, head2)
+
+ax2 = fig1.add_subplot(3, 2, 2, projection=mlsomap)
+mlsomap.plot(axes=ax2,title=False)
+R_SUN = head2['R_SUN']
+ax2.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170829_200801_kcor_l2_avg.fts'
+
+data3 = fits.getdata(fits_dir_mlso)
+head3 = fits.getheader(fits_dir_mlso)
+head3['detector'] = ('KCor')
+mlsomap = sunpy.map.Map(data3, head3)
+
+ax3 = fig1.add_subplot(3, 2, 3, projection=mlsomap)
+mlsomap.plot(axes=ax3,title=False)
+R_SUN = head3['R_SUN']
+ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170903_025117_kcor_l2_avg.fts'
+
+data4 = fits.getdata(fits_dir_mlso)
+head4 = fits.getheader(fits_dir_mlso)
+head4['detector'] = ('KCor')
+mlsomap = sunpy.map.Map(data4, head4)
+
+ax4 = fig1.add_subplot(3, 2, 4, projection=mlsomap)
+mlsomap.plot(axes=ax4,title=False)
+R_SUN = head4['R_SUN']
+ax4.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170906_213054_kcor_l2_avg.fts'
+
+data5 = fits.getdata(fits_dir_mlso)
+head5 = fits.getheader(fits_dir_mlso)
+head5['detector'] = ('KCor')
+mlsomap = sunpy.map.Map(data5, head5)
+
+
+ax5 = fig1.add_subplot(3, 2, 5, projection=mlsomap)
+mlsomap.plot(axes=ax5,title=False)
+R_SUN = head5['R_SUN']
+ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
+
+data6 = fits.getdata(fits_dir_mlso)
+head6 = fits.getheader(fits_dir_mlso)
+head6['detector'] = ('KCor')
+mlsomap = sunpy.map.Map(data6, head6)
+
+ax6 = fig1.add_subplot(3, 2, 6, projection=mlsomap)
+ax6.set_xlabel(' ')
+mlsomap.plot(axes=ax6,title=False)
+R_SUN = head6['R_SUN']
+ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+plt.subplots_adjust(bottom=0.05, top=0.95)
+plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_Plots.png'))
+plt.show()
+
+
+Bz1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
+# By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
+Bz2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_pB.fits'
+# By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By.fits'
+Bz3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_pB.fits'
+# By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By.fits'
+Bz4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_pB.fits'
+# By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By.fits'
+Bz5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_pB.fits'
+# By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By.fits'
+Bz6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_pB.fits'
+
+
+fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
+
+data1 = fits.getdata(fits_dir_psi)
+head1 = fits.getheader(fits_dir_psi)
+head1['detector'] = ('KCor')
+psimap = sunpy.map.Map(data1, head1)
+# psimap.plot_settings['norm'] = plt.Normalize(psimap.min(), psimap.max())
+
+fig2 = plt.figure(figsize=(10, 10))
+ax1 = fig2.add_subplot(3, 2, 1, projection=psimap)
+psimap.plot(axes=ax1,title=False,norm=matplotlib.colors.LogNorm())
+R_SUN = head1['R_SUN']
+ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_pB.fits'
+
+data2 = fits.getdata(fits_dir_psi)
+head2 = fits.getheader(fits_dir_psi)
+head2['detector'] = ('KCor')
+psimap = sunpy.map.Map(data2, head2)
+
+ax2 = fig2.add_subplot(3, 2, 2, projection=psimap)
+psimap.plot(axes=ax2,title=False,norm=matplotlib.colors.LogNorm())
+R_SUN = head2['R_SUN']
+ax2.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_pB.fits'
+
+data3 = fits.getdata(fits_dir_psi)
+head3 = fits.getheader(fits_dir_psi)
+head3['detector'] = ('KCor')
+psimap = sunpy.map.Map(data3, head3)
+
+ax3 = fig2.add_subplot(3, 2, 3, projection=psimap)
+psimap.plot(axes=ax3,title=False,norm=matplotlib.colors.LogNorm())
+R_SUN = head3['R_SUN']
+ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_pB.fits'
+
+data4 = fits.getdata(fits_dir_psi)
+head4 = fits.getheader(fits_dir_psi)
+head4['detector'] = ('KCor')
+psimap = sunpy.map.Map(data4, head4)
+
+ax4 = fig2.add_subplot(3, 2, 4, projection=psimap)
+psimap.plot(axes=ax4,title=False,norm=matplotlib.colors.LogNorm())
+R_SUN = head4['R_SUN']
+ax4.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_pB.fits'
+
+data5 = fits.getdata(fits_dir_psi)
+head5 = fits.getheader(fits_dir_psi)
+head5['detector'] = ('KCor')
+psimap = sunpy.map.Map(data5, head5)
+
+
+ax5 = fig2.add_subplot(3, 2, 5, projection=psimap)
+psimap.plot(axes=ax5,title=False,norm=matplotlib.colors.LogNorm())
+R_SUN = head5['R_SUN']
+ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_pB.fits'
+
+data6 = fits.getdata(fits_dir_psi)
+head6 = fits.getheader(fits_dir_psi)
+head6['detector'] = ('KCor')
+psimap = sunpy.map.Map(data6, head6)
+
+ax6 = fig2.add_subplot(3, 2, 6, projection=psimap)
+ax6.set_xlabel(' ')
+psimap.plot(axes=ax6,title=False,norm=matplotlib.colors.LogNorm())
+R_SUN = head6['R_SUN']
+ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+plt.subplots_adjust(bottom=0.05, top=0.95)
+plt.savefig(os.path.join(repo_path,'Output/Plots/PSI_Plots.png'))
+plt.show()
 
 
 
+
+"""
+def create_six_fig_plot_dens(files_z, outpath):
+    file1_z, file2_z, file3_z, file4_z, file5_z, file6_z = files_z
+
+    fits_dir_bz_los_coaligned = file1_z
+    data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+    head_bz_los_coaligned['detector'] = ('KCor')
+    # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+    bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+
+    wcs = WCS(head_bz_los_coaligned)
+
+    # ny, nz = 1024,1024
+    # dy = np.linspace(0, int(ny), ny)
+    # dz = np.linspace(0, int(nz), nz)
+    R_SUN = head_bz_los_coaligned['R_SUN']
+    # widths = np.linspace(0,500,by_los_coaligned_map.data.size)
+    # skip_val = 14
+    # skip = (slice(None, None, skip_val), slice(None, None, skip_val))
+    # skip1 = slice(None, None, skip_val)
+    fig = plt.figure(figsize =(10, 10))
+    # ax1 = plt.subplot(3,2,1,projection=wcs)
+    # fig.add_subplot(rows, columns, i+1,projection=wcs)
+    ax1 = fig.add_subplot(3, 2, 1, projection=bz_los_coaligned_map)
+    bz_los_coaligned_map.plot(axes=ax1,norm=matplotlib.colors.LogNorm())
+    # ax1.imshow(data_bz_los_coaligned,origin='lower',cmap='Greys_r',aspect='auto')
+    ax1.set_aspect('equal')
+    ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+    # ax1.set_title('6.89000_303.470 LOS $B_z$ vs $B_y$ Field Vector Plot')
+    ax1.set_xlabel(' ')
+    ax1.set_ylabel('Helioprojective Latitude (Solar-Y)')
+
+
+    fits_dir_bz_los_coaligned = file2_z
+    data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+    head_bz_los_coaligned['detector'] = ('KCor')
+    # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+    bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+
+    wcs = WCS(head_bz_los_coaligned)
+
+    # ny, nz = 1024,1024
+    # dy = np.linspace(0, int(ny), ny)
+    # dz = np.linspace(0, int(nz), nz)
+    R_SUN = head_bz_los_coaligned['R_SUN']
+    # widths = np.linspace(0,500,by_los_coaligned_map.data.size)
+    # skip_val = 14
+    # skip = (slice(None, None, skip_val), slice(None, None, skip_val))
+    # skip1 = slice(None, None, skip_val)
+    fig, ((ax1, ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3, 2, subplot_kw={'projection':wcs},figsize =(15, 15))
+    # ax1 = plt.subplot(3,2,1,projection=wcs)
+    ax2 = fig.add_subplot(3, 2, 2, projection=bz_los_coaligned_map)
+    bz_los_coaligned_map.plot(axes=ax2,norm=matplotlib.colors.LogNorm())
+    # ax2.imshow(data_bz_los_coaligned,norm=matplotlib.colors.LogNorm(),origin='lower',cmap='Greys_r',aspect='auto')
+    ax2.set_aspect('equal')
+    ax2.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+    # ax1.set_title('6.89000_303.470 LOS $B_z$ vs $B_y$ Field Vector Plot')
+    ax2.set_xlabel(' ')
+    ax2.set_ylabel('Helioprojective Latitude (Solar-Y)')
+
+    fits_dir_bz_los_coaligned = file3_z
+    data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+    head_bz_los_coaligned['detector'] = ('KCor')
+    # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+    bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+
+    wcs = WCS(head_bz_los_coaligned)
+
+    # ny, nz = 1024,1024
+    # dy = np.linspace(0, int(ny), ny)
+    # dz = np.linspace(0, int(nz), nz)
+    R_SUN = head_bz_los_coaligned['R_SUN']
+    # widths = np.linspace(0,500,by_los_coaligned_map.data.size)
+    # skip_val = 14
+    # skip = (slice(None, None, skip_val), slice(None, None, skip_val))
+    # skip1 = slice(None, None, skip_val)
+    fig, ((ax1, ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3, 2, subplot_kw={'projection':wcs},figsize =(10, 10))
+    # ax1 = plt.subplot(3,2,1,projection=wcs)
+    ax3 = fig.add_subplot(3, 2, 3, projection=bz_los_coaligned_map)
+    bz_los_coaligned_map.plot(axes=ax3,norm=matplotlib.colors.LogNorm())
+    # ax3.imshow(data_bz_los_coaligned,norm=matplotlib.colors.LogNorm(),origin='lower',cmap='Greys_r',aspect='auto')
+    ax3.set_aspect('equal')
+    ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+    # ax1.set_title('6.89000_303.470 LOS $B_z$ vs $B_y$ Field Vector Plot')
+    ax3.set_xlabel(' ')
+    ax3.set_ylabel('Helioprojective Latitude (Solar-Y)')
+
+    fits_dir_bz_los_coaligned = file4_z
+    data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+    head_bz_los_coaligned['detector'] = ('KCor')
+    # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+    bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+
+    wcs = WCS(head_bz_los_coaligned)
+
+    # ny, nz = 1024,1024
+    # dy = np.linspace(0, int(ny), ny)
+    # dz = np.linspace(0, int(nz), nz)
+    R_SUN = head_bz_los_coaligned['R_SUN']
+    # widths = np.linspace(0,500,by_los_coaligned_map.data.size)
+    # skip_val = 14
+    # skip = (slice(None, None, skip_val), slice(None, None, skip_val))
+    # skip1 = slice(None, None, skip_val)
+    fig, ((ax1, ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3, 2, subplot_kw={'projection':wcs},figsize =(10, 10))
+    # ax1 = plt.subplot(3,2,1,projection=wcs)
+    ax4 = fig.add_subplot(3, 2, 4, projection=bz_los_coaligned_map)
+    bz_los_coaligned_map.plot(axes=ax4,norm=matplotlib.colors.LogNorm())
+    # ax4.imshow(data_bz_los_coaligned,norm=matplotlib.colors.LogNorm(),origin='lower',cmap='Greys_r',aspect='auto')
+    ax4.set_aspect('equal')
+    ax4.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+    # ax1.set_title('6.89000_303.470 LOS $B_z$ vs $B_y$ Field Vector Plot')
+    ax4.set_xlabel(' ')
+    ax4.set_ylabel('Helioprojective Latitude (Solar-Y)')
+
+    fits_dir_bz_los_coaligned = file5_z
+    data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+    head_bz_los_coaligned['detector'] = ('KCor')
+    # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+    bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+
+    wcs = WCS(head_bz_los_coaligned)
+
+    # ny, nz = 1024,1024
+    # dy = np.linspace(0, int(ny), ny)
+    # dz = np.linspace(0, int(nz), nz)
+    R_SUN = head_bz_los_coaligned['R_SUN']
+    # widths = np.linspace(0,500,by_los_coaligned_map.data.size)
+    # skip_val = 14
+    # skip = (slice(None, None, skip_val), slice(None, None, skip_val))
+    # skip1 = slice(None, None, skip_val)
+    fig, ((ax1, ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3, 2, subplot_kw={'projection':wcs},figsize =(10, 10))
+    # ax1 = plt.subplot(3,2,1,projection=wcs)
+    ax5 = fig.add_subplot(3, 2, 5, projection=bz_los_coaligned_map)
+    bz_los_coaligned_map.plot(axes=ax5,norm=matplotlib.colors.LogNorm())
+    # ax5.imshow(data_bz_los_coaligned,norm=matplotlib.colors.LogNorm(),origin='lower',cmap='Greys_r',aspect='auto')
+    ax5.set_aspect('equal')
+    ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+    # ax1.set_title('6.89000_303.470 LOS $B_z$ vs $B_y$ Field Vector Plot')
+    ax5.set_xlabel('Helioprojective Longitude (Solar-X)')
+    ax5.set_ylabel('Helioprojective Latitude (Solar-Y)')
+
+    fits_dir_bz_los_coaligned = file6_z
+    data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+    head_bz_los_coaligned['detector'] = ('KCor')
+    # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+    bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+
+    wcs = WCS(head_bz_los_coaligned)
+
+    # ny, nz = 1024,1024
+    # dy = np.linspace(0, int(ny), ny)
+    # dz = np.linspace(0, int(nz), nz)
+    R_SUN = head_bz_los_coaligned['R_SUN']
+    # widths = np.linspace(0,500,by_los_coaligned_map.data.size)
+    # skip_val = 14
+    # skip = (slice(None, None, skip_val), slice(None, None, skip_val))
+    # skip1 = slice(None, None, skip_val)
+    fig, ((ax1, ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3, 2, subplot_kw={'projection':wcs},figsize =(10, 10))
+    # ax1 = plt.subplot(3,2,1,projection=wcs)
+    ax6 = fig.add_subplot(3, 2, 6, projection=bz_los_coaligned_map)
+    bz_los_coaligned_map.plot(axes=ax6,norm=matplotlib.colors.LogNorm())
+    # ax6.imshow(data_bz_los_coaligned,norm=matplotlib.colors.LogNorm(),origin='lower',cmap='Greys_r',aspect='auto')
+    ax6.set_aspect('equal')
+    ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+    # ax1.set_title('6.89000_303.470 LOS $B_z$ vs $B_y$ Field Vector Plot')
+    ax6.set_xlabel('Helioprojective Longitude (Solar-X)')
+    ax6.set_ylabel('Helioprojective Latitude (Solar-Y)')
+    plt.subplots_adjust(bottom=0.05, top=0.95)
+
+    mpl.rcParams.update(mpl.rcParamsDefault)
+    # fig.tight_layout()
+    # fig.set_constrained_layout_pads(w_pad=1 / 102, h_pad=1 / 102, hspace=0.0,
+    #                                 wspace=0.0)
+    plt.savefig(outpath)
+
+    plt.show()
+    plt.close()
+
+    return fig
+"""
 #
 # n =int(len(err_mlso_los_deg)/3)
 # x_vals = np.linspace(0,90,n)
@@ -219,8 +595,8 @@ def create_six_fig_plot(files_z, files_y, outpath):
     ax1.set_aspect('equal')
     ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
     # ax1.set_title('6.89000_303.470 LOS $B_z$ vs $B_y$ Field Vector Plot')
-    ax1.set_xlabel(' ')
-    ax1.set_ylabel('Z Position')
+    ax1.set_xlabel('Helioprojective Longitude (Solar-X)')
+    ax1.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
     fits_dir_bz_los_coaligned = file2_z
     data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
@@ -245,8 +621,8 @@ def create_six_fig_plot(files_z, files_y, outpath):
     ax2.set_aspect('equal')
     ax2.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
     # ax2.set_title('7.05600_236.978 LOS $B_z$ vs $B_y$ Field Vector Plot')
-    ax2.set_xlabel(' ')
-    ax2.set_ylabel('Z Position')
+    ax2.set_xlabel('Helioprojective Longitude (Solar-X)')
+    ax2.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
     fits_dir_bz_los_coaligned = file3_z
     data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
@@ -271,8 +647,8 @@ def create_six_fig_plot(files_z, files_y, outpath):
     ax3.set_aspect('equal')
     ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
     # ax3.set_title('7.15300_183.443 LOS $B_z$ vs $B_y$ Field Vector Plot')
-    ax3.set_xlabel(' ')
-    ax3.set_ylabel('Z Position')
+    ax3.set_xlabel('Helioprojective Longitude (Solar-X)')
+    ax3.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
     fits_dir_bz_los_coaligned = file4_z
     data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
@@ -297,8 +673,8 @@ def create_six_fig_plot(files_z, files_y, outpath):
     ax4.set_aspect('equal')
     ax4.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
     # ax4.set_title('7.22000_126.906 LOS $B_z$ vs $B_y$ Field Vector Plot')
-    ax4.set_xlabel(' ')
-    ax4.set_ylabel('Z Position')
+    ax4.set_xlabel('Helioprojective Longitude (Solar-X)')
+    ax4.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
     fits_dir_bz_los_coaligned = file5_z
     data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
@@ -323,8 +699,8 @@ def create_six_fig_plot(files_z, files_y, outpath):
     ax5.set_aspect('equal')
     ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
     # ax5.set_title('7.24700_77.0150 LOS $B_z$ vs $B_y$ Field Vector Plot')
-    ax5.set_xlabel('Y Position')
-    ax5.set_ylabel('Z Position')
+    ax5.set_xlabel('Helioprojective Longitude (Solar-X)')
+    ax5.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
     fits_dir_bz_los_coaligned = file6_z
     data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
@@ -349,8 +725,8 @@ def create_six_fig_plot(files_z, files_y, outpath):
     ax6.set_aspect('equal')
     ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
     # ax6.set_title('7.23800_11.5530 LOS $B_z$ vs $B_y$ Field Vector Plot')
-    ax6.set_xlabel('Y Position')
-    ax6.set_ylabel('Z Position')
+    ax6.set_xlabel('Helioprojective Longitude (Solar-X)')
+    ax6.set_ylabel('Helioprojective Latitude (Solar-Y)')
     plt.subplots_adjust(bottom=0.05, top=0.95)
 
     mpl.rcParams.update(mpl.rcParamsDefault)
@@ -377,8 +753,71 @@ Bz6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.
 By6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_By_LOS.fits'
 file_list_Bz_LOS = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
 file_list_By_LOS = [By1, By2, By3, By4, By5, By6]
-fig1 = create_six_fig_plot(file_list_Bz_LOS,file_list_By_LOS,os.path.join(repo_path,'Output/Plots/LOS_B_Field_Vector_Plots.png'))
-fig2 = create_six_fig_plot(file_list_Bz_LOS,file_list_By_LOS,os.path.join(repo_path,'Output/Plots/LOS_B_Field_Vector_Plots.png'))
+
+create_six_fig_plot(file_list_Bz_LOS,file_list_By_LOS,os.path.join(repo_path,'Output/Plots/LOS_B_Field_Vector_Plots.png'))
+
+Bz1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_Bz.fits'
+By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_By.fits'
+Bz2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_Bz.fits'
+By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By.fits'
+Bz3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_Bz.fits'
+By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By.fits'
+Bz4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_Bz.fits'
+By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By.fits'
+Bz5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_Bz.fits'
+By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By.fits'
+Bz6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_Bz.fits'
+By6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_By.fits'
+file_list_Bz_LOS = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
+file_list_By_LOS = [By1, By2, By3, By4, By5, By6]
+
+create_six_fig_plot(file_list_Bz_LOS,file_list_By_LOS,os.path.join(repo_path,'Output/Plots/Central_B_Field_Vector_Plots.png'))
+
+
+Bz1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
+# By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
+Bz2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_pB.fits'
+# By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By.fits'
+Bz3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_pB.fits'
+# By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By.fits'
+Bz4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_pB.fits'
+# By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By.fits'
+Bz5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_pB.fits'
+# By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By.fits'
+Bz6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_pB.fits'
+# By6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_By.fits'
+file_list_pB = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
+# file_list_By_LOS = [By1, By2, By3, By4, By5, By6]
+
+
+
+
+By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170820_180657_kcor_l2_avg.fts'
+# By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
+By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170825_185258_kcor_l2_avg.fts'
+# By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By.fits'
+By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170829_200801_kcor_l2_avg.fts'
+# By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By.fits'
+By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170903_025117_kcor_l2_avg.fts'
+# By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By.fits'
+By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170906_213054_kcor_l2_avg.fts'
+# By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By.fits'
+By6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
+# By6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_By.fits'
+file_list_pB = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
+file_list_MLSO = [By1, By2, By3, By4, By5, By6]
+# file_list_By_LOS = [By1, By2, By3, By4, By5, By6]
+
+# fig1 = create_six_fig_plot_dens(file_list_pB,os.path.join(repo_path,'Output/Plots/Forward_pB_Plots.png'))
+# fig2 = create_six_fig_plot_dens(file_list_MLSO,os.path.join(repo_path,'Output/Plots/MLSO_Plots.png'))
+
+
+
+
+# fig1 = create_six_fig_plot(file_list_Bz_LOS,file_list_By_LOS,os.path.join(repo_path,'Output/Plots/LOS_B_Field_Vector_Plots.png'))
+
+
+# fig2 = create_six_fig_plot(file_list_Bz_LOS,file_list_By_LOS,os.path.join(repo_path,'Output/Plots/LOS_B_Field_Vector_Plots.png'))
 
 backend = mpl.get_backend()
 mpl.use('agg')
@@ -400,10 +839,11 @@ fig,ax = plt.subplots(figsize=(15, 15),dpi=100)
 fig.subplots_adjust(0, 0, 1, 1)
 ax.set_axis_off()
 ax.matshow(a)
-plt.subplots_adjust(bottom=0.05, top=0.95)
+plt.subplots_adjust(bottom=0.05, top=1.25)
 plt.show()
 plt.close()
 
+"""
 fits_dir_bz_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_Bz.fits'
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned = fits.getheader(fits_dir_bz_central_coaligned)
@@ -433,8 +873,8 @@ ax1.quiver(dy[skip1],dz[skip1],by_central_coaligned_map.data[skip],bz_central_co
 ax1.set_aspect('equal')
 ax1.add_patch(Circle((0,0), R_SUN, color='black',zorder=100))
 ax1.set_title('6.89000_303.470 Central $B_z$ vs $B_y$ Field Vector Plot')
-ax1.set_xlabel('Y Position')
-ax1.set_ylabel('Z Position')
+ax1.set_xlabel('Helioprojective Longitude (Solar-X)')
+ax1.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
 fits_dir_bz_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_Bz.fits'
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
@@ -458,8 +898,8 @@ ax2.quiver(dy[skip1],dz[skip1],by_central_coaligned_map.data[skip],bz_central_co
 ax2.set_aspect('equal')
 ax2.add_patch(Circle((0,0), R_SUN, color='black',zorder=100))
 ax2.set_title('7.05600_236.978 Central $B_z$ vs $B_y$ Field Vector Plot')
-ax2.set_xlabel('Y Position')
-ax2.set_ylabel('Z Position')
+ax2.set_xlabel('Helioprojective Longitude (Solar-X)')
+ax2.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
 fits_dir_bz_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_Bz.fits'
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
@@ -483,8 +923,8 @@ ax3.quiver(dy[skip1],dz[skip1],by_central_coaligned_map.data[skip],bz_central_co
 ax3.set_aspect('equal')
 ax3.add_patch(Circle((0,0), R_SUN, color='black',zorder=100))
 ax3.set_title('7.15300_183.443 Central $B_z$ vs $B_y$ Field Vector Plot')
-ax3.set_xlabel('Y Position')
-ax3.set_ylabel('Z Position')
+ax3.set_xlabel('Helioprojective Longitude (Solar-X)')
+ax3.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
 fits_dir_bz_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_Bz.fits'
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
@@ -508,8 +948,8 @@ ax4.quiver(dy[skip1],dz[skip1],by_central_coaligned_map.data[skip],bz_central_co
 ax4.set_aspect('equal')
 ax4.add_patch(Circle((0,0), R_SUN, color='black',zorder=100))
 ax4.set_title('7.22000_126.906 Central $B_z$ vs $B_y$ Field Vector Plot')
-ax4.set_xlabel('Y Position')
-ax4.set_ylabel('Z Position')
+ax4.set_xlabel('Helioprojective Longitude (Solar-X)')
+ax4.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
 fits_dir_bz_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_Bz.fits'
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
@@ -533,8 +973,8 @@ ax6.quiver(dy[skip1],dz[skip1],by_central_coaligned_map.data[skip],bz_central_co
 ax6.set_aspect('equal')
 ax6.add_patch(Circle((0,0), R_SUN, color='black',zorder=100))
 ax6.set_title('7.23800_11.5530 Central $B_z$ vs $B_y$ Field Vector Plot')
-ax6.set_xlabel('Y Position')
-ax6.set_ylabel('Z Position')
+ax6.set_xlabel('Helioprojective Longitude (Solar-X)')
+ax6.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
 fits_dir_bz_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_Bz.fits'
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
@@ -558,13 +998,14 @@ ax5.quiver(dy[skip1],dz[skip1],by_central_coaligned_map.data[skip],bz_central_co
 ax5.set_aspect('equal')
 ax5.add_patch(Circle((0,0), R_SUN, color='black',zorder=100))
 ax5.set_title('7.24700_77.0150 Central $B_z$ vs $B_y$ Field Vector Plot')
-ax5.set_xlabel('Y Position')
-ax5.set_ylabel('Z Position')
+ax5.set_xlabel('Helioprojective Longitude (Solar-X)')
+ax5.set_ylabel('Helioprojective Latitude (Solar-Y)')
 mpl.rcParams.update(mpl.rcParamsDefault)
 plt.tight_layout()
 plt.savefig(os.path.join(repo_path,'Output/Plots/Central_B_Field_Vector_Plots.png'))
 plt.show()
 plt.close()
+"""
 
 # retrieve probability density data from seaborne distplots
 dist_values_mlso_central = sns.distplot(err_mlso_central_deg).get_lines()[0].get_data()[1]

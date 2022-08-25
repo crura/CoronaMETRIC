@@ -1249,6 +1249,237 @@ def integrate_distribution(dist, x1, x2, x_min, x_max):
 
 integrate_distribution(err_mlso_central_deg,-14.5,0,xmin_mlso_central, xmax_mlso_central)
 
+
+
+
+# Make Combined Plot
+
+
+
+fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170820_180657_kcor_l2_avg.fts'
+
+data1 = fits.getdata(fits_dir_mlso)
+head1 = fits.getheader(fits_dir_mlso)
+head1['detector'] = ('KCor')
+mlsomap = sunpy.map.Map(data1, head1)
+# psimap.plot_settings['norm'] = plt.Normalize(mlsomap.min(), mlsomap.max())
+
+fig1 = plt.figure(figsize=(10, 10))
+ax1 = fig1.add_subplot(3, 2, 1, projection=mlsomap)
+mlsomap.plot(axes=ax1,title=False)
+R_SUN = head1['R_SUN']
+ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
+
+data2 = fits.getdata(fits_dir_mlso)
+head2 = fits.getheader(fits_dir_mlso)
+head2['detector'] = ('KCor')
+mlsomap = sunpy.map.Map(data2, head2)
+
+ax2 = fig1.add_subplot(3, 2, 2, projection=mlsomap)
+mlsomap.plot(axes=ax2,title=False,norm=matplotlib.colors.LogNorm())
+R_SUN = head2['R_SUN']
+ax2.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170825_185258_kcor_l2_avg.fts'
+
+data3 = fits.getdata(fits_dir_mlso)
+head3 = fits.getheader(fits_dir_mlso)
+head3['detector'] = ('KCor')
+mlsomap = sunpy.map.Map(data3, head3)
+
+ax3 = fig1.add_subplot(3, 2, 3, projection=mlsomap)
+mlsomap.plot(axes=ax3,title=False)
+R_SUN = head3['R_SUN']
+ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_pB.fits'
+
+data4 = fits.getdata(fits_dir_mlso)
+head4 = fits.getheader(fits_dir_mlso)
+head4['detector'] = ('KCor')
+mlsomap = sunpy.map.Map(data4, head4)
+
+ax4 = fig1.add_subplot(3, 2, 4, projection=mlsomap)
+mlsomap.plot(axes=ax4,title=False,norm=matplotlib.colors.LogNorm())
+R_SUN = head4['R_SUN']
+ax4.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170829_200801_kcor_l2_avg.fts'
+
+data5 = fits.getdata(fits_dir_mlso)
+head5 = fits.getheader(fits_dir_mlso)
+head5['detector'] = ('KCor')
+mlsomap = sunpy.map.Map(data5, head5)
+
+
+ax5 = fig1.add_subplot(3, 2, 5, projection=mlsomap)
+mlsomap.plot(axes=ax5,title=False)
+R_SUN = head5['R_SUN']
+ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_pB.fits'
+
+data6 = fits.getdata(fits_dir_mlso)
+head6 = fits.getheader(fits_dir_mlso)
+head6['detector'] = ('KCor')
+mlsomap = sunpy.map.Map(data6, head6)
+
+ax6 = fig1.add_subplot(3, 2, 6, projection=mlsomap)
+ax6.set_xlabel(' ')
+mlsomap.plot(axes=ax6,title=False,norm=matplotlib.colors.LogNorm())
+R_SUN = head6['R_SUN']
+ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+plt.subplots_adjust(bottom=0.05, top=0.95)
+plt.show()
+plt.close()
+# plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_Plots.png'))
+# plt.show()
+
+By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170820_180657_kcor_l2_avg.fts'
+# By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
+By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170825_185258_kcor_l2_avg.fts'
+# By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By.fits'
+By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170829_200801_kcor_l2_avg.fts'
+# By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By.fits'
+By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170903_025117_kcor_l2_avg.fts'
+# By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By.fits'
+By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170906_213054_kcor_l2_avg.fts'
+# By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By.fits'
+By6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
+
+Bz1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
+# By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
+Bz2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_pB.fits'
+# By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By.fits'
+Bz3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_pB.fits'
+# By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By.fits'
+Bz4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_pB.fits'
+# By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By.fits'
+Bz5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_pB.fits'
+# By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By.fits'
+Bz6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_pB.fits'
+
+
+fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170903_025117_kcor_l2_avg.fts'
+
+data1 = fits.getdata(fits_dir_psi)
+head1 = fits.getheader(fits_dir_psi)
+head1['detector'] = ('KCor')
+psimap = sunpy.map.Map(data1, head1)
+# psimap.plot_settings['norm'] = plt.Normalize(psimap.min(), psimap.max())
+
+fig2 = plt.figure(figsize=(10, 10))
+ax1 = fig2.add_subplot(3, 2, 1, projection=psimap)
+psimap.plot(axes=ax1,title=False)
+R_SUN = head1['R_SUN']
+ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_pB.fits'
+
+data2 = fits.getdata(fits_dir_psi)
+head2 = fits.getheader(fits_dir_psi)
+head2['detector'] = ('KCor')
+psimap = sunpy.map.Map(data2, head2)
+
+ax2 = fig2.add_subplot(3, 2, 2, projection=psimap)
+psimap.plot(axes=ax2,title=False,norm=matplotlib.colors.LogNorm())
+R_SUN = head2['R_SUN']
+ax2.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170906_213054_kcor_l2_avg.fts'
+
+data3 = fits.getdata(fits_dir_psi)
+head3 = fits.getheader(fits_dir_psi)
+head3['detector'] = ('KCor')
+psimap = sunpy.map.Map(data3, head3)
+
+ax3 = fig2.add_subplot(3, 2, 3, projection=psimap)
+psimap.plot(axes=ax3,title=False)
+R_SUN = head3['R_SUN']
+ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_pB.fits'
+
+data4 = fits.getdata(fits_dir_psi)
+head4 = fits.getheader(fits_dir_psi)
+head4['detector'] = ('KCor')
+psimap = sunpy.map.Map(data4, head4)
+
+ax4 = fig2.add_subplot(3, 2, 4, projection=psimap)
+psimap.plot(axes=ax4,title=False,norm=matplotlib.colors.LogNorm())
+R_SUN = head4['R_SUN']
+ax4.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
+
+data5 = fits.getdata(fits_dir_psi)
+head5 = fits.getheader(fits_dir_psi)
+head5['detector'] = ('KCor')
+psimap = sunpy.map.Map(data5, head5)
+
+
+ax5 = fig2.add_subplot(3, 2, 5, projection=psimap)
+psimap.plot(axes=ax5,title=False)
+R_SUN = head5['R_SUN']
+ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_pB.fits'
+
+data6 = fits.getdata(fits_dir_psi)
+head6 = fits.getheader(fits_dir_psi)
+head6['detector'] = ('KCor')
+psimap = sunpy.map.Map(data6, head6)
+
+ax6 = fig2.add_subplot(3, 2, 6, projection=psimap)
+ax6.set_xlabel(' ')
+psimap.plot(axes=ax6,title=False,norm=matplotlib.colors.LogNorm())
+R_SUN = head6['R_SUN']
+ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+plt.subplots_adjust(bottom=0.05, top=0.95)
+plt.show()
+plt.close()
+# plt.savefig(os.path.join(repo_path,'Output/Plots/PSI_Plots.png'))
+# plt.show()
+
+
+import matplotlib as mpl
+backend = mpl.get_backend()
+mpl.use('agg')
+# matplotlib.use('agg')
+
+
+c1 = fig1.canvas
+c2 = fig2.canvas
+
+c1.draw()
+c2.draw()
+
+a1 = np.array(c1.buffer_rgba())
+a2 = np.array(c2.buffer_rgba())
+a = np.hstack((a1,a2))
+
+
+mpl.use(backend)
+fig,ax = plt.subplots(figsize=(15, 15),dpi=100)
+fig.subplots_adjust(0, 0, 1, 1)
+ax.set_axis_off()
+ax.matshow(a)
+plt.subplots_adjust(bottom=0.05, top=1.25)
+plt.savefig(os.path.join(repo_path,'Output/Plots/Combined_Plot.png'))
+plt.show()
+plt.close()
+
+
 #
 # # new bandwith STUFF
 # bandwidth = 0.5

@@ -5,7 +5,7 @@ spawn, 'git rev-parse --show-toplevel', git_repo
 
 ; for_drive parameters are set here
 
-fits_directory = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170829_200801_kcor_l2_avg.fts'
+fits_directory = git_repo + '/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
 head = headfits(fits_directory)
 crln_obs = SXPAR(head,'CRLN_OBS');236.978
 crlt_obs = SXPAR(head,'CRLT_OBS');7.056

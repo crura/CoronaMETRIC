@@ -187,21 +187,21 @@ plt.savefig(os.path.join(repo_path,'Data/Forward_Parameters/Plots/Forward_Electr
 plt.close()
 
 # Change the duplicate MLSO image carrington latitude and longitude to be equivalent to the model parameter's to allow for interpolation using WCS
-mlso_dir = os.path.join(repo_path,'Data/MLSO/20170829_200801_kcor_l2_avg_2.fts')
-repo = git.Repo('.', search_parent_directories=True)
-repo_path = repo.working_tree_dir
-idl_save = readsav(os.path.join(repo_path,'Data/model_parameters.sav'))
-crln_obs = idl_save['crln_obs']
-crlt_obs = idl_save['crlt_obs']
-crln_obs_print = float(str(idl_save['crln_obs_print'],'utf-8'))
-crlt_obs_print = float(str(idl_save['crlt_obs_print'], 'utf-8'))
-occlt = idl_save['occlt']
-r_sun_range = idl_save['range']
-data = fits.getdata(mlso_dir)
-head = fits.getheader(mlso_dir)
-head['CRLT_OBS'] = crlt_obs_print
-head['CRLN_OBS'] = crln_obs_print
-# head['hgln_obs'] = head['CRLN_OBS']
-# head['hglt_obs'] = head['CRLT_OBS']
-hdunew = fits.PrimaryHDU(data=data,header=head)
-hdunew.writeto(mlso_dir,overwrite=True)
+# mlso_dir = os.path.join(repo_path,'Data/MLSO/20170829_200801_kcor_l2_avg_2.fts')
+# repo = git.Repo('.', search_parent_directories=True)
+# repo_path = repo.working_tree_dir
+# idl_save = readsav(os.path.join(repo_path,'Data/model_parameters.sav'))
+# crln_obs = idl_save['crln_obs']
+# crlt_obs = idl_save['crlt_obs']
+# crln_obs_print = float(str(idl_save['crln_obs_print'],'utf-8'))
+# crlt_obs_print = float(str(idl_save['crlt_obs_print'], 'utf-8'))
+# occlt = idl_save['occlt']
+# r_sun_range = idl_save['range']
+# data = fits.getdata(mlso_dir)
+# head = fits.getheader(mlso_dir)
+# head['CRLT_OBS'] = crlt_obs_print
+# head['CRLN_OBS'] = crln_obs_print
+# # head['hgln_obs'] = head['CRLN_OBS']
+# # head['hglt_obs'] = head['CRLT_OBS']
+# hdunew = fits.PrimaryHDU(data=data,header=head)
+# hdunew.writeto(mlso_dir,overwrite=True)

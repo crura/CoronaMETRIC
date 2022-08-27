@@ -1236,7 +1236,7 @@ def integrate_distribution(dist, x1, x2, x_min, x_max):
         dist_name = 'PSI/FORWARD LOS'
 
 
-    plt.title('Probability Density Integral for {} between points {}, {}: {}'.format(dist_name,x1,x2,res),fontsize=10)
+    plt.title('Probability Density Integral for {} between points {}, {}: {}'.format(dist_name,x1,x2,round(res,5)),fontsize=10)
 
     plt.xlabel('x')
     plt.ylabel('Normal Distribution')

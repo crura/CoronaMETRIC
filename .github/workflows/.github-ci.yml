@@ -178,10 +178,10 @@ jobs:
           name: output-data
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
 
-      # - uses: actions/download-artifact@v3
-      #   with:
-      #     name: my-artifact
-      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
+      - uses: actions/download-artifact@v3
+        with:
+          name: my-artifact
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
 
       - name: Perform Unit Tests
 

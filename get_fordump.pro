@@ -3,13 +3,15 @@ function get_2D_coord ;, Nxy, dx, dy, R_occult
 ;
 ; V. Uritsky 2021
 ;
-  R_occult = 1.06 ; this is what OCCULT is set to in generate_forward_model.pro
-  dx = 12.16/256.0 & dy = dx ; 12.16 is rsun range which is abs(rsun xmax) + abs(rsun xmin) of forward model
+  restore, git_repo + '/Data/model_parameters.sav'
+  R_occult = occlt ; this is what OCCULT is set to in generate_forward_model.pro
+  rsun_abs = range + range
+  dx = rsun_abs/256.0 & dy = dx ; 12.16 is rsun range which is abs(rsun xmax) + abs(rsun xmin) of forward model
   Nxy = 256
 
   X0 = 0  & Y0 = 0; Sun's disk center
 
-  X = findgen(Nxy)*(12.16/Nxy) - 6.08 + dx/2  ; grid node positions, centered, 6.08 is rsun of forward model
+  X = findgen(Nxy)*(rsun_abs/Nxy) - range + dx/2  ; grid node positions, centered, 6.08 is rsun of forward model
   Y = X
 
   i_arr = [0.0] & j_arr = i_arr

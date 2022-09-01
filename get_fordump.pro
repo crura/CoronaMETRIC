@@ -3,6 +3,7 @@ function get_2D_coord ;, Nxy, dx, dy, R_occult
 ;
 ; V. Uritsky 2021
 ;
+  spawn, 'git rev-parse --show-toplevel', git_repo
   restore, git_repo + '/Data/model_parameters.sav'
   R_occult = occlt ; this is what OCCULT is set to in generate_forward_model.pro
   rsun_abs = range + range

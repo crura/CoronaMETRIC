@@ -55,13 +55,14 @@ jobs:
           echo ".compile -v '/Users/crura/SSW/packages/forward/idl/DEFAULTS/for_settingdefaults.pro'" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/util/default.pro'" &&
           echo ".compile -v '/Users/crura/IDLWorkspace/Default/linspace.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_image_as_fits.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_fits.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_mlso_fits.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/rtp2xyz.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/generate_forward_model.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/get_fordump.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/image_coalignment.pro'" &&
+          git_repo=$(git rev-parse --show-toplevel) &&
+          echo ".compile -v '$git_repo/IDL_Scripts/write_psi_image_as_fits.pro'" &&
+          echo ".compile -v '$git_repo/IDL_Scripts/write_psi_fits.pro'" &&
+          echo ".compile -v '$git_repo/IDL_Scripts/write_psi_mlso_fits.pro'" &&
+          echo ".compile -v '$git_repo/IDL_Scripts/rtp2xyz.pro'" &&
+          echo ".compile -v '$git_repo/generate_forward_model.pro'" &&
+          echo ".compile -v '$git_repo/get_fordump.pro'" &&
+          echo ".compile -v '$git_repo/image_coalignment.pro'" &&
           echo "generate_forward_model()" &&
           echo "get_fordump()" &&
           cat) |
@@ -147,14 +148,15 @@ jobs:
           echo ".compile -v '/Users/crura/SSW/packages/forward/idl/DEFAULTS/for_settingdefaults.pro'" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/util/default.pro'" &&
           echo ".compile -v '/Users/crura/IDLWorkspace/Default/linspace.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_image_as_fits.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_fits.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/write_psi_mlso_fits.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/IDL_Scripts/rtp2xyz.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/generate_forward_model.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/get_fordump.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/image_coalignment.pro'" &&
-          echo ".compile -v '/Users/crura/Desktop/Research/github/Image-Coalignment/save_parameters.pro'" &&
+          git_repo=$(git rev-parse --show-toplevel) &&
+          echo ".compile -v '$git_repo/IDL_Scripts/write_psi_image_as_fits.pro'" &&
+          echo ".compile -v '$git_repo/IDL_Scripts/write_psi_fits.pro'" &&
+          echo ".compile -v '$git_repo/IDL_Scripts/write_psi_mlso_fits.pro'" &&
+          echo ".compile -v '$git_repo/IDL_Scripts/rtp2xyz.pro'" &&
+          echo ".compile -v '$git_repo/generate_forward_model.pro'" &&
+          echo ".compile -v '$git_repo/get_fordump.pro'" &&
+          echo ".compile -v '$git_repo/image_coalignment.pro'" &&
+          echo ".compile -v '$git_repo/save_parameters.pro'" &&
           echo "image_coalignment()" &&
           echo "save_parameters()" &&
           cat) |

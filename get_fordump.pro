@@ -84,6 +84,7 @@ function get_fordump
   save,BY_2d,filename= git_repo + '/Data/By_2d_Center.sav'
   save,BZ_2d,filename= git_repo + '/Data/Bz_2d_Center.sav'
 
+  spawn, 'rm -r ' + git_repo + '/Data/Central_Parameters; mkdir ' + git_repo + '/Data/Central_Parameters'
   write_csv, git_repo + '/Data/Central_Parameters/rotated_Bx_2d.csv',BX_2d
   write_csv, git_repo + '/Data/Central_Parameters/rotated_By_2d.csv',BY_2d
   write_csv, git_repo + '/Data/Central_Parameters/rotated_Bz_2d.csv',BZ_2d

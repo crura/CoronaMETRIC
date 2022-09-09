@@ -117,8 +117,11 @@ outpath = 'Data/Integrated_Parameters'
 np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_Bz.csv'),image_sum_bz.ravel(),delimiter=',') # save the LOS integrated Bz as a 1D array in a csv file
 
 # mkdir plots outpath if directory does not exist
-outpath_plots = 'Data/Integrated_Parameters/Plots'
-Path(outpath_plots).mkdir(parents=True,exist_ok=True)
+outpath_los_plots = 'Data/Integrated_Parameters/Plots'
+Path(outpath_los_plots).mkdir(parents=True,exist_ok=True)
+
+outpath_central_plots = 'Data/Central_Parameters/Plots'
+Path(outpath_central_plots).mkdir(parents=True,exist_ok=True)
 
 # generate Bz vs By vector plot showing LOS-Integrated B field line tracing
 print('generating LOS Bz vs By vector plot')

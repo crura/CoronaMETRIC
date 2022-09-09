@@ -45,7 +45,7 @@ image_sum = np.sum(imagelist, axis=0)
 
 outpath = 'Data/Integrated_Parameters'
 
-# mkdir outpath if directory does not exist 
+# mkdir outpath if directory does not exist
 Path(outpath).mkdir(parents=True,exist_ok=True)
 
 np.savetxt(os.path.join(repo_path,outpath,'Integrated_Electron_Density.csv'),image_sum.ravel(),delimiter=',') # save the integrated electron density as a 1D array in a csv file
@@ -115,6 +115,10 @@ image_sum_bz = np.sum(imagelist_bz, axis=0)
 outpath = 'Data/Integrated_Parameters'
 
 np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_Bz.csv'),image_sum_bz.ravel(),delimiter=',') # save the LOS integrated Bz as a 1D array in a csv file
+
+# mkdir plots outpath if directory does not exist
+outpath_plots = 'Data/Integrated_Parameters/Plots'
+Path(outpath_plots).mkdir(parents=True,exist_ok=True)
 
 # generate Bz vs By vector plot showing LOS-Integrated B field line tracing
 print('generating LOS Bz vs By vector plot')

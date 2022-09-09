@@ -43,7 +43,7 @@ for child in parent_list:
 
 image_sum = np.sum(imagelist, axis=0)
 
-outpath = 'Data/Integrated_Parameters'
+outpath = os.path.join(repo_path,'Data/Integrated_Parameters')
 
 # mkdir outpath if directory does not exist
 Path(outpath).mkdir(parents=True,exist_ok=True)
@@ -118,13 +118,13 @@ np.savetxt(os.path.join(repo_path,outpath,'Integrated_LOS_Bz.csv'),image_sum_bz.
 
 # mkdir plots outpath if directory does not exist
 
-outpath_los_plots = 'Data/Integrated_Parameters/Plots'
+outpath_los_plots = os.path.join(repo_path,'Data/Integrated_Parameters/Plots')
 Path(outpath_los_plots).mkdir(parents=True,exist_ok=True)
 
-outpath_central_plots = 'Data/Central_Parameters/Plots'
+outpath_central_plots = os.path.join(repo_path,'Data/Central_Parameters/Plots')
 Path(outpath_central_plots).mkdir(parents=True,exist_ok=True)
 
-outpath_forward_plots = 'Data/Forward_Parameters/Plots'
+outpath_forward_plots = os.path.join(repo_path,'Data/Forward_Parameters/Plots')
 Path(outpath_forward_plots).mkdir(parents=True,exist_ok=True)
 
 # generate Bz vs By vector plot showing LOS-Integrated B field line tracing

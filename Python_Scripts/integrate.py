@@ -10,6 +10,7 @@ import matplotlib as mpl
 import git
 from scipy.io import readsav
 import unittest
+from pathlib import Path
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -43,6 +44,9 @@ for child in parent_list:
 image_sum = np.sum(imagelist, axis=0)
 
 outpath = 'Data/Integrated_Parameters'
+
+# mkdir outpath if directory does not exist 
+Path(outpath).mkdir(parents=True,exist_ok=True)
 
 np.savetxt(os.path.join(repo_path,outpath,'Integrated_Electron_Density.csv'),image_sum.ravel(),delimiter=',') # save the integrated electron density as a 1D array in a csv file
 

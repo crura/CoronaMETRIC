@@ -55,7 +55,7 @@ function get_fordump
 
 
   ;spawn, 'cp /Users/crura/SSW/packages/forward/datadump /Users/crura/Desktop/Research/github/Image-Coalignment/Data'
-  restore, '/Users/crura/SSW/packages/forward/datadump',/v
+  restore, '/Users/crura/Desktop/Research/Data/datadump_' + crlt_obs_print + '_' + crln_obs_print,/v
   spawn, 'git rev-parse --show-toplevel', git_repo
   print,git_repo
   BX = BROBS*sin(THETA3DUSE)*cos(PHI3DUSE) + BTHOBS*cos(THETA3DUSE)*cos(PHI3DUSE) - BPHOBS*sin(PHI3DUSE)

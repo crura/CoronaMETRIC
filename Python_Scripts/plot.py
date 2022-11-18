@@ -41,7 +41,7 @@ xmax_mlso_central = 104.0
 kde0_mlso_central_deg = gaussian_kde(err_mlso_central_deg)
 x_1_mlso_central_deg = np.linspace(xmin_mlso_central, xmax_mlso_central, 200)
 kde0_x_mlso_central_deg = kde0_mlso_central_deg(x_1_mlso_central_deg)
-plt.plot(x_1_mlso_central_deg, kde0_x_mlso_central_deg, color='b', label='mlso central KDE scipy')
+# plt.plot(x_1_mlso_central_deg, kde0_x_mlso_central_deg, color='b', label='mlso central KDE scipy')
 
 xmin_forward_central = -17.24
 xmax_forward_central = 106.13
@@ -49,7 +49,7 @@ xmax_forward_central = 106.13
 kde0_forward_central_deg = gaussian_kde(err_forward_central_deg)
 x_1_forward_central_deg = np.linspace(xmin_forward_central, xmax_forward_central, 200)
 kde0_x_forward_central_deg = kde0_forward_central_deg(x_1_forward_central_deg)
-plt.plot(x_1_forward_central_deg, kde0_x_forward_central_deg, color='b', label='forward central KDE scipy')
+# plt.plot(x_1_forward_central_deg, kde0_x_forward_central_deg, color='b', label='forward central KDE scipy')
 
 xmin_random = -18.395
 xmax_random = 108.39
@@ -57,20 +57,33 @@ xmax_random = 108.39
 kde0_random_deg = gaussian_kde(err_random_deg)
 x_1_random_deg = np.linspace(xmin_random, xmax_random, 200)
 kde0_x_random_deg = kde0_random_deg(x_1_random_deg)
-plt.plot(x_1_random_deg, kde0_x_random_deg, color='b', label='random KDE scipy')
+# plt.plot(x_1_random_deg, kde0_x_random_deg, color='b', label='random KDE scipy')
 
 
 
+#
+# sns.distplot(err_mlso_central_deg,hist=True,label='MLSO',bins=30)
+# sns.distplot(err_forward_central_deg,hist=True,label='FORWARD',bins=30)
+# sns.distplot(err_random_deg,hist=False,label='Random')
+# plt.xlabel('Angle Discrepancy')
+# plt.ylabel('Probability Density')
+# plt.title('Feature Tracing Performance against Central POS $B$ Field')
+# plt.xlim(0,90)
+# plt.ylim(0,0.07)
+# plt.legend()
 
-sns.distplot(err_mlso_central_deg,hist=True,label='MLSO',bins=30)
-sns.distplot(err_forward_central_deg,hist=True,label='FORWARD',bins=30)
-sns.distplot(err_random_deg,hist=False,label='Random')
-plt.xlabel('Angle Discrepancy')
-plt.ylabel('Probability Density')
-plt.title('Feature Tracing Performance against Central POS $B$ Field')
-plt.xlim(0,90)
-plt.ylim(0,0.07)
-plt.legend()
+fig = plt.figure(figsize=(8,8))
+ax = fig.subplots(1,1)
+sns.distplot(err_mlso_central_deg,hist=True,label='MLSO K-COR',bins=30,ax=ax)
+sns.distplot(err_forward_central_deg,hist=True,label='PSI/FORWARD pB',bins=30,ax=ax)
+sns.distplot(err_random_deg,hist=False,label='Random',ax=ax)
+ax.set_xlabel('Angle Discrepancy')
+ax.set_ylabel('Probability Density')
+ax.set_title('QRaFT Feature Tracing Performance Against Central POS $B$ Field')
+ax.set_xlim(0,90)
+ax.set_ylim(0,0.07)
+ax.legend()
+
 # plt.text(20,0.045,"MLSO average discrepancy: " + str(np.round(np.average(err_mlso_central_deg),5)))
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
@@ -1479,6 +1492,34 @@ plt.savefig(os.path.join(repo_path,'Output/Plots/Combined_Plot.png'))
 plt.show()
 plt.close()
 
+from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+import pandas as pd
+colnames=['year', 'day', 'rad_au', 'hg_lat','hg_lon']
+hi = pd.read_csv('/Users/crura/Desktop/Research/github/Image-Coalignment/Data/helios_PKexb4xQt9.lst.txt',delim_whitespace=True,names=colnames,skiprows=1)
+epoch = datetime(2017,1,1,0)
+
+plt.gcf().clear()
+fig = plt.figure(1,figsize=(10,10))
+ax = fig.add_subplot(111)
+ax.scatter(hi['day'].values,hi['hg_lon'].values,label='Earth position from JPL ephemeris')
+ax.plot(xnew,ynew,label='Interpolated earth position')
+ax.set_ylabel('Heliographic Longitude of Earth')
+ax.set_xlabel('Day in Year')
+ax.set_title('Position of Earth in August-September 2017')
+delta_time = epoch + timedelta(days=xnew[np.where(np.round(ynew,3)==303.470)[0][1]]-1)
+# [line1] = plt.axvline(xnew[np.where(np.round(ynew,3)==303.470)[0][1]],linestyle='--',label='Locations of PSI/FORWARD Model Slices')
+ax.axvline(xnew[np.where(np.round(ynew,3)==303.470)[0][1]],linestyle='--',label='Locations of PSI/FORWARD Model Slices')
+ax.axvline(xnew[np.where(np.round(ynew,3)==236.978)[0][1]],linestyle='--')
+ax.axvline(xnew[np.where(np.round(ynew,3)==183.443)[0][1]],linestyle='--')
+ax.axvline(xnew[np.where(np.round(ynew,3)==126.906)[0][1]],linestyle='--')
+ax.axvline(xnew[np.where(np.round(ynew,3)==77.015)[0][1]],linestyle='--')
+ax.axvline(xnew[np.where(np.round(ynew,3)==11.553)[0][1]],linestyle='--')
+handles, labels = ax.get_legend_handles_labels()
+lgd = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(1.04, 1))
+plt.legend(bbox_to_anchor=(1.04, 1))
+plt.savefig('/Users/crura/Desktop/Research/Presentations/ephemeris_plot.png',bbox_extra_artists=(lgd))
+plt.show()
 
 #
 # # new bandwith STUFF

@@ -33,5 +33,6 @@ forward_pb_image = quantmap.data
 save,crln_obs,crlt_obs,occlt,range,crlt_obs_print,crln_obs_print,forward_pb_image,date_obs,fits_directory,filename=git_repo + '/Data/model_parameters.sav'
 restore, '/Users/crura/SSW/packages/forward/datadump',/v
 spawn, 'cp /Users/crura/SSW/packages/forward/datadump /Users/crura/Desktop/Research/Data/datadump_' + crlt_obs_print + '_' + crln_obs_print
+get_fordump()
 return, 0
 END

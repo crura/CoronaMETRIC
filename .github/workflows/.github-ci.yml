@@ -69,9 +69,9 @@ jobs:
           /Users/crura/Documents/bin/ssw
 
       - uses: actions/upload-artifact@v3
-          with:
-            name: output-data
-            path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
+        with:
+          name: output-data
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
 
   #
   # Python-build:

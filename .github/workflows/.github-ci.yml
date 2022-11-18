@@ -65,6 +65,9 @@ jobs:
           echo ".compile -v '$git_repo/image_coalignment.pro'" &&
           echo ".compile -v '$git_repo/save_parameters.pro'" &&
           echo "generate_forward_model()" &&
+          source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
+          conda init bash &&
+          conda activate test_env &&
           cat) |
           /Users/crura/Documents/bin/ssw
 

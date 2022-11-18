@@ -35,5 +35,7 @@ restore, '/Users/crura/SSW/packages/forward/datadump',/v
 spawn, 'cp /Users/crura/SSW/packages/forward/datadump /Users/crura/Desktop/Research/Data/datadump_' + crlt_obs_print + '_' + crln_obs_print
 hi = get_fordump()
 spawn, 'python Python_Scripts/integrate.py'
+hi2 = image_coalignment()
+hi3 = save_parameters()
 return, 0
 END

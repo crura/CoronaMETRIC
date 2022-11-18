@@ -37,7 +37,6 @@ hi = get_fordump()
 spawn, 'python Python_Scripts/integrate.py'
 hi2 = image_coalignment()
 hi3 = save_parameters()
-spawn, 'cd Python_Scripts'
-spawn, 'python -m unittest'
+spawn, 'python -m unittest discover Python_Scripts/'
 return, 0
 END

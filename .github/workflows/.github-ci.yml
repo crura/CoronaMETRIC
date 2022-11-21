@@ -34,7 +34,10 @@ jobs:
         env:
           ACTIONS_RUNNER_HOOK_JOB_STARTED: /Users/crura/Documents/bin/ssw
         run: |
-          (echo "ssw_path" &&
+          (source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
+          conda init bash &&
+          conda activate test_env &&
+          echo "ssw_path" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/string/strjustify.pro'" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/system/strrep_logenv.pro'" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/string/prstr.pro'" &&
@@ -65,9 +68,6 @@ jobs:
           echo ".compile -v '$git_repo/image_coalignment.pro'" &&
           echo ".compile -v '$git_repo/save_parameters.pro'" &&
           echo "generate_forward_model()" &&
-          source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
-          conda init bash &&
-          conda activate test_env &&
           cat) |
           /Users/crura/Documents/bin/ssw
 

@@ -34,10 +34,10 @@ jobs:
         env:
           ACTIONS_RUNNER_HOOK_JOB_STARTED: /Users/crura/Documents/bin/ssw
         run: |
-          (source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
+          source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
           conda init bash &&
           conda activate test_env &&
-          echo "ssw_path" &&
+          (echo "ssw_path" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/string/strjustify.pro'" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/system/strrep_logenv.pro'" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/string/prstr.pro'" &&

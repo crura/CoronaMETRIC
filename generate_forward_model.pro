@@ -5,7 +5,7 @@ spawn, 'git rev-parse --show-toplevel', git_repo
 
 ; for_drive parameters are set here
 
-fits_directory = git_repo + '/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
+fits_directory = git_repo + directory; '/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
 head = headfits(fits_directory)
 rsun = sxpar(head,'R_SUN')
 shape = sxpar(head,'NAXIS1')

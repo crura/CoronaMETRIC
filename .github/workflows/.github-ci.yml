@@ -67,7 +67,8 @@ jobs:
           echo ".compile -v '$git_repo/get_fordump.pro'" &&
           echo ".compile -v '$git_repo/image_coalignment.pro'" &&
           echo ".compile -v '$git_repo/save_parameters.pro'" &&
-          echo "generate_forward_model()" &&
+          echo ".compile -v '$git_repo/run_code.pro'" &&
+          echo "run_code," &&
           cat) |
           /Users/crura/Documents/bin/ssw
 

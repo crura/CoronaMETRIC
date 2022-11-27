@@ -74,8 +74,8 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: output-data
-          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
+          name: output-fits-images
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output/fits_images
 
   #
   # Python-build:

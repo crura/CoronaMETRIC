@@ -1,4 +1,4 @@
-data_dir = os.path.join(repo_path,'Data/QRaFT/errors.sav')
+import os
 from scipy.io import readsav
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -9,6 +9,14 @@ from astropy.io import fits
 import sunpy
 import sunpy.map
 import matplotlib
+import numpy as np
+import scipy as sci
+from tqdm import tqdm_notebook
+import pandas as pd
+import unittest
+from pathlib import Path
+
+data_dir = os.path.join(repo_path,'Data/QRaFT/errors.sav')
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -22,7 +30,7 @@ err_random = idl_save['ERR_ARR_RND']
 
 # Generate plots for Central arrays
 mpl.rcParams.update(mpl.rcParamsDefault)
-import numpy as np
+
 err_mlso_central_deg = err_mlso_central[np.where(err_mlso_central > 0)]*180/np.pi
 err_forward_central_deg = err_forward_central[np.where(err_forward_central > 0)]*180/np.pi
 err_random_deg = err_random[np.where(err_random > 0)]*180/np.pi
@@ -174,7 +182,7 @@ plt.show()
 plt.close()
 
 from sklearn.neighbors import KernelDensity
-import numpy as np
+
 
 """
 n =int(len(err_mlso_los_deg)/3)
@@ -1034,7 +1042,7 @@ plt.close()
 dist_values_random = sns.distplot(err_random_deg).get_lines()[0].get_data()[1]
 plt.close()
 
-import numpy as np
+
 from scipy.stats import norm
 from matplotlib import pyplot as plt
 # creating the data distribution

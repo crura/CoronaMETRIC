@@ -1,4 +1,4 @@
-data_dir = '/Users/crura/Desktop/Research/Vadim/errors.sav'
+data_dir = os.path.join(repo_path,'Data/QRaFT/errors.sav')
 from scipy.io import readsav
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -1496,7 +1496,7 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import pandas as pd
 colnames=['year', 'day', 'rad_au', 'hg_lat','hg_lon']
-hi = pd.read_csv(os.path.join(repo_path,'Data/helios_PKexb4xQt9.lst.txt'),delim_whitespace=True,names=colnames,skiprows=1)
+hi = pd.read_csv(os.path.join(repo_path,'Data/Ephemeris/helios_PKexb4xQt9.lst.txt'),delim_whitespace=True,names=colnames,skiprows=1)
 epoch = datetime(2017,1,1,0)
 
 plt.gcf().clear()
@@ -1518,7 +1518,7 @@ ax.axvline(xnew[np.where(np.round(ynew,3)==11.553)[0][1]],linestyle='--')
 handles, labels = ax.get_legend_handles_labels()
 lgd = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(1.04, 1))
 plt.legend(bbox_to_anchor=(1.04, 1))
-plt.savefig('/Users/crura/Desktop/Research/Presentations/ephemeris_plot.png',bbox_extra_artists=(lgd))
+plt.savefig(os.path.join(repo_path,'Output/Plots/Ephemeris_Plot.png'),bbox_extra_artists=(lgd))
 plt.show()
 
 #

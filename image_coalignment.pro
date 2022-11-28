@@ -33,20 +33,15 @@ function image_coalignment, directory
 
   ; Construct and write fits image for PSI integrated electron density
 
+  dens = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_Electron_Density.csv')
+  len = fix(sqrt(n_elements(dens.FIELD1)))
+  dens_2d = reform(dens.field1,len,len)
   out_string = strcompress(string(CRLT_OBS),/remove_all) + '_' + strcompress(string(CRLN_OBS),/remove_all)
   rsun_range = range + range
-  dx = rsun_range/256
+  dx = rsun_range/len
   ; convert x,y arrays to rsun
-  x_array = linspace(0,255,256) * dx
-  y_array= linspace(0,255,256) * dx
-  ; x_1d = read_csv('/Users/crura/Desktop/Research/Rotated_x_Test.csv')
-  ; x_1 = x_1d.FIELD1
-  ; y_1d = read_csv('/Users/crura/Desktop/Research/Rotated_y_Test.csv')
-  ; y_1 = y_1d.FIELD1
-
-
-  dens = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_Electron_Density.csv')
-  dens_2d = reform(dens.field1,256,256)
+  x_array = linspace(0,len-1,len) * dx
+  y_array = linspace(0,len-1,len) * dx
 
 
 

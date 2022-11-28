@@ -70,17 +70,19 @@ function get_fordump
   Y =R3DUSE*sin(THETA3DUSE)*sin(PHI3DUSE) + THETA3DUSE*cos(THETA3DUSE)*sin(PHI3DUSE) + PHI3DUSE*cos(PHI3DUSE)
   Z =R3DUSE*cos(THETA3DUSE) - THETA3DUSE*sin(THETA3DUSE)
 
-  ;help,BX[78,*]
+  sz = size(densobs) ; find size of forward datadump array outputs
+  max_slice_index = fix(sz[1]) ; find number of slices in forward output
+  half_slice_index = fix(sz[1]/2) ; find index of plane of sky slice in forward output
 
-  BX_2d =  convert_psi_array(BX[39,*])
-  BY_2d = convert_psi_array(BY[39,*])
-  BZ_2d = convert_psi_array(BZ[39,*])
+  BX_2d =  convert_psi_array(BX[half_slice_index,*])
+  BY_2d = convert_psi_array(BY[half_slice_index,*])
+  BZ_2d = convert_psi_array(BZ[half_slice_index,*])
 
-  X_2d =  convert_psi_array(X[39,*])
-  Y_2d = convert_psi_array(Y[39,*])
-  Z_2d = convert_psi_array(Z[39,*])
+  X_2d =  convert_psi_array(X[half_slice_index,*])
+  Y_2d = convert_psi_array(Y[half_slice_index,*])
+  Z_2d = convert_psi_array(Z[half_slice_index,*])
 
-  Dens_2d_center = convert_psi_array(DENSOBS[39,*])
+  Dens_2d_center = convert_psi_array(DENSOBS[half_slice_index,*])
 
   save,Dens_2d_center,filename= git_repo + '/Data/Electron_Density_Center.sav'
 
@@ -146,7 +148,7 @@ function get_fordump
    spawn, 'rm -r ' + git_repo + '/Data/Bx_Rotated; mkdir ' + git_repo + '/Data/Bx_Rotated'
    spawn, 'rm -r ' + git_repo + '/Data/By_Rotated; mkdir ' + git_repo + '/Data/By_Rotated'
    spawn, 'rm -r ' + git_repo + '/Data/Bz_Rotated; mkdir ' + git_repo + '/Data/Bz_Rotated'
-   for i =0,78 do begin
+   for i =0,max_slice_index-1 do begin
     jstring = STRTRIM(i,2)
     rho_xyzproj = convert_psi_array(DENSOBS[i,*])
     BX_2d =  convert_psi_array(BX[i,*])

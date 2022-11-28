@@ -16,10 +16,10 @@ import pandas as pd
 import unittest
 from pathlib import Path
 
-data_dir = os.path.join(repo_path,'Data/QRaFT/errors.sav')
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
+data_dir = os.path.join(repo_path,'Data/QRaFT/errors.sav')
 
 idl_save = readsav(data_dir)
 err_mlso_central = idl_save['ERR_ARR_MLSO']

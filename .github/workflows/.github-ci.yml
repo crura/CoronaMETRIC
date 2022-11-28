@@ -73,18 +73,23 @@ jobs:
           /Users/crura/Documents/bin/ssw
 
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: output-fits-images
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output/fits_images
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: output-fits-images
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output/fits_images
+
       - name: Plot Figures for Paper
-        
+
         run: |
           source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
           conda init bash &&
           conda activate test_env &&
           python Python_Scripts/plot.py
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: output-fits-images
-          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output/fits_images
 
       - uses: actions/upload-artifact@v3
         with:

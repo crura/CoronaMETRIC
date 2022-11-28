@@ -34,7 +34,7 @@ function image_coalignment, directory
   ; Construct and write fits image for PSI integrated electron density
 
   dens = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_Electron_Density.csv')
-  len = fix(sqrt(n_elements(dens.FIELD1)))
+  len = fix(sqrt(n_elements(forward_pb_image)))
   dens_2d = reform(dens.field1,len,len)
   out_string = strcompress(string(CRLT_OBS),/remove_all) + '_' + strcompress(string(CRLN_OBS),/remove_all)
   rsun_range = range + range
@@ -78,30 +78,30 @@ function image_coalignment, directory
 
   ; Construct and write fits image for PSI Bx LOS field
   bx_los_1d = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_LOS_Bx.csv')
-  bx_los_2d = reform(bx_los_1d.field1,256,256)
+  bx_los_2d = reform(bx_los_1d.field1,len,len)
   output_bx_los = git_repo + '/Output/Forward_Bx_LOS_MLSO_Projection.fits'
   WRITE_PSI_IMAGE_AS_FITS,output_bx_los,bx_los_2d,x_array,y_array,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
 
 
   ; Construct and write fits image for PSI Bx LOS field
   by_los_1d = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_LOS_By.csv')
-  by_los_2d = reform(by_los_1d.field1,256,256)
+  by_los_2d = reform(by_los_1d.field1,len,len)
   output_by_los = git_repo + '/Output/Forward_By_LOS_MLSO_Projection.fits'
   WRITE_PSI_IMAGE_AS_FITS,output_by_los,by_los_2d,x_array,y_array,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
 
 
   ; Construct and write fits image for PSI Bx LOS field
   bz_los_1d = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_LOS_Bz.csv')
-  bz_los_2d = reform(bz_los_1d.field1,256,256)
+  bz_los_2d = reform(bz_los_1d.field1,len,len)
   output_bz_los = git_repo + '/Output/Forward_Bz_LOS_MLSO_Projection.fits'
   WRITE_PSI_IMAGE_AS_FITS,output_bz_los,bz_los_2d,x_array,y_array,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
 
   ; Construct and write fits image for PSI Central Electron Density
   rsun_range = range + range
-  dx = rsun_range/256
+  dx = rsun_range/len
   ; convert x,y arrays to rsun
-  x_array = linspace(0,255,256) * dx
-  y_array= linspace(0,255,256) * dx
+  x_array = linspace(0,len-1,len) * dx
+  y_array= linspace(0,len-1,len) * dx
 
   ; dens = read_csv(git_repo + '/Data/Central_Parameters/rotated_Dens_2d.csv')
   ; dens_2d = reform(dens.field1,256,256)
@@ -118,10 +118,10 @@ function image_coalignment, directory
   ; Construct and write fits image for PSI integrated electron density
 
   rsun_range = range + range
-  dx = rsun_range/256
+  dx = rsun_range/len
   ; convert x,y arrays to rsun
-  x_array = linspace(0,255,256) * dx
-  y_array= linspace(0,255,256) * dx
+  x_array = linspace(0,len-1,len) * dx
+  y_array= linspace(0,len-1,len) * dx
   ; x_1d = read_csv('/Users/crura/Desktop/Research/Rotated_x_Test.csv')
   ; x_1 = x_1d.FIELD1
   ; y_1d = read_csv('/Users/crura/Desktop/Research/Rotated_y_Test.csv')
@@ -143,7 +143,7 @@ function image_coalignment, directory
 
   ; Construct and write fits image for PSI Bx LOS field
   bz_los_1d = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_LOS_Bz.csv')
-  bz_los_2d = reform(bz_los_1d.field1,256,256)
+  bz_los_2d = reform(bz_los_1d.field1,len,len)
   output_bz_los = git_repo + '/Output/Forward_Bz_LOS_MLSO_Projection.fits'
   WRITE_PSI_IMAGE_AS_FITS,output_bz_los,bz_los_2d,x_array,y_array,DATE,CMER,BANG,/GetCoords;,ObsDistanceAU=1
 
@@ -286,11 +286,14 @@ function image_coalignment, directory
   save,bx_central_coaligned,by_central_coaligned,bz_central_coaligned,filename=git_repo + '/Output/Central_B_Field_MLSO_Coaligned.sav'
   save,bx_integrated_coaligned,by_integrated_coaligned,bz_integrated_coaligned,filename=git_repo + '/Output/LOS_B_Field_MLSO_Coaligned.sav'
 
-  dx_new = rsun_range/1024
-  x_array_new = linspace(0,1023,1024) * dx_new
-  y_array_new= linspace(0,1023,1024) * dx_new
-
   head_fits_mlso = headfits(fits_directory)
+
+  ; find length of reference image from fits header to use for coalignment
+  len_new = sxpar(head_fits_mlso,'NAXIS1')
+
+  dx_new = rsun_range/len_new
+  x_array_new = linspace(0,len_new-1,len_new) * dx_new
+  y_array_new= linspace(0,len_new-1,len_new) * dx_new
   sxaddpar,head_fits_mlso,'TELESCOP','PSI-MAS Forward Model' ;Modify value of TELESCOP
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
@@ -301,8 +304,8 @@ function image_coalignment, directory
 
   writefits, output, by_central_coaligned, head_fits_mlso
 
-  x_array_new = linspace(0,1023,1024) * dx_new
-  y_array_new= linspace(0,1023,1024) * dx_new
+  x_array_new = linspace(0,len_new-1,len_new) * dx_new
+  y_array_new= linspace(0,len_new-1,len_new) * dx_new
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs
@@ -312,8 +315,8 @@ function image_coalignment, directory
 
   writefits, output, by_integrated_coaligned, head_fits_mlso
 
-  x_array_new = linspace(0,1023,1024) * dx_new
-  y_array_new= linspace(0,1023,1024) * dx_new
+  x_array_new = linspace(0,len_new-1,len_new) * dx_new
+  y_array_new= linspace(0,len_new-1,len_new) * dx_new
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs
@@ -323,8 +326,8 @@ function image_coalignment, directory
 
   writefits, output, bz_central_coaligned, head_fits_mlso
 
-  x_array_new = linspace(0,1023,1024) * dx_new
-  y_array_new= linspace(0,1023,1024) * dx_new
+  x_array_new = linspace(0,len_new-1,len_new) * dx_new
+  y_array_new= linspace(0,len_new-1,len_new) * dx_new
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs
@@ -334,8 +337,8 @@ function image_coalignment, directory
 
   writefits, output, bz_integrated_coaligned, head_fits_mlso
 
-  x_array_new = linspace(0,1023,1024) * dx_new
-  y_array_new= linspace(0,1023,1024) * dx_new
+  x_array_new = linspace(0,len_new-1,len_new) * dx_new
+  y_array_new= linspace(0,len_new-1,len_new) * dx_new
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs
@@ -345,8 +348,8 @@ function image_coalignment, directory
 
   writefits, output, psi_central_dens_coaligned, head_fits_mlso
 
-  x_array_new = linspace(0,1023,1024) * dx_new
-  y_array_new= linspace(0,1023,1024) * dx_new
+  x_array_new = linspace(0,len_new-1,len_new) * dx_new
+  y_array_new= linspace(0,len_new-1,len_new) * dx_new
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs
@@ -356,8 +359,8 @@ function image_coalignment, directory
 
   writefits, output, psi_integrated_dens_coaligned, head_fits_mlso
 
-  x_array_new = linspace(0,1023,1024) * dx_new
-  y_array_new= linspace(0,1023,1024) * dx_new
+  x_array_new = linspace(0,len_new-1,len_new) * dx_new
+  y_array_new= linspace(0,len_new-1,len_new) * dx_new
 
   DATE=date_obs ;'2014-04-13T18:00:00' '1988-01-18T17:20:43.123Z'
   CMER=crln_obs

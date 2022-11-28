@@ -279,20 +279,20 @@ plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_Plots.png'))
 plt.show()
 
 
-Bz1 = os.path.join(repo_path,'Output/6.89000_303.470_pB.fits')
-# By1 = os.path.join(repo_path,'Output/6.89000_303.470_pB.fits')
-Bz2 = os.path.join(repo_path,'Output/7.05600_236.978_pB.fits')
-# By2 = os.path.join(repo_path,'Output/7.05600_236.978_By.fits')
-Bz3 = os.path.join(repo_path,'Output/7.15300_183.443_pB.fits')
-# By3 = os.path.join(repo_path,'Output/7.15300_183.443_By.fits')
-Bz4 = os.path.join(repo_path,'Output/7.22000_126.906_pB.fits')
-# By4 = os.path.join(repo_path,'Output/7.22000_126.906_By.fits')
-Bz5 = os.path.join(repo_path,'Output/7.24700_77.0150_pB.fits')
-# By5 = os.path.join(repo_path,'Output/7.24700_77.0150_By.fits')
-Bz6 = os.path.join(repo_path,'Output/7.23800_11.5530_pB.fits')
+Bz1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+# By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+Bz2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_pB.fits')
+# By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
+Bz3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_pB.fits')
+# By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
+Bz4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_pB.fits')
+# By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
+Bz5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_pB.fits')
+# By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
+Bz6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_pB.fits')
 
 
-fits_dir_psi = os.path.join(repo_path,'Output/6.89000_303.470_pB.fits')
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
 
 data1 = fits.getdata(fits_dir_psi)
 head1 = fits.getheader(fits_dir_psi)
@@ -306,7 +306,7 @@ psimap.plot(axes=ax1,title=False,norm=matplotlib.colors.LogNorm())
 R_SUN = head1['R_SUN']
 ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
-fits_dir_psi = os.path.join(repo_path,'Output/7.05600_236.978_pB.fits')
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_pB.fits')
 
 data2 = fits.getdata(fits_dir_psi)
 head2 = fits.getheader(fits_dir_psi)
@@ -319,7 +319,7 @@ R_SUN = head2['R_SUN']
 ax2.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = os.path.join(repo_path,'Output/7.15300_183.443_pB.fits')
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_pB.fits')
 
 data3 = fits.getdata(fits_dir_psi)
 head3 = fits.getheader(fits_dir_psi)
@@ -332,7 +332,7 @@ R_SUN = head3['R_SUN']
 ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = os.path.join(repo_path,'Output/7.22000_126.906_pB.fits')
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_pB.fits')
 
 data4 = fits.getdata(fits_dir_psi)
 head4 = fits.getheader(fits_dir_psi)
@@ -345,7 +345,7 @@ R_SUN = head4['R_SUN']
 ax4.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = os.path.join(repo_path,'Output/7.24700_77.0150_pB.fits')
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_pB.fits')
 
 data5 = fits.getdata(fits_dir_psi)
 head5 = fits.getheader(fits_dir_psi)
@@ -359,7 +359,7 @@ R_SUN = head5['R_SUN']
 ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = os.path.join(repo_path,'Output/7.23800_11.5530_pB.fits')
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_pB.fits')
 
 data6 = fits.getdata(fits_dir_psi)
 head6 = fits.getheader(fits_dir_psi)
@@ -760,53 +760,53 @@ def create_six_fig_plot(files_z, files_y, outpath):
 
     return fig
 
-Bz1 = os.path.join(repo_path,'Output/6.89000_303.470_Bz_LOS.fits')
-By1 = os.path.join(repo_path,'Output/6.89000_303.470_By_LOS.fits')
-Bz2 = os.path.join(repo_path,'Output/7.05600_236.978_Bz_LOS.fits')
-By2 = os.path.join(repo_path,'Output/7.05600_236.978_By_LOS.fits')
-Bz3 = os.path.join(repo_path,'Output/7.15300_183.443_Bz_LOS.fits')
-By3 = os.path.join(repo_path,'Output/7.15300_183.443_By_LOS.fits')
-Bz4 = os.path.join(repo_path,'Output/7.22000_126.906_Bz_LOS.fits')
-By4 = os.path.join(repo_path,'Output/7.22000_126.906_By_LOS.fits')
-Bz5 = os.path.join(repo_path,'Output/7.24700_77.0150_Bz_LOS.fits')
-By5 = os.path.join(repo_path,'Output/7.24700_77.0150_By_LOS.fits')
-Bz6 = os.path.join(repo_path,'Output/7.23800_11.5530_Bz_LOS.fits')
-By6 = os.path.join(repo_path,'Output/7.23800_11.5530_By_LOS.fits')
+Bz1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_Bz_LOS.fits')
+By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_By_LOS.fits')
+Bz2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_Bz_LOS.fits')
+By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By_LOS.fits')
+Bz3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_Bz_LOS.fits')
+By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By_LOS.fits')
+Bz4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_Bz_LOS.fits')
+By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By_LOS.fits')
+Bz5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_Bz_LOS.fits')
+By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By_LOS.fits')
+Bz6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_Bz_LOS.fits')
+By6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_By_LOS.fits')
 file_list_Bz_LOS = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
 file_list_By_LOS = [By1, By2, By3, By4, By5, By6]
 
 create_six_fig_plot(file_list_Bz_LOS,file_list_By_LOS,os.path.join(repo_path,'Output/Plots/LOS_B_Field_Vector_Plots.png'))
 
-Bz1 = os.path.join(repo_path,'Output/6.89000_303.470_Bz.fits')
-By1 = os.path.join(repo_path,'Output/6.89000_303.470_By.fits')
-Bz2 = os.path.join(repo_path,'Output/7.05600_236.978_Bz.fits')
-By2 = os.path.join(repo_path,'Output/7.05600_236.978_By.fits')
-Bz3 = os.path.join(repo_path,'Output/7.15300_183.443_Bz.fits')
-By3 = os.path.join(repo_path,'Output/7.15300_183.443_By.fits')
-Bz4 = os.path.join(repo_path,'Output/7.22000_126.906_Bz.fits')
-By4 = os.path.join(repo_path,'Output/7.22000_126.906_By.fits')
-Bz5 = os.path.join(repo_path,'Output/7.24700_77.0150_Bz.fits')
-By5 = os.path.join(repo_path,'Output/7.24700_77.0150_By.fits')
-Bz6 = os.path.join(repo_path,'Output/7.23800_11.5530_Bz.fits')
-By6 = os.path.join(repo_path,'Output/7.23800_11.5530_By.fits')
+Bz1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_Bz.fits')
+By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_By.fits')
+Bz2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_Bz.fits')
+By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
+Bz3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_Bz.fits')
+By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
+Bz4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_Bz.fits')
+By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
+Bz5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_Bz.fits')
+By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
+Bz6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_Bz.fits')
+By6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_By.fits')
 file_list_Bz_LOS = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
 file_list_By_LOS = [By1, By2, By3, By4, By5, By6]
 
 create_six_fig_plot(file_list_Bz_LOS,file_list_By_LOS,os.path.join(repo_path,'Output/Plots/Central_B_Field_Vector_Plots.png'))
 
 
-Bz1 = os.path.join(repo_path,'Output/6.89000_303.470_pB.fits')
-# By1 = os.path.join(repo_path,'Output/6.89000_303.470_pB.fits')
-Bz2 = os.path.join(repo_path,'Output/7.05600_236.978_pB.fits')
-# By2 = os.path.join(repo_path,'Output/7.05600_236.978_By.fits')
-Bz3 = os.path.join(repo_path,'Output/7.15300_183.443_pB.fits')
-# By3 = os.path.join(repo_path,'Output/7.15300_183.443_By.fits')
-Bz4 = os.path.join(repo_path,'Output/7.22000_126.906_pB.fits')
-# By4 = os.path.join(repo_path,'Output/7.22000_126.906_By.fits')
-Bz5 = os.path.join(repo_path,'Output/7.24700_77.0150_pB.fits')
-# By5 = os.path.join(repo_path,'Output/7.24700_77.0150_By.fits')
-Bz6 = os.path.join(repo_path,'Output/7.23800_11.5530_pB.fits')
-# By6 = os.path.join(repo_path,'Output/7.23800_11.5530_By.fits')
+Bz1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+# By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+Bz2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_pB.fits')
+# By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
+Bz3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_pB.fits')
+# By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
+Bz4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_pB.fits')
+# By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
+Bz5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_pB.fits')
+# By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
+Bz6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_pB.fits')
+# By6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_By.fits')
 file_list_pB = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
 # file_list_By_LOS = [By1, By2, By3, By4, By5, By6]
 
@@ -814,17 +814,17 @@ file_list_pB = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
 
 
 By1 = os.path.join(repo_path,'Data/MLSO/20170820_180657_kcor_l2_avg.fts')
-# By1 = os.path.join(repo_path,'Output/6.89000_303.470_pB.fits')
+# By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
 By2 = os.path.join(repo_path,'Data/MLSO/20170825_185258_kcor_l2_avg.fts')
-# By2 = os.path.join(repo_path,'Output/7.05600_236.978_By.fits')
+# By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
 By3 = os.path.join(repo_path,'Data/MLSO/20170829_200801_kcor_l2_avg.fts')
-# By3 = os.path.join(repo_path,'Output/7.15300_183.443_By.fits')
+# By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
 By4 = os.path.join(repo_path,'Data/MLSO/20170903_025117_kcor_l2_avg.fts')
-# By4 = os.path.join(repo_path,'Output/7.22000_126.906_By.fits')
+# By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
 By5 = os.path.join(repo_path,'Data/MLSO/20170906_213054_kcor_l2_avg.fts')
-# By5 = os.path.join(repo_path,'Output/7.24700_77.0150_By.fits')
+# By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
 By6 = os.path.join(repo_path,'Data/MLSO/20170911_202927_kcor_l2_avg.fts')
-# By6 = os.path.join(repo_path,'Output/7.23800_11.5530_By.fits')
+# By6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_By.fits')
 file_list_pB = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
 file_list_MLSO = [By1, By2, By3, By4, By5, By6]
 # file_list_By_LOS = [By1, By2, By3, By4, By5, By6]
@@ -865,7 +865,7 @@ plt.show()
 plt.close()
 
 """
-fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/6.89000_303.470_Bz.fits')
+fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_Bz.fits')
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned = fits.getheader(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -873,7 +873,7 @@ head_bz_central_coaligned['detector'] = ('KCor')
 # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
 bz_central_coaligned_map = sunpy.map.Map(data_bz_central_coaligned, head_bz_central_coaligned)
 
-fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/6.89000_303.470_By.fits')
+fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_By.fits')
 data_by_central_coaligned = fits.getdata(fits_dir_by_central_coaligned)
 head_by_central_coaligned = fits.getheader(fits_dir_by_central_coaligned)
 head_by_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -897,7 +897,7 @@ ax1.set_title('6.89000_303.470 Central $B_z$ vs $B_y$ Field Vector Plot')
 ax1.set_xlabel('Helioprojective Longitude (Solar-X)')
 ax1.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
-fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/7.05600_236.978_Bz.fits')
+fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_Bz.fits')
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned = fits.getheader(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -905,7 +905,7 @@ head_bz_central_coaligned['detector'] = ('KCor')
 # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
 bz_central_coaligned_map = sunpy.map.Map(data_bz_central_coaligned, head_bz_central_coaligned)
 
-fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/7.05600_236.978_By.fits')
+fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
 data_by_central_coaligned = fits.getdata(fits_dir_by_central_coaligned)
 head_by_central_coaligned = fits.getheader(fits_dir_by_central_coaligned)
 head_by_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -922,7 +922,7 @@ ax2.set_title('7.05600_236.978 Central $B_z$ vs $B_y$ Field Vector Plot')
 ax2.set_xlabel('Helioprojective Longitude (Solar-X)')
 ax2.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
-fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/7.15300_183.443_Bz.fits')
+fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_Bz.fits')
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned = fits.getheader(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -930,7 +930,7 @@ head_bz_central_coaligned['detector'] = ('KCor')
 # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
 bz_central_coaligned_map = sunpy.map.Map(data_bz_central_coaligned, head_bz_central_coaligned)
 
-fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/7.15300_183.443_By.fits')
+fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
 data_by_central_coaligned = fits.getdata(fits_dir_by_central_coaligned)
 head_by_central_coaligned = fits.getheader(fits_dir_by_central_coaligned)
 head_by_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -947,7 +947,7 @@ ax3.set_title('7.15300_183.443 Central $B_z$ vs $B_y$ Field Vector Plot')
 ax3.set_xlabel('Helioprojective Longitude (Solar-X)')
 ax3.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
-fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/7.22000_126.906_Bz.fits')
+fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_Bz.fits')
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned = fits.getheader(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -955,7 +955,7 @@ head_bz_central_coaligned['detector'] = ('KCor')
 # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
 bz_central_coaligned_map = sunpy.map.Map(data_bz_central_coaligned, head_bz_central_coaligned)
 
-fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/7.22000_126.906_By.fits')
+fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
 data_by_central_coaligned = fits.getdata(fits_dir_by_central_coaligned)
 head_by_central_coaligned = fits.getheader(fits_dir_by_central_coaligned)
 head_by_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -972,7 +972,7 @@ ax4.set_title('7.22000_126.906 Central $B_z$ vs $B_y$ Field Vector Plot')
 ax4.set_xlabel('Helioprojective Longitude (Solar-X)')
 ax4.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
-fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/7.23800_11.5530_Bz.fits')
+fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_Bz.fits')
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned = fits.getheader(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -980,7 +980,7 @@ head_bz_central_coaligned['detector'] = ('KCor')
 # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
 bz_central_coaligned_map = sunpy.map.Map(data_bz_central_coaligned, head_bz_central_coaligned)
 
-fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/7.23800_11.5530_By.fits')
+fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_By.fits')
 data_by_central_coaligned = fits.getdata(fits_dir_by_central_coaligned)
 head_by_central_coaligned = fits.getheader(fits_dir_by_central_coaligned)
 head_by_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -997,7 +997,7 @@ ax6.set_title('7.23800_11.5530 Central $B_z$ vs $B_y$ Field Vector Plot')
 ax6.set_xlabel('Helioprojective Longitude (Solar-X)')
 ax6.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
-fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/7.24700_77.0150_Bz.fits')
+fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_Bz.fits')
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned = fits.getheader(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -1005,7 +1005,7 @@ head_bz_central_coaligned['detector'] = ('KCor')
 # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
 bz_central_coaligned_map = sunpy.map.Map(data_bz_central_coaligned, head_bz_central_coaligned)
 
-fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/7.24700_77.0150_By.fits')
+fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
 data_by_central_coaligned = fits.getdata(fits_dir_by_central_coaligned)
 head_by_central_coaligned = fits.getheader(fits_dir_by_central_coaligned)
 head_by_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -1291,7 +1291,7 @@ mlsomap.plot(axes=ax1,title=False)
 R_SUN = head1['R_SUN']
 ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
-fits_dir_mlso = os.path.join(repo_path,'Output/6.89000_303.470_pB.fits')
+fits_dir_mlso = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
 
 data2 = fits.getdata(fits_dir_mlso)
 head2 = fits.getheader(fits_dir_mlso)
@@ -1317,7 +1317,7 @@ R_SUN = head3['R_SUN']
 ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_mlso = os.path.join(repo_path,'Output/7.05600_236.978_pB.fits')
+fits_dir_mlso = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_pB.fits')
 
 data4 = fits.getdata(fits_dir_mlso)
 head4 = fits.getheader(fits_dir_mlso)
@@ -1344,7 +1344,7 @@ R_SUN = head5['R_SUN']
 ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_mlso = os.path.join(repo_path,'Output/7.15300_183.443_pB.fits')
+fits_dir_mlso = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_pB.fits')
 
 data6 = fits.getdata(fits_dir_mlso)
 head6 = fits.getheader(fits_dir_mlso)
@@ -1363,28 +1363,28 @@ plt.close()
 # plt.show()
 
 By1 = os.path.join(repo_path,'Data/MLSO/20170820_180657_kcor_l2_avg.fts')
-# By1 = os.path.join(repo_path,'Output/6.89000_303.470_pB.fits')
+# By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
 By2 = os.path.join(repo_path,'Data/MLSO/20170825_185258_kcor_l2_avg.fts')
-# By2 = os.path.join(repo_path,'Output/7.05600_236.978_By.fits')
+# By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
 By3 = os.path.join(repo_path,'Data/MLSO/20170829_200801_kcor_l2_avg.fts')
-# By3 = os.path.join(repo_path,'Output/7.15300_183.443_By.fits')
+# By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
 By4 = os.path.join(repo_path,'Data/MLSO/20170903_025117_kcor_l2_avg.fts')
-# By4 = os.path.join(repo_path,'Output/7.22000_126.906_By.fits')
+# By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
 By5 = os.path.join(repo_path,'Data/MLSO/20170906_213054_kcor_l2_avg.fts')
-# By5 = os.path.join(repo_path,'Output/7.24700_77.0150_By.fits')
+# By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
 By6 = os.path.join(repo_path,'Data/MLSO/20170911_202927_kcor_l2_avg.fts')
 
-Bz1 = os.path.join(repo_path,'Output/6.89000_303.470_pB.fits')
-# By1 = os.path.join(repo_path,'Output/6.89000_303.470_pB.fits')
-Bz2 = os.path.join(repo_path,'Output/7.05600_236.978_pB.fits')
-# By2 = os.path.join(repo_path,'Output/7.05600_236.978_By.fits')
-Bz3 = os.path.join(repo_path,'Output/7.15300_183.443_pB.fits')
-# By3 = os.path.join(repo_path,'Output/7.15300_183.443_By.fits')
-Bz4 = os.path.join(repo_path,'Output/7.22000_126.906_pB.fits')
-# By4 = os.path.join(repo_path,'Output/7.22000_126.906_By.fits')
-Bz5 = os.path.join(repo_path,'Output/7.24700_77.0150_pB.fits')
-# By5 = os.path.join(repo_path,'Output/7.24700_77.0150_By.fits')
-Bz6 = os.path.join(repo_path,'Output/7.23800_11.5530_pB.fits')
+Bz1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+# By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+Bz2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_pB.fits')
+# By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
+Bz3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_pB.fits')
+# By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
+Bz4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_pB.fits')
+# By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
+Bz5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_pB.fits')
+# By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
+Bz6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_pB.fits')
 
 
 fits_dir_psi = os.path.join(repo_path,'Data/MLSO/20170903_025117_kcor_l2_avg.fts')
@@ -1401,7 +1401,7 @@ psimap.plot(axes=ax1,title=False)
 R_SUN = head1['R_SUN']
 ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
-fits_dir_psi = os.path.join(repo_path,'Output/7.22000_126.906_pB.fits')
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_pB.fits')
 
 data2 = fits.getdata(fits_dir_psi)
 head2 = fits.getheader(fits_dir_psi)
@@ -1427,7 +1427,7 @@ R_SUN = head3['R_SUN']
 ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = os.path.join(repo_path,'Output/7.24700_77.0150_pB.fits')
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_pB.fits')
 
 data4 = fits.getdata(fits_dir_psi)
 head4 = fits.getheader(fits_dir_psi)
@@ -1454,7 +1454,7 @@ R_SUN = head5['R_SUN']
 ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = os.path.join(repo_path,'Output/7.23800_11.5530_pB.fits')
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_pB.fits')
 
 data6 = fits.getdata(fits_dir_psi)
 head6 = fits.getheader(fits_dir_psi)

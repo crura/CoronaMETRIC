@@ -1264,7 +1264,7 @@ def integrate_distribution(dist, x1, x2, x_min, x_max):
 
     plt.savefig(os.path.join(repo_path,'Output/Plots/integrate_normal_distribution.png')
     # plt.show()
-    # plt.close()
+    # plt.close() 
 
     return res
 

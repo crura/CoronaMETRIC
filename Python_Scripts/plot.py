@@ -1262,9 +1262,11 @@ def integrate_distribution(dist, x1, x2, x_min, x_max):
     plt.xlabel('x')
     plt.ylabel('Normal Distribution')
 
-    plt.savefig(os.path.join(repo_path,'Output/Plots/integrate_normal_distribution.png')
+    plt.savefig(os.path.join(repo_path,'Output/Plots/integrate_normal_distribution.png'))
+    # return res
+
     # plt.show()
-    # plt.close() 
+    plt.close()
 
     return res
 

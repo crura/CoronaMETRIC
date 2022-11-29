@@ -78,10 +78,6 @@ jobs:
           name: output-fits-images
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output/fits_images
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: output-fits-images
-          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output/fits_images
 
       - name: Plot Figures for Paper
 

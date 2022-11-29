@@ -3,13 +3,19 @@ function get_2D_coord ;, Nxy, dx, dy, R_occult
 ;
 ; V. Uritsky 2021
 ;
-  R_occult = 1.06 ; this is what OCCULT is set to in generate_forward_model.pro
-  dx = 12.16/256.0 & dy = dx ; 12.16 is rsun range which is abs(rsun xmax) + abs(rsun xmin) of forward model
-  Nxy = 256
+  spawn, 'git rev-parse --show-toplevel', git_repo
+  restore, git_repo + '/Data/model_parameters.sav'
+
+  len = fix(sqrt(n_elements(forward_pb_image)))
+
+  R_occult = occlt ; this is what OCCULT is set to in generate_forward_model.pro
+  rsun_abs = range + range
+  dx = rsun_abs/len & dy = dx ; 12.16 is rsun range which is abs(rsun xmax) + abs(rsun xmin) of forward model
+  Nxy = len
 
   X0 = 0  & Y0 = 0; Sun's disk center
 
-  X = findgen(Nxy)*(12.16/Nxy) - 6.08 + dx/2  ; grid node positions, centered, 6.08 is rsun of forward model
+  X = findgen(Nxy)*(rsun_abs/Nxy) - range + dx/2  ; grid node positions, centered, 6.08 is rsun of forward model
   Y = X
 
   i_arr = [0.0] & j_arr = i_arr
@@ -52,8 +58,10 @@ function get_fordump
 
 
   ;spawn, 'cp /Users/crura/SSW/packages/forward/datadump /Users/crura/Desktop/Research/github/Image-Coalignment/Data'
-  restore, '/Users/crura/SSW/packages/forward/datadump',/v
   spawn, 'git rev-parse --show-toplevel', git_repo
+  restore, git_repo + '/Data/model_parameters.sav'
+  restore, '/Users/crura/Desktop/Research/Data/datadump_' + crlt_obs_print + '_' + crln_obs_print,/v
+  print,git_repo
   BX = BROBS*sin(THETA3DUSE)*cos(PHI3DUSE) + BTHOBS*cos(THETA3DUSE)*cos(PHI3DUSE) - BPHOBS*sin(PHI3DUSE)
   BY = BROBS*sin(THETA3DUSE)*sin(PHI3DUSE) + BTHOBS*cos(THETA3DUSE)*sin(PHI3DUSE) + BPHOBS*cos(PHI3DUSE)
   BZ = BROBS*cos(THETA3DUSE) - BTHOBS*sin(THETA3DUSE)
@@ -62,17 +70,19 @@ function get_fordump
   Y =R3DUSE*sin(THETA3DUSE)*sin(PHI3DUSE) + THETA3DUSE*cos(THETA3DUSE)*sin(PHI3DUSE) + PHI3DUSE*cos(PHI3DUSE)
   Z =R3DUSE*cos(THETA3DUSE) - THETA3DUSE*sin(THETA3DUSE)
 
-  ;help,BX[78,*]
+  sz = size(densobs) ; find size of forward datadump array outputs
+  max_slice_index = fix(sz[1]) ; find number of slices in forward output
+  half_slice_index = fix(sz[1]/2) ; find index of plane of sky slice in forward output
 
-  BX_2d =  convert_psi_array(BX[39,*])
-  BY_2d = convert_psi_array(BY[39,*])
-  BZ_2d = convert_psi_array(BZ[39,*])
+  BX_2d =  convert_psi_array(BX[half_slice_index,*])
+  BY_2d = convert_psi_array(BY[half_slice_index,*])
+  BZ_2d = convert_psi_array(BZ[half_slice_index,*])
 
-  X_2d =  convert_psi_array(X[39,*])
-  Y_2d = convert_psi_array(Y[39,*])
-  Z_2d = convert_psi_array(Z[39,*])
+  X_2d =  convert_psi_array(X[half_slice_index,*])
+  Y_2d = convert_psi_array(Y[half_slice_index,*])
+  Z_2d = convert_psi_array(Z[half_slice_index,*])
 
-  Dens_2d_center = convert_psi_array(DENSOBS[39,*])
+  Dens_2d_center = convert_psi_array(DENSOBS[half_slice_index,*])
 
   save,Dens_2d_center,filename= git_repo + '/Data/Electron_Density_Center.sav'
 
@@ -80,6 +90,7 @@ function get_fordump
   save,BY_2d,filename= git_repo + '/Data/By_2d_Center.sav'
   save,BZ_2d,filename= git_repo + '/Data/Bz_2d_Center.sav'
 
+  spawn, 'rm -r ' + git_repo + '/Data/Central_Parameters; mkdir ' + git_repo + '/Data/Central_Parameters'
   write_csv, git_repo + '/Data/Central_Parameters/rotated_Bx_2d.csv',BX_2d
   write_csv, git_repo + '/Data/Central_Parameters/rotated_By_2d.csv',BY_2d
   write_csv, git_repo + '/Data/Central_Parameters/rotated_Bz_2d.csv',BZ_2d
@@ -93,10 +104,12 @@ function get_fordump
 
   ; STUFF THAT WORKS IS ABOVE
 
+  len = fix(sqrt(n_elements(forward_pb_image)))
+
   Nr = n_elements(R3DUSE[0,*])
   Nt = n_elements(THETA3DUSE[0,*])
   Np = n_elements(PHI3DUSE[0,*])
-  rho_xyz = fltarr(256,256)
+  rho_xyz = fltarr(len,len)
 
   ;for i=0, Nr-1 do begin
 
@@ -114,8 +127,8 @@ function get_fordump
   BZnew = convert_psi_array(BZ)
 
 
-  for j=0, 255 do $
-    for k = 0, 255 do begin
+  for j=0, len-1 do $
+    for k = 0, len-1 do begin
     ;j = i
     ;k = i
       X = sin(thetanew[j])*cos(phinew[k]) + cos(thetanew[j])*cos(phinew[k]) - sin(phinew[k])
@@ -129,13 +142,13 @@ function get_fordump
 
    endfor
 
-   densarr = fltarr(256,256)
+   densarr = fltarr(len,len)
 
    spawn, 'rm -r ' + git_repo + '/Data/Rotated_Density_LOS; mkdir ' + git_repo + '/Data/Rotated_Density_LOS'
    spawn, 'rm -r ' + git_repo + '/Data/Bx_Rotated; mkdir ' + git_repo + '/Data/Bx_Rotated'
    spawn, 'rm -r ' + git_repo + '/Data/By_Rotated; mkdir ' + git_repo + '/Data/By_Rotated'
    spawn, 'rm -r ' + git_repo + '/Data/Bz_Rotated; mkdir ' + git_repo + '/Data/Bz_Rotated'
-   for i =0,78 do begin
+   for i =0,max_slice_index-1 do begin
     jstring = STRTRIM(i,2)
     rho_xyzproj = convert_psi_array(DENSOBS[i,*])
     BX_2d =  convert_psi_array(BX[i,*])

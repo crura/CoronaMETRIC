@@ -5,12 +5,15 @@ spawn, 'git rev-parse --show-toplevel', git_repo
 
 ; for_drive parameters are set here
 
-fits_directory = git_repo + '/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
+fits_directory = git_repo + '/' + directory; '/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
 head = headfits(fits_directory)
+rsun = sxpar(head,'R_SUN')
+shape = sxpar(head,'NAXIS1')
 crln_obs = SXPAR(head,'CRLN_OBS');236.978
 crlt_obs = SXPAR(head,'CRLT_OBS');7.056
-occlt = 1.0600000
-range = 6.0799999
+rad_occlt_pix = sxpar(head,'RCAM_DCR')
+occlt = rad_occlt_pix/rsun;1.0600000
+range = shape/rsun; 6.0799999
 date_obs = SXPAR(head,'DATE-OBS')
 
 
@@ -28,5 +31,12 @@ restore,'/Users/crura/SSW/packages/forward/output.sav',/v
 write_csv, git_repo + '/Data/Forward_PB_data.csv',quantmap.data
 forward_pb_image = quantmap.data
 save,crln_obs,crlt_obs,occlt,range,crlt_obs_print,crln_obs_print,forward_pb_image,date_obs,fits_directory,filename=git_repo + '/Data/model_parameters.sav'
+restore, '/Users/crura/SSW/packages/forward/datadump',/v
+spawn, 'cp /Users/crura/SSW/packages/forward/datadump /Users/crura/Desktop/Research/Data/datadump_' + crlt_obs_print + '_' + crln_obs_print
+hi = get_fordump()
+spawn, 'python Python_Scripts/integrate.py'
+hi2 = image_coalignment()
+hi3 = save_parameters()
+spawn, 'python -m unittest discover Python_Scripts/'
 return, 0
 END

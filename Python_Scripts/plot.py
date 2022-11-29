@@ -1,4 +1,4 @@
-data_dir = '/Users/crura/Desktop/Research/Vadim/errors.sav'
+import os
 from scipy.io import readsav
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -9,9 +9,17 @@ from astropy.io import fits
 import sunpy
 import sunpy.map
 import matplotlib
+import numpy as np
+import scipy as sci
+from tqdm import tqdm_notebook
+import pandas as pd
+import unittest
+from pathlib import Path
+from scipy.interpolate import interp1d
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
+data_dir = os.path.join(repo_path,'Data/QRaFT/errors.sav')
 
 idl_save = readsav(data_dir)
 err_mlso_central = idl_save['ERR_ARR_MLSO']
@@ -22,7 +30,7 @@ err_random = idl_save['ERR_ARR_RND']
 
 # Generate plots for Central arrays
 mpl.rcParams.update(mpl.rcParamsDefault)
-import numpy as np
+
 err_mlso_central_deg = err_mlso_central[np.where(err_mlso_central > 0)]*180/np.pi
 err_forward_central_deg = err_forward_central[np.where(err_forward_central > 0)]*180/np.pi
 err_random_deg = err_random[np.where(err_random > 0)]*180/np.pi
@@ -41,7 +49,7 @@ xmax_mlso_central = 104.0
 kde0_mlso_central_deg = gaussian_kde(err_mlso_central_deg)
 x_1_mlso_central_deg = np.linspace(xmin_mlso_central, xmax_mlso_central, 200)
 kde0_x_mlso_central_deg = kde0_mlso_central_deg(x_1_mlso_central_deg)
-plt.plot(x_1_mlso_central_deg, kde0_x_mlso_central_deg, color='b', label='mlso central KDE scipy')
+# plt.plot(x_1_mlso_central_deg, kde0_x_mlso_central_deg, color='b', label='mlso central KDE scipy')
 
 xmin_forward_central = -17.24
 xmax_forward_central = 106.13
@@ -49,7 +57,7 @@ xmax_forward_central = 106.13
 kde0_forward_central_deg = gaussian_kde(err_forward_central_deg)
 x_1_forward_central_deg = np.linspace(xmin_forward_central, xmax_forward_central, 200)
 kde0_x_forward_central_deg = kde0_forward_central_deg(x_1_forward_central_deg)
-plt.plot(x_1_forward_central_deg, kde0_x_forward_central_deg, color='b', label='forward central KDE scipy')
+# plt.plot(x_1_forward_central_deg, kde0_x_forward_central_deg, color='b', label='forward central KDE scipy')
 
 xmin_random = -18.395
 xmax_random = 108.39
@@ -57,20 +65,33 @@ xmax_random = 108.39
 kde0_random_deg = gaussian_kde(err_random_deg)
 x_1_random_deg = np.linspace(xmin_random, xmax_random, 200)
 kde0_x_random_deg = kde0_random_deg(x_1_random_deg)
-plt.plot(x_1_random_deg, kde0_x_random_deg, color='b', label='random KDE scipy')
+# plt.plot(x_1_random_deg, kde0_x_random_deg, color='b', label='random KDE scipy')
 
 
 
+#
+# sns.distplot(err_mlso_central_deg,hist=True,label='MLSO',bins=30)
+# sns.distplot(err_forward_central_deg,hist=True,label='FORWARD',bins=30)
+# sns.distplot(err_random_deg,hist=False,label='Random')
+# plt.xlabel('Angle Discrepancy')
+# plt.ylabel('Probability Density')
+# plt.title('Feature Tracing Performance against Central POS $B$ Field')
+# plt.xlim(0,90)
+# plt.ylim(0,0.07)
+# plt.legend()
 
-sns.distplot(err_mlso_central_deg,hist=True,label='MLSO',bins=30)
-sns.distplot(err_forward_central_deg,hist=True,label='FORWARD',bins=30)
-sns.distplot(err_random_deg,hist=False,label='Random')
-plt.xlabel('Angle Discrepancy')
-plt.ylabel('Probability Density')
-plt.title('Feature Tracing Performance against Central POS $B$ Field')
-plt.xlim(0,90)
-plt.ylim(0,0.07)
-plt.legend()
+fig = plt.figure(figsize=(8,8))
+ax = fig.subplots(1,1)
+sns.distplot(err_mlso_central_deg,hist=True,label='MLSO K-COR',bins=30,ax=ax)
+sns.distplot(err_forward_central_deg,hist=True,label='PSI/FORWARD pB',bins=30,ax=ax)
+sns.distplot(err_random_deg,hist=False,label='Random',ax=ax)
+ax.set_xlabel('Angle Discrepancy')
+ax.set_ylabel('Probability Density')
+ax.set_title('QRaFT Feature Tracing Performance Against Central POS $B$ Field')
+ax.set_xlim(0,90)
+ax.set_ylim(0,0.07)
+ax.legend()
+
 # plt.text(20,0.045,"MLSO average discrepancy: " + str(np.round(np.average(err_mlso_central_deg),5)))
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
@@ -161,7 +182,7 @@ plt.show()
 plt.close()
 
 from sklearn.neighbors import KernelDensity
-import numpy as np
+
 
 """
 n =int(len(err_mlso_los_deg)/3)
@@ -174,7 +195,7 @@ log_dens = kde.score_samples(x_train)
 """
 
 
-fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170820_180657_kcor_l2_avg.fts'
+fits_dir_mlso = os.path.join(repo_path,'Data/MLSO/20170820_180657_kcor_l2_avg.fts')
 
 data1 = fits.getdata(fits_dir_mlso)
 head1 = fits.getheader(fits_dir_mlso)
@@ -188,7 +209,7 @@ mlsomap.plot(axes=ax1,title=False)
 R_SUN = head1['R_SUN']
 ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
-fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170825_185258_kcor_l2_avg.fts'
+fits_dir_mlso = os.path.join(repo_path,'Data/MLSO/20170825_185258_kcor_l2_avg.fts')
 
 data2 = fits.getdata(fits_dir_mlso)
 head2 = fits.getheader(fits_dir_mlso)
@@ -201,7 +222,7 @@ R_SUN = head2['R_SUN']
 ax2.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170829_200801_kcor_l2_avg.fts'
+fits_dir_mlso = os.path.join(repo_path,'Data/MLSO/20170829_200801_kcor_l2_avg.fts')
 
 data3 = fits.getdata(fits_dir_mlso)
 head3 = fits.getheader(fits_dir_mlso)
@@ -214,7 +235,7 @@ R_SUN = head3['R_SUN']
 ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170903_025117_kcor_l2_avg.fts'
+fits_dir_mlso = os.path.join(repo_path,'Data/MLSO/20170903_025117_kcor_l2_avg.fts')
 
 data4 = fits.getdata(fits_dir_mlso)
 head4 = fits.getheader(fits_dir_mlso)
@@ -227,7 +248,7 @@ R_SUN = head4['R_SUN']
 ax4.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170906_213054_kcor_l2_avg.fts'
+fits_dir_mlso = os.path.join(repo_path,'Data/MLSO/20170906_213054_kcor_l2_avg.fts')
 
 data5 = fits.getdata(fits_dir_mlso)
 head5 = fits.getheader(fits_dir_mlso)
@@ -241,7 +262,7 @@ R_SUN = head5['R_SUN']
 ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
+fits_dir_mlso = os.path.join(repo_path,'Data/MLSO/20170911_202927_kcor_l2_avg.fts')
 
 data6 = fits.getdata(fits_dir_mlso)
 head6 = fits.getheader(fits_dir_mlso)
@@ -258,20 +279,20 @@ plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_Plots.png'))
 plt.show()
 
 
-Bz1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
-# By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
-Bz2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_pB.fits'
-# By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By.fits'
-Bz3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_pB.fits'
-# By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By.fits'
-Bz4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_pB.fits'
-# By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By.fits'
-Bz5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_pB.fits'
-# By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By.fits'
-Bz6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_pB.fits'
+Bz1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+# By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+Bz2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_pB.fits')
+# By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
+Bz3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_pB.fits')
+# By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
+Bz4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_pB.fits')
+# By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
+Bz5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_pB.fits')
+# By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
+Bz6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_pB.fits')
 
 
-fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
 
 data1 = fits.getdata(fits_dir_psi)
 head1 = fits.getheader(fits_dir_psi)
@@ -285,7 +306,7 @@ psimap.plot(axes=ax1,title=False,norm=matplotlib.colors.LogNorm())
 R_SUN = head1['R_SUN']
 ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
-fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_pB.fits'
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_pB.fits')
 
 data2 = fits.getdata(fits_dir_psi)
 head2 = fits.getheader(fits_dir_psi)
@@ -298,7 +319,7 @@ R_SUN = head2['R_SUN']
 ax2.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_pB.fits'
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_pB.fits')
 
 data3 = fits.getdata(fits_dir_psi)
 head3 = fits.getheader(fits_dir_psi)
@@ -311,7 +332,7 @@ R_SUN = head3['R_SUN']
 ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_pB.fits'
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_pB.fits')
 
 data4 = fits.getdata(fits_dir_psi)
 head4 = fits.getheader(fits_dir_psi)
@@ -324,7 +345,7 @@ R_SUN = head4['R_SUN']
 ax4.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_pB.fits'
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_pB.fits')
 
 data5 = fits.getdata(fits_dir_psi)
 head5 = fits.getheader(fits_dir_psi)
@@ -338,7 +359,7 @@ R_SUN = head5['R_SUN']
 ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_pB.fits'
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_pB.fits')
 
 data6 = fits.getdata(fits_dir_psi)
 head6 = fits.getheader(fits_dir_psi)
@@ -739,71 +760,71 @@ def create_six_fig_plot(files_z, files_y, outpath):
 
     return fig
 
-Bz1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_Bz_LOS.fits'
-By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_By_LOS.fits'
-Bz2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_Bz_LOS.fits'
-By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By_LOS.fits'
-Bz3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_Bz_LOS.fits'
-By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By_LOS.fits'
-Bz4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_Bz_LOS.fits'
-By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By_LOS.fits'
-Bz5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_Bz_LOS.fits'
-By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By_LOS.fits'
-Bz6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_Bz_LOS.fits'
-By6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_By_LOS.fits'
+Bz1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_Bz_LOS.fits')
+By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_By_LOS.fits')
+Bz2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_Bz_LOS.fits')
+By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By_LOS.fits')
+Bz3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_Bz_LOS.fits')
+By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By_LOS.fits')
+Bz4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_Bz_LOS.fits')
+By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By_LOS.fits')
+Bz5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_Bz_LOS.fits')
+By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By_LOS.fits')
+Bz6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_Bz_LOS.fits')
+By6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_By_LOS.fits')
 file_list_Bz_LOS = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
 file_list_By_LOS = [By1, By2, By3, By4, By5, By6]
 
 create_six_fig_plot(file_list_Bz_LOS,file_list_By_LOS,os.path.join(repo_path,'Output/Plots/LOS_B_Field_Vector_Plots.png'))
 
-Bz1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_Bz.fits'
-By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_By.fits'
-Bz2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_Bz.fits'
-By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By.fits'
-Bz3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_Bz.fits'
-By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By.fits'
-Bz4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_Bz.fits'
-By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By.fits'
-Bz5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_Bz.fits'
-By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By.fits'
-Bz6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_Bz.fits'
-By6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_By.fits'
+Bz1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_Bz.fits')
+By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_By.fits')
+Bz2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_Bz.fits')
+By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
+Bz3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_Bz.fits')
+By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
+Bz4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_Bz.fits')
+By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
+Bz5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_Bz.fits')
+By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
+Bz6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_Bz.fits')
+By6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_By.fits')
 file_list_Bz_LOS = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
 file_list_By_LOS = [By1, By2, By3, By4, By5, By6]
 
 create_six_fig_plot(file_list_Bz_LOS,file_list_By_LOS,os.path.join(repo_path,'Output/Plots/Central_B_Field_Vector_Plots.png'))
 
 
-Bz1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
-# By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
-Bz2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_pB.fits'
-# By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By.fits'
-Bz3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_pB.fits'
-# By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By.fits'
-Bz4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_pB.fits'
-# By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By.fits'
-Bz5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_pB.fits'
-# By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By.fits'
-Bz6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_pB.fits'
-# By6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_By.fits'
+Bz1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+# By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+Bz2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_pB.fits')
+# By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
+Bz3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_pB.fits')
+# By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
+Bz4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_pB.fits')
+# By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
+Bz5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_pB.fits')
+# By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
+Bz6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_pB.fits')
+# By6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_By.fits')
 file_list_pB = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
 # file_list_By_LOS = [By1, By2, By3, By4, By5, By6]
 
 
 
 
-By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170820_180657_kcor_l2_avg.fts'
-# By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
-By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170825_185258_kcor_l2_avg.fts'
-# By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By.fits'
-By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170829_200801_kcor_l2_avg.fts'
-# By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By.fits'
-By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170903_025117_kcor_l2_avg.fts'
-# By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By.fits'
-By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170906_213054_kcor_l2_avg.fts'
-# By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By.fits'
-By6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
-# By6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_By.fits'
+By1 = os.path.join(repo_path,'Data/MLSO/20170820_180657_kcor_l2_avg.fts')
+# By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+By2 = os.path.join(repo_path,'Data/MLSO/20170825_185258_kcor_l2_avg.fts')
+# By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
+By3 = os.path.join(repo_path,'Data/MLSO/20170829_200801_kcor_l2_avg.fts')
+# By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
+By4 = os.path.join(repo_path,'Data/MLSO/20170903_025117_kcor_l2_avg.fts')
+# By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
+By5 = os.path.join(repo_path,'Data/MLSO/20170906_213054_kcor_l2_avg.fts')
+# By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
+By6 = os.path.join(repo_path,'Data/MLSO/20170911_202927_kcor_l2_avg.fts')
+# By6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_By.fits')
 file_list_pB = [Bz1, Bz2, Bz3, Bz4, Bz5, Bz6]
 file_list_MLSO = [By1, By2, By3, By4, By5, By6]
 # file_list_By_LOS = [By1, By2, By3, By4, By5, By6]
@@ -844,7 +865,7 @@ plt.show()
 plt.close()
 
 """
-fits_dir_bz_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_Bz.fits'
+fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_Bz.fits')
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned = fits.getheader(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -852,7 +873,7 @@ head_bz_central_coaligned['detector'] = ('KCor')
 # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
 bz_central_coaligned_map = sunpy.map.Map(data_bz_central_coaligned, head_bz_central_coaligned)
 
-fits_dir_by_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_By.fits'
+fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_By.fits')
 data_by_central_coaligned = fits.getdata(fits_dir_by_central_coaligned)
 head_by_central_coaligned = fits.getheader(fits_dir_by_central_coaligned)
 head_by_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -876,7 +897,7 @@ ax1.set_title('6.89000_303.470 Central $B_z$ vs $B_y$ Field Vector Plot')
 ax1.set_xlabel('Helioprojective Longitude (Solar-X)')
 ax1.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
-fits_dir_bz_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_Bz.fits'
+fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_Bz.fits')
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned = fits.getheader(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -884,7 +905,7 @@ head_bz_central_coaligned['detector'] = ('KCor')
 # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
 bz_central_coaligned_map = sunpy.map.Map(data_bz_central_coaligned, head_bz_central_coaligned)
 
-fits_dir_by_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By.fits'
+fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
 data_by_central_coaligned = fits.getdata(fits_dir_by_central_coaligned)
 head_by_central_coaligned = fits.getheader(fits_dir_by_central_coaligned)
 head_by_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -901,7 +922,7 @@ ax2.set_title('7.05600_236.978 Central $B_z$ vs $B_y$ Field Vector Plot')
 ax2.set_xlabel('Helioprojective Longitude (Solar-X)')
 ax2.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
-fits_dir_bz_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_Bz.fits'
+fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_Bz.fits')
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned = fits.getheader(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -909,7 +930,7 @@ head_bz_central_coaligned['detector'] = ('KCor')
 # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
 bz_central_coaligned_map = sunpy.map.Map(data_bz_central_coaligned, head_bz_central_coaligned)
 
-fits_dir_by_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By.fits'
+fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
 data_by_central_coaligned = fits.getdata(fits_dir_by_central_coaligned)
 head_by_central_coaligned = fits.getheader(fits_dir_by_central_coaligned)
 head_by_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -926,7 +947,7 @@ ax3.set_title('7.15300_183.443 Central $B_z$ vs $B_y$ Field Vector Plot')
 ax3.set_xlabel('Helioprojective Longitude (Solar-X)')
 ax3.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
-fits_dir_bz_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_Bz.fits'
+fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_Bz.fits')
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned = fits.getheader(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -934,7 +955,7 @@ head_bz_central_coaligned['detector'] = ('KCor')
 # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
 bz_central_coaligned_map = sunpy.map.Map(data_bz_central_coaligned, head_bz_central_coaligned)
 
-fits_dir_by_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By.fits'
+fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
 data_by_central_coaligned = fits.getdata(fits_dir_by_central_coaligned)
 head_by_central_coaligned = fits.getheader(fits_dir_by_central_coaligned)
 head_by_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -951,7 +972,7 @@ ax4.set_title('7.22000_126.906 Central $B_z$ vs $B_y$ Field Vector Plot')
 ax4.set_xlabel('Helioprojective Longitude (Solar-X)')
 ax4.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
-fits_dir_bz_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_Bz.fits'
+fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_Bz.fits')
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned = fits.getheader(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -959,7 +980,7 @@ head_bz_central_coaligned['detector'] = ('KCor')
 # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
 bz_central_coaligned_map = sunpy.map.Map(data_bz_central_coaligned, head_bz_central_coaligned)
 
-fits_dir_by_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_By.fits'
+fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_By.fits')
 data_by_central_coaligned = fits.getdata(fits_dir_by_central_coaligned)
 head_by_central_coaligned = fits.getheader(fits_dir_by_central_coaligned)
 head_by_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -976,7 +997,7 @@ ax6.set_title('7.23800_11.5530 Central $B_z$ vs $B_y$ Field Vector Plot')
 ax6.set_xlabel('Helioprojective Longitude (Solar-X)')
 ax6.set_ylabel('Helioprojective Latitude (Solar-Y)')
 
-fits_dir_bz_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_Bz.fits'
+fits_dir_bz_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_Bz.fits')
 data_bz_central_coaligned = fits.getdata(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned = fits.getheader(fits_dir_bz_central_coaligned)
 head_bz_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -984,7 +1005,7 @@ head_bz_central_coaligned['detector'] = ('KCor')
 # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
 bz_central_coaligned_map = sunpy.map.Map(data_bz_central_coaligned, head_bz_central_coaligned)
 
-fits_dir_by_central_coaligned = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By.fits'
+fits_dir_by_central_coaligned = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
 data_by_central_coaligned = fits.getdata(fits_dir_by_central_coaligned)
 head_by_central_coaligned = fits.getheader(fits_dir_by_central_coaligned)
 head_by_central_coaligned['Observatory'] = ('PSI-MAS')
@@ -1021,7 +1042,7 @@ plt.close()
 dist_values_random = sns.distplot(err_random_deg).get_lines()[0].get_data()[1]
 plt.close()
 
-import numpy as np
+
 from scipy.stats import norm
 from matplotlib import pyplot as plt
 # creating the data distribution
@@ -1256,7 +1277,7 @@ integrate_distribution(err_mlso_central_deg,-14.5,0,xmin_mlso_central, xmax_mlso
 
 
 
-fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170820_180657_kcor_l2_avg.fts'
+fits_dir_mlso = os.path.join(repo_path,'Data/MLSO/20170820_180657_kcor_l2_avg.fts')
 
 data1 = fits.getdata(fits_dir_mlso)
 head1 = fits.getheader(fits_dir_mlso)
@@ -1270,7 +1291,7 @@ mlsomap.plot(axes=ax1,title=False)
 R_SUN = head1['R_SUN']
 ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
-fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
+fits_dir_mlso = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
 
 data2 = fits.getdata(fits_dir_mlso)
 head2 = fits.getheader(fits_dir_mlso)
@@ -1283,7 +1304,7 @@ R_SUN = head2['R_SUN']
 ax2.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170825_185258_kcor_l2_avg.fts'
+fits_dir_mlso = os.path.join(repo_path,'Data/MLSO/20170825_185258_kcor_l2_avg.fts')
 
 data3 = fits.getdata(fits_dir_mlso)
 head3 = fits.getheader(fits_dir_mlso)
@@ -1296,7 +1317,7 @@ R_SUN = head3['R_SUN']
 ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_pB.fits'
+fits_dir_mlso = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_pB.fits')
 
 data4 = fits.getdata(fits_dir_mlso)
 head4 = fits.getheader(fits_dir_mlso)
@@ -1309,7 +1330,7 @@ R_SUN = head4['R_SUN']
 ax4.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170829_200801_kcor_l2_avg.fts'
+fits_dir_mlso = os.path.join(repo_path,'Data/MLSO/20170829_200801_kcor_l2_avg.fts')
 
 data5 = fits.getdata(fits_dir_mlso)
 head5 = fits.getheader(fits_dir_mlso)
@@ -1323,7 +1344,7 @@ R_SUN = head5['R_SUN']
 ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_mlso = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_pB.fits'
+fits_dir_mlso = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_pB.fits')
 
 data6 = fits.getdata(fits_dir_mlso)
 head6 = fits.getheader(fits_dir_mlso)
@@ -1341,32 +1362,32 @@ plt.close()
 # plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_Plots.png'))
 # plt.show()
 
-By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170820_180657_kcor_l2_avg.fts'
-# By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
-By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170825_185258_kcor_l2_avg.fts'
-# By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By.fits'
-By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170829_200801_kcor_l2_avg.fts'
-# By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By.fits'
-By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170903_025117_kcor_l2_avg.fts'
-# By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By.fits'
-By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170906_213054_kcor_l2_avg.fts'
-# By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By.fits'
-By6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
+By1 = os.path.join(repo_path,'Data/MLSO/20170820_180657_kcor_l2_avg.fts')
+# By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+By2 = os.path.join(repo_path,'Data/MLSO/20170825_185258_kcor_l2_avg.fts')
+# By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
+By3 = os.path.join(repo_path,'Data/MLSO/20170829_200801_kcor_l2_avg.fts')
+# By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
+By4 = os.path.join(repo_path,'Data/MLSO/20170903_025117_kcor_l2_avg.fts')
+# By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
+By5 = os.path.join(repo_path,'Data/MLSO/20170906_213054_kcor_l2_avg.fts')
+# By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
+By6 = os.path.join(repo_path,'Data/MLSO/20170911_202927_kcor_l2_avg.fts')
 
-Bz1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
-# By1 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/6.89000_303.470_pB.fits'
-Bz2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_pB.fits'
-# By2 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.05600_236.978_By.fits'
-Bz3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_pB.fits'
-# By3 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.15300_183.443_By.fits'
-Bz4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_pB.fits'
-# By4 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_By.fits'
-Bz5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_pB.fits'
-# By5 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_By.fits'
-Bz6 = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_pB.fits'
+Bz1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+# By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+Bz2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_pB.fits')
+# By2 = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_By.fits')
+Bz3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_pB.fits')
+# By3 = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_By.fits')
+Bz4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_pB.fits')
+# By4 = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_By.fits')
+Bz5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_pB.fits')
+# By5 = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_By.fits')
+Bz6 = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_pB.fits')
 
 
-fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170903_025117_kcor_l2_avg.fts'
+fits_dir_psi = os.path.join(repo_path,'Data/MLSO/20170903_025117_kcor_l2_avg.fts')
 
 data1 = fits.getdata(fits_dir_psi)
 head1 = fits.getheader(fits_dir_psi)
@@ -1380,7 +1401,7 @@ psimap.plot(axes=ax1,title=False)
 R_SUN = head1['R_SUN']
 ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
-fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.22000_126.906_pB.fits'
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_pB.fits')
 
 data2 = fits.getdata(fits_dir_psi)
 head2 = fits.getheader(fits_dir_psi)
@@ -1393,7 +1414,7 @@ R_SUN = head2['R_SUN']
 ax2.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170906_213054_kcor_l2_avg.fts'
+fits_dir_psi = os.path.join(repo_path,'Data/MLSO/20170906_213054_kcor_l2_avg.fts')
 
 data3 = fits.getdata(fits_dir_psi)
 head3 = fits.getheader(fits_dir_psi)
@@ -1406,7 +1427,7 @@ R_SUN = head3['R_SUN']
 ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.24700_77.0150_pB.fits'
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_pB.fits')
 
 data4 = fits.getdata(fits_dir_psi)
 head4 = fits.getheader(fits_dir_psi)
@@ -1419,7 +1440,7 @@ R_SUN = head4['R_SUN']
 ax4.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
+fits_dir_psi = os.path.join(repo_path,'Data/MLSO/20170911_202927_kcor_l2_avg.fts')
 
 data5 = fits.getdata(fits_dir_psi)
 head5 = fits.getheader(fits_dir_psi)
@@ -1433,7 +1454,7 @@ R_SUN = head5['R_SUN']
 ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = '/Users/crura/Desktop/Research/github/Image-Coalignment/Output/7.23800_11.5530_pB.fits'
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_pB.fits')
 
 data6 = fits.getdata(fits_dir_psi)
 head6 = fits.getheader(fits_dir_psi)
@@ -1479,6 +1500,37 @@ plt.savefig(os.path.join(repo_path,'Output/Plots/Combined_Plot.png'))
 plt.show()
 plt.close()
 
+from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+import pandas as pd
+colnames=['year', 'day', 'rad_au', 'hg_lat','hg_lon']
+hi = pd.read_csv(os.path.join(repo_path,'Data/Ephemeris/helios_PKexb4xQt9.lst.txt'),delim_whitespace=True,names=colnames,skiprows=1)
+epoch = datetime(2017,1,1,0)
+xnew = np.linspace(229,255,1000000)
+f1 = interp1d(hi['day'].values,hi['hg_lon'].values,kind='linear')
+ynew = f1(xnew)
+
+plt.gcf().clear()
+fig = plt.figure(1,figsize=(10,10))
+ax = fig.add_subplot(111)
+ax.scatter(hi['day'].values,hi['hg_lon'].values,label='Earth position from JPL ephemeris')
+ax.plot(xnew,ynew,label='Interpolated earth position')
+ax.set_ylabel('Heliographic Longitude of Earth')
+ax.set_xlabel('Day in Year')
+ax.set_title('Position of Earth in August-September 2017')
+delta_time = epoch + timedelta(days=xnew[np.where(np.round(ynew,3)==303.470)[0][1]]-1)
+# [line1] = plt.axvline(xnew[np.where(np.round(ynew,3)==303.470)[0][1]],linestyle='--',label='Locations of PSI/FORWARD Model Slices')
+ax.axvline(xnew[np.where(np.round(ynew,3)==303.470)[0][1]],linestyle='--',label='Locations of PSI/FORWARD Model Slices')
+ax.axvline(xnew[np.where(np.round(ynew,3)==236.978)[0][1]],linestyle='--')
+ax.axvline(xnew[np.where(np.round(ynew,3)==183.443)[0][1]],linestyle='--')
+ax.axvline(xnew[np.where(np.round(ynew,3)==126.906)[0][1]],linestyle='--')
+ax.axvline(xnew[np.where(np.round(ynew,3)==77.015)[0][1]],linestyle='--')
+ax.axvline(xnew[np.where(np.round(ynew,3)==11.553)[0][1]],linestyle='--')
+handles, labels = ax.get_legend_handles_labels()
+lgd = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(1.04, 1))
+plt.legend(bbox_to_anchor=(1.04, 1))
+plt.savefig(os.path.join(repo_path,'Output/Plots/Ephemeris_Plot.png'),bbox_extra_artists=(lgd))
+plt.show()
 
 #
 # # new bandwith STUFF

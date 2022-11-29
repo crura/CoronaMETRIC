@@ -6,8 +6,8 @@ function save_parameters
   restore, git_repo + '/Data/Bx_2d_Center.sav',/v
   restore, git_repo + '/Data/By_2d_Center.sav',/v
   restore, git_repo + '/Data/Bz_2d_Center.sav',/v
-  restore, '/Users/crura/SSW/packages/forward/datadump',/v
   restore, git_repo + '/Data/model_parameters.sav',/v
+  restore, '/Users/crura/Desktop/Research/Data/datadump_' + crlt_obs_print + '_' + crln_obs_print,/v
 
 
   out_string = strcompress(string(CRLT_OBS),/remove_all) + '_' + strcompress(string(CRLN_OBS),/remove_all) + '.sav'

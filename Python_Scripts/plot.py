@@ -15,7 +15,7 @@ from tqdm import tqdm_notebook
 import pandas as pd
 import unittest
 from pathlib import Path
-
+from scipy.interpolate import interp1d
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -1506,6 +1506,9 @@ import pandas as pd
 colnames=['year', 'day', 'rad_au', 'hg_lat','hg_lon']
 hi = pd.read_csv(os.path.join(repo_path,'Data/Ephemeris/helios_PKexb4xQt9.lst.txt'),delim_whitespace=True,names=colnames,skiprows=1)
 epoch = datetime(2017,1,1,0)
+xnew = np.linspace(229,255,1000000)
+f1 = interp1d(hi['day'].values,hi['hg_lon'].values,kind='linear')
+ynew = f1(xnew)
 
 plt.gcf().clear()
 fig = plt.figure(1,figsize=(10,10))

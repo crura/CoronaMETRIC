@@ -96,7 +96,7 @@ ax.legend()
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance.png'))
-plt.show()
+# plt.show()
 plt.close()
 print(np.min(err_forward_central_deg))
 # Generate plots for LOS arrays
@@ -139,7 +139,7 @@ plt.ylim(0,0.07)
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance_LOS.png'))
-plt.show()
+# plt.show()
 plt.close()
 
 
@@ -178,7 +178,7 @@ ax[1].set_ylim(0,0.07)
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 ax[1].legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance_Combined.png'))
-plt.show()
+# plt.show()
 plt.close()
 
 from sklearn.neighbors import KernelDensity
@@ -276,7 +276,7 @@ R_SUN = head6['R_SUN']
 ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 plt.subplots_adjust(bottom=0.05, top=0.95)
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_Plots.png'))
-plt.show()
+# plt.show()
 
 
 Bz1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
@@ -373,7 +373,7 @@ R_SUN = head6['R_SUN']
 ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 plt.subplots_adjust(bottom=0.05, top=0.95)
 plt.savefig(os.path.join(repo_path,'Output/Plots/PSI_Plots.png'))
-plt.show()
+# plt.show()
 
 
 
@@ -755,7 +755,7 @@ def create_six_fig_plot(files_z, files_y, outpath):
     # fig.set_constrained_layout_pads(w_pad=1 / 102, h_pad=1 / 102, hspace=0.0,
     #                                 wspace=0.0)
     plt.savefig(outpath)
-    plt.show()
+    # plt.show()
     plt.close()
 
     return fig
@@ -861,7 +861,7 @@ fig.subplots_adjust(0, 0, 1, 1)
 ax.set_axis_off()
 ax.matshow(a)
 plt.subplots_adjust(bottom=0.05, top=1.25)
-plt.show()
+# plt.show()
 plt.close()
 
 """
@@ -1262,8 +1262,8 @@ def integrate_distribution(dist, x1, x2, x_min, x_max):
     plt.xlabel('x')
     plt.ylabel('Normal Distribution')
 
-    plt.savefig("integrate_normal_distribution.png")
-    plt.show()
+    plt.savefig(os.path.join(repo_path,'Output/Plots/integrate_normal_distribution.png')
+    # plt.show()
     plt.close()
 
     return res
@@ -1357,9 +1357,9 @@ mlsomap.plot(axes=ax6,title=False,norm=matplotlib.colors.LogNorm())
 R_SUN = head6['R_SUN']
 ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 plt.subplots_adjust(bottom=0.05, top=0.95)
-plt.show()
+# plt.show()
 plt.close()
-# plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_Plots.png'))
+plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_Plots_2.png'))
 # plt.show()
 
 By1 = os.path.join(repo_path,'Data/MLSO/20170820_180657_kcor_l2_avg.fts')
@@ -1467,7 +1467,7 @@ psimap.plot(axes=ax6,title=False,norm=matplotlib.colors.LogNorm())
 R_SUN = head6['R_SUN']
 ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 plt.subplots_adjust(bottom=0.05, top=0.95)
-plt.show()
+# plt.show()
 plt.close()
 # plt.savefig(os.path.join(repo_path,'Output/Plots/PSI_Plots.png'))
 # plt.show()
@@ -1497,7 +1497,7 @@ ax.set_axis_off()
 ax.matshow(a)
 plt.subplots_adjust(bottom=0.05, top=1.25)
 plt.savefig(os.path.join(repo_path,'Output/Plots/Combined_Plot.png'))
-plt.show()
+# plt.show()
 plt.close()
 
 from datetime import datetime, timedelta
@@ -1530,7 +1530,7 @@ handles, labels = ax.get_legend_handles_labels()
 lgd = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(1.04, 1))
 plt.legend(bbox_to_anchor=(1.04, 1))
 plt.savefig(os.path.join(repo_path,'Output/Plots/Ephemeris_Plot.png'),bbox_extra_artists=(lgd))
-plt.show()
+# plt.show()
 
 #
 # # new bandwith STUFF

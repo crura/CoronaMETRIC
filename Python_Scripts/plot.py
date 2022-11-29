@@ -1363,8 +1363,8 @@ R_SUN = head6['R_SUN']
 ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 plt.subplots_adjust(bottom=0.05, top=0.95)
 # plt.show()
+plt.savefig(os.path.join(repo_path,'Output/Plots/Combined_Plots_1.png'))
 plt.close()
-plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_Plots_2.png'))
 # plt.show()
 
 By1 = os.path.join(repo_path,'Data/MLSO/20170820_180657_kcor_l2_avg.fts')
@@ -1473,8 +1473,8 @@ R_SUN = head6['R_SUN']
 ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 plt.subplots_adjust(bottom=0.05, top=0.95)
 # plt.show()
+plt.savefig(os.path.join(repo_path,'Output/Plots/Combined_Plots_2.png'))
 plt.close()
-# plt.savefig(os.path.join(repo_path,'Output/Plots/PSI_Plots.png'))
 # plt.show()
 
 
@@ -1535,7 +1535,7 @@ handles, labels = ax.get_legend_handles_labels()
 lgd = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(1.04, 1))
 plt.legend(bbox_to_anchor=(1.04, 1))
 plt.savefig(os.path.join(repo_path,'Output/Plots/Ephemeris_Plot.png'),bbox_extra_artists=(lgd))
-plt.show()
+# plt.show()
 
 #
 # # new bandwith STUFF

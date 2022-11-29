@@ -16,6 +16,9 @@ import pandas as pd
 import unittest
 from pathlib import Path
 from scipy.interpolate import interp1d
+import matplotlib
+matplotlib.use('TkAgg')
+mpl.use('TkAgg')
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -1475,10 +1478,10 @@ plt.close()
 # plt.show()
 
 
-import matplotlib as mpl
-backend = mpl.get_backend()
-mpl.use('agg')
-# matplotlib.use('agg')
+# import matplotlib as mpl
+# backend = mpl.get_backend()
+# mpl.use('TkAgg')
+# matplotlib.use('TkAgg')
 
 
 c1 = fig1.canvas
@@ -1492,7 +1495,7 @@ a2 = np.array(c2.buffer_rgba())
 a = np.hstack((a1,a2))
 
 
-mpl.use(backend)
+# mpl.use(backend)
 fig,ax = plt.subplots(figsize=(15, 15),dpi=100)
 fig.subplots_adjust(0, 0, 1, 1)
 ax.set_axis_off()

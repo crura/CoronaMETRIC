@@ -7,12 +7,12 @@ spawn, 'git rev-parse --show-toplevel', git_repo
 
 fits_directory = git_repo + '/' + directory; '/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
 head = headfits(fits_directory)
-rsun = sxpar(head,'R_SUN')
+rsun = 2;sxpar(head,'R_SUN')
 shape = sxpar(head,'NAXIS1')
 crln_obs = SXPAR(head,'CRLN_OBS');236.978
 crlt_obs = SXPAR(head,'CRLT_OBS');7.056
 rad_occlt_pix = sxpar(head,'RCAM_DCR')
-occlt = rad_occlt_pix/rsun;1.0600000
+occlt = 1.4;rad_occlt_pix/rsun;1.0600000
 range = shape/rsun; 6.0799999
 date_obs = SXPAR(head,'DATE-OBS')
 

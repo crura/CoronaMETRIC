@@ -80,13 +80,13 @@ jobs:
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output/fits_images
 
 
-      - name: Plot Figures for Paper
-
-        run: |
-          source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
-          conda init bash &&
-          conda activate test_env &&
-          python Python_Scripts/plot.py
+      # - name: Plot Figures for Paper
+      #
+      #   run: |
+      #     source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
+      #     conda init bash &&
+      #     conda activate test_env &&
+      #     python Python_Scripts/plot_paper_figures.py.py
 
       - uses: actions/upload-artifact@v3
         with:

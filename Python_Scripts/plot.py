@@ -107,7 +107,7 @@ cor1map = sunpy.map.Map(data2, head2)
 fig1 = plt.figure(figsize=(10, 10))
 ax1 = fig1.add_subplot(1, 2, 1, projection=cor1map)
 cor1map.plot(axes=ax1,title=False,norm=matplotlib.colors.LogNorm())
-R_SUN = 1.45 * (head2['rsun'] / head2['cdelt1'])
+R_SUN = occlt * (head2['rsun'] / head2['cdelt1'])
 ax1.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
 
 
@@ -125,7 +125,7 @@ psimap = sunpy.map.Map(data1, head1)
 
 ax2 = fig1.add_subplot(1, 2, 2, projection=cor1map)
 psimap.plot(axes=ax2,title=False,norm=matplotlib.colors.LogNorm())
-R_SUN = 1.06 * (head1['rsun'] / head1['cdelt1'])
+R_SUN = occlt * (head1['rsun'] / head1['cdelt1'])
 ax2.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
 psimap.plot_settings['norm'] = plt.Normalize(cor1map.min(), cor1map.max())
 plt.savefig(os.path.join(repo_path,'Output/Plots/Model_Comparison.png'))

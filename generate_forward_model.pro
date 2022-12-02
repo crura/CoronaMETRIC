@@ -19,6 +19,8 @@ occlt = 1.4500000;rad_occlt_pix/rsun;1.0600000
 range = shape/rsun; 6.0799999
 time = wcs.time
 date_obs = time.observ_date
+date_split = strsplit(date_obs,'T',/extract)
+date_print = repstr(date_split[0],'-','_')
 
 
 crlt_obs_print = strcompress(string(CRLT_OBS),/remove_all)

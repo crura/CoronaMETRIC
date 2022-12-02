@@ -26,10 +26,11 @@ idl_save = readsav(os.path.join(repo_path,'Data/model_parameters.sav'))
 date_obs =idl_save['DATE_OBS']
 crln_obs_print = idl_save['crln_obs_print']
 crlt_obs_print = idl_save['crlt_obs_print']
+date_print = str(idl_save['date_print'],'utf-8')
 fits_directory = str(idl_save['fits_directory'][0],'utf-8')
 occlt = idl_save['occlt']
 shape = idl_save['shape']
-params = str(crlt_obs_print,'utf-8') + '_' +  str(crln_obs_print,'utf-8')
+params = date_print + '_PSI'
 
 
 

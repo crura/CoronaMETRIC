@@ -112,6 +112,6 @@ ax1 = fig2.add_subplot(1, 2, 2, projection=cor1map)
 psimap.plot(axes=ax1,title=False,norm=matplotlib.colors.LogNorm())
 R_SUN = head1['R_SUN']
 ax1.add_patch(Circle((shape,shape), R_SUN, color='black',zorder=100))
-plt.savefig(os.path.join(repo_path,'Output/Plots/Model_Comparison.png')
-plt.show()
+plt.savefig(os.path.join(repo_path,'Output/Plots/Model_Comparison.png'))
+# plt.show()
 plt.close()

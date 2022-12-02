@@ -93,41 +93,37 @@ fits_dir_cor1 = os.path.join(repo_path,'Data/COR1/2017_08_20_rep_avg.fts')
 
 data2 = fits.getdata(fits_dir_cor1)
 head2 = fits.getheader(fits_dir_cor1)
-head2['detector'] = ('Cor-1')
-# head2_struct = fitshead2struct(head2)
-# wcs2 = fitshead2wcs(head2)
-# position2 = wcs2.position
-
-
-
-
+# head2['detector'] = ('Cor-1')
 cor1map = sunpy.map.Map(data2, head2)
 
 
-fig1 = plt.figure(figsize=(10, 10))
+fits_dir_psi = os.path.join(repo_path,'Output/fits_images/{}_pB.fits'.format(params))
+data1 = fits.getdata(fits_dir_psi)
+head1 = fits.getheader(fits_dir_psi)
+head1['detector'] = ('Cor-1')
+psimap = sunpy.map.Map(data1, head1)
+
+
+
+
+fig1 = plt.figure(figsize=(15, 8))
 ax1 = fig1.add_subplot(1, 2, 1, projection=cor1map)
-cor1map.plot(axes=ax1,title=False,norm=matplotlib.colors.LogNorm())
+
+cor1map.plot(axes=ax1,title=False)
+
 R_SUN = occlt * (head2['rsun'] / head2['cdelt1'])
 ax1.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
 
 
-fits_dir_psi = os.path.join(repo_path,'Output/fits_images/{}_pB.fits'.format(params))
-
-data1 = fits.getdata(fits_dir_psi)
-head1 = fits.getheader(fits_dir_psi)
-head1['detector'] = ('Cor-1')
-# head1_struct = fitshead2struct(head1)
-# wcs1 = fitshead2wcs(head1)
-# position1 = wcs2.position
-psimap = sunpy.map.Map(data1, head1)
-# psimap.plot_settings['norm'] = plt.Normalize(psimap.min(), psimap.max())
-
 
 ax2 = fig1.add_subplot(1, 2, 2, projection=cor1map)
+psimap.plot_settings['norm'] = plt.Normalize(cor1map.min(), cor1map.max())
+
 psimap.plot(axes=ax2,title=False,norm=matplotlib.colors.LogNorm())
 R_SUN = occlt * (head1['rsun'] / head1['cdelt1'])
 ax2.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
-psimap.plot_settings['norm'] = plt.Normalize(cor1map.min(), cor1map.max())
+ax1.title.set_text('COR-1 Observation {}'.format(str(date_obs,'utf-8') + 'Z'))
+ax2.title.set_text('PSI/FORWARD pB Eclipse Model {}'.format(str(date_obs,'utf-8') + 'Z'))
 plt.savefig(os.path.join(repo_path,'Output/Plots/Model_Comparison.png'))
-plt.show()
+# plt.show()
 plt.close()

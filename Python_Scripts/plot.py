@@ -11,6 +11,11 @@ import pandas as pd
 import git
 from scipy.io import readsav
 import os
+from matplotlib.patches import Circle
+
+
+import subprocess
+subprocess.run(["mkdir","Output/Plots","-p"])
 
 path = __file__
 pathnew = Path(path)
@@ -21,6 +26,7 @@ idl_save = readsav(os.path.join(repo_path,'Data/model_parameters.sav'))
 date_obs =idl_save['DATE_OBS']
 crln_obs_print = idl_save['crln_obs_print']
 crlt_obs_print = idl_save['crlt_obs_print']
+fits_directory = idl_save['fits_directory']
 shape = idl_save['shape']
 params = str(crlt_obs_print,'utf-8') + '_' +  str(crln_obs_print,'utf-8')
 
@@ -33,7 +39,7 @@ head = fits.getheader(fits_dir)
 
 psimap = sunpy.map.Map(data, head)
 
-fits_dir_mlso = pathnew.parent.parent.joinpath(str(idl_save['fits_directory'],'utf-8'))
+fits_dir_mlso = pathnew.parent.parent.joinpath(str(fits_directory[0],encoding='utf-8'))
 
 data = fits.getdata(fits_dir_mlso)
 head = fits.getheader(fits_dir_mlso)
@@ -87,13 +93,20 @@ fits_dir_cor1 = os.path.join(repo_path,'Data/COR1/2017_08_20_rep_avg.fts')
 data2 = fits.getdata(fits_dir_cor1)
 head2 = fits.getheader(fits_dir_cor1)
 head2['detector'] = ('KCor')
-cor1map = sunpy.map.Map(data1, head1)
+# head2_struct = fitshead2struct(head2)
+# wcs2 = fitshead2wcs(head2)
+# position2 = wcs2.position
+
+
+
+
+cor1map = sunpy.map.Map(data2, head2)
 
 
 fig1 = plt.figure(figsize=(10, 10))
 ax1 = fig1.add_subplot(1, 2, 1, projection=cor1map)
 cor1map.plot(axes=ax1,title=False)
-R_SUN = head1['R_SUN']
+R_SUN = head2['rsun'] / head2['cdelt1']
 ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 
 
@@ -104,13 +117,16 @@ fits_dir_psi = os.path.join(repo_path,'Output/fits_images/{}_pB.fits'.format(par
 data1 = fits.getdata(fits_dir_psi)
 head1 = fits.getheader(fits_dir_psi)
 head1['detector'] = ('Cor-1')
+# head1_struct = fitshead2struct(head1)
+# wcs1 = fitshead2wcs(head1)
+# position1 = wcs2.position
 psimap = sunpy.map.Map(data1, head1)
 # psimap.plot_settings['norm'] = plt.Normalize(psimap.min(), psimap.max())
 
 fig2 = plt.figure(figsize=(10, 10))
 ax1 = fig2.add_subplot(1, 2, 2, projection=cor1map)
 psimap.plot(axes=ax1,title=False,norm=matplotlib.colors.LogNorm())
-R_SUN = head1['R_SUN']
+R_SUN = head1['rsun'] / head1['cdelt1']
 ax1.add_patch(Circle((shape,shape), R_SUN, color='black',zorder=100))
 plt.savefig(os.path.join(repo_path,'Output/Plots/Model_Comparison.png'))
 # plt.show()

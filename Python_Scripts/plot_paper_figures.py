@@ -1614,3 +1614,35 @@ ax.legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/COR1_vs_FORWARD_Feature_Tracing_Performance.png'))
 # plt.show()
 plt.close()
+
+
+
+
+# Generate figure for combined plot of COR-1 and MLSO K-COR datasets
+fig, ax = plt.subplots(1,2,figsize=(16,8))
+
+# Generate plots for MLSO K-COR dataset on left axis
+sns.distplot(err_mlso_central_deg,hist=True,label='MLSO K-COR',bins=30,ax=ax[0])
+sns.distplot(err_forward_central_deg,hist=True,label='PSI/FORWARD pB',bins=30,ax=ax[0])
+sns.distplot(err_random_deg,hist=False,label='Random',ax=ax[0])
+ax[0].set_xlabel('Angle Discrepancy')
+ax[0].set_ylabel('Probability Density')
+ax[0].set_title('QRaFT Feature Tracing Performance MLSO K-COR vs FORWARD')
+ax[0].set_xlim(0,90)
+ax[0].set_ylim(0,0.07)
+ax[0].legend()
+
+# Generate plots for COR1 dataset on right axis
+sns.distplot(err_cor1_central_deg,hist=True,label='COR-1',bins=30,ax=ax[1])
+sns.distplot(err_forward_cor1_central_deg,hist=True,label='PSI/FORWARD pB',bins=30,ax=ax[1])
+sns.distplot(err_random_deg,hist=False,label='Random',ax=ax[1])
+# sns.kdeplot(err_mlso_los_deg,label='KDE')
+ax[1].set_xlabel('Angle Discrepancy')
+ax[1].set_ylabel('Probability Density')
+ax[1].set_title('QRaFT Feature Tracing Performance COR-1 vs FORWARD')
+ax[1].set_xlim(0,90)
+ax[1].set_ylim(0,0.07)
+ax[1].legend()
+plt.savefig(os.path.join(repo_path,'Output/Plots/COR1_vs_FORWARD_Feature_Tracing_Performance_Combined.png'))
+# plt.show()
+plt.close()

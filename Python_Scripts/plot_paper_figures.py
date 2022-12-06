@@ -1558,3 +1558,37 @@ err_cor1_los = idl_save_2['ERR_ARR_LOS_COR1']
 err_forward_cor1_central = idl_save_2['ERR_ARR_FORWARD']
 err_forward_cor1_los = idl_save_2['ERR_ARR_LOS_FORWARD']
 # err_random = idl_save_2['ERR_ARR_RND']
+
+
+# Generate plots for Central arrays
+mpl.rcParams.update(mpl.rcParamsDefault)
+
+# convert arrays from radians to degrees
+err_cor1_central_deg = err_cor1_central[np.where(err_cor1_central > 0)]*180/np.pi
+err_forward_cor1_central_deg = err_forward_cor1_central[np.where(err_forward_cor1_central > 0)]*180/np.pi
+err_random_deg = err_random[np.where(err_random > 0)]*180/np.pi
+
+# set minimum and maximum x values for gaussian kde calculation
+xmin_cor1_central = -14.5
+xmax_cor1_central = 104.0
+
+
+kde0_cor1_central_deg = gaussian_kde(err_cor1_central_deg)
+x_1_cor1_central_deg = np.linspace(xmin_cor1_central, xmax_cor1_central, 200)
+kde0_x_cor1_central_deg = kde0_mlso_central_deg(x_1_cor1_central_deg)
+# plt.plot(x_1_mlso_central_deg, kde0_x_mlso_central_deg, color='b', label='mlso central KDE scipy')
+
+xmin_forward_cor1_central = -17.24
+xmax_forward_cor1_central = 106.13
+
+kde0_forward_cor1_central = gaussian_kde(err_forward_cor1_central_deg)
+x_1_forward_cor1_central_deg = np.linspace(xmin_forward_cor1_central, xmax_forward_cor1_central, 200)
+kde0_x_forward_cor1_central_deg = kde0_forward_central_deg(x_1_forward_cor1_central_deg)
+# plt.plot(x_1_forward_central_deg, kde0_x_forward_central_deg, color='b', label='forward central KDE scipy')
+
+xmin_random = -18.395
+xmax_random = 108.39
+
+kde0_random_deg = gaussian_kde(err_random_deg)
+x_1_random_deg = np.linspace(xmin_random, xmax_random, 200)
+kde0_x_random_deg = kde0_random_deg(x_1_random_deg)

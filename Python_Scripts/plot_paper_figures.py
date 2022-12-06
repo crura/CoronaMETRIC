@@ -1572,7 +1572,7 @@ err_random_deg = err_random[np.where(err_random > 0)]*180/np.pi
 xmin_cor1_central = -14.5
 xmax_cor1_central = 104.0
 
-
+# Calculate Gaussian KDE for cor1 pB vs central B field dataset
 kde0_cor1_central_deg = gaussian_kde(err_cor1_central_deg)
 x_1_cor1_central_deg = np.linspace(xmin_cor1_central, xmax_cor1_central, 200)
 kde0_x_cor1_central_deg = kde0_mlso_central_deg(x_1_cor1_central_deg)
@@ -1581,6 +1581,7 @@ kde0_x_cor1_central_deg = kde0_mlso_central_deg(x_1_cor1_central_deg)
 xmin_forward_cor1_central = -17.24
 xmax_forward_cor1_central = 106.13
 
+# Calculate Gaussian KDE for forward pB vs central B field dataset (cor-1 version)
 kde0_forward_cor1_central = gaussian_kde(err_forward_cor1_central_deg)
 x_1_forward_cor1_central_deg = np.linspace(xmin_forward_cor1_central, xmax_forward_cor1_central, 200)
 kde0_x_forward_cor1_central_deg = kde0_forward_central_deg(x_1_forward_cor1_central_deg)
@@ -1589,6 +1590,27 @@ kde0_x_forward_cor1_central_deg = kde0_forward_central_deg(x_1_forward_cor1_cent
 xmin_random = -18.395
 xmax_random = 108.39
 
+# Calculate Gaussian KDE for forward pB vs random B field dataset
 kde0_random_deg = gaussian_kde(err_random_deg)
 x_1_random_deg = np.linspace(xmin_random, xmax_random, 200)
 kde0_x_random_deg = kde0_random_deg(x_1_random_deg)
+
+
+fig = plt.figure(figsize=(8,8))
+ax = fig.subplots(1,1)
+sns.distplot(err_cor1_central_deg,hist=True,label='COR-1',bins=30,ax=ax)
+sns.distplot(err_forward_cor1_central_deg,hist=True,label='PSI/FORWARD pB',bins=30,ax=ax)
+sns.distplot(err_random_deg,hist=False,label='Random',ax=ax)
+ax.set_xlabel('Angle Discrepancy')
+ax.set_ylabel('Probability Density')
+ax.set_title('QRaFT Feature Tracing Performance Against Central POS $B$ Field')
+ax.set_xlim(0,90)
+ax.set_ylim(0,0.07)
+ax.legend()
+
+plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
+plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
+plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
+plt.savefig(os.path.join(repo_path,'Output/Plots/COR1_vs_FORWARD_Feature_Tracing_Performance.png'))
+# plt.show()
+plt.close()

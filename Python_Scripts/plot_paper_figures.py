@@ -1548,3 +1548,13 @@ plt.savefig(os.path.join(repo_path,'Output/Plots/Ephemeris_Plot.png'),bbox_extra
 # plt.plot(x_1, dist_values_mlso_los_norm, label='seaborne')
 # plt.legend()
 # plt.show()
+
+
+
+data_dir_2 = os.path.join(repo_path,'Data/QRaFT/errors_cor1.sav')
+idl_save_2 = readsav(data_dir_2)
+err_cor1_central = idl_save_2['ERR_ARR_COR1']
+err_cor1_los = idl_save_2['ERR_ARR_LOS_COR1']
+err_forward_cor1_central = idl_save_2['ERR_ARR_FORWARD']
+err_forward_cor1_los = idl_save_2['ERR_ARR_LOS_FORWARD']
+# err_random = idl_save_2['ERR_ARR_RND']

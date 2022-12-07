@@ -42,6 +42,7 @@ head2 = fits.getheader(fits_dir_cor1)
 cor1map = sunpy.map.Map(data2, head2)
 
 
+
 fits_dir_psi = os.path.join(repo_path,'Output/fits_images/{}_pB.fits'.format(params))
 data1 = fits.getdata(fits_dir_psi)
 head1 = fits.getheader(fits_dir_psi)
@@ -53,7 +54,7 @@ psimap = sunpy.map.Map(data1, head1)
 
 fig1 = plt.figure(figsize=(15, 8))
 ax1 = fig1.add_subplot(1, 2, 1, projection=cor1map)
-
+cor1map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
 cor1map.plot(axes=ax1,title=False)
 
 R_SUN = occlt * (head2['rsun'] / head2['cdelt1'])

@@ -1574,8 +1574,8 @@ xmax_cor1_central = 104.0
 
 # Calculate Gaussian KDE for cor1 pB vs central B field dataset
 kde0_cor1_central_deg = gaussian_kde(err_cor1_central_deg)
-x_1_cor1_central_deg = np.linspace(xmin_cor1_central, xmax_cor1_central, 200)
-kde0_x_cor1_central_deg = kde0_mlso_central_deg(x_1_cor1_central_deg)
+x_1_cor1_central_deg = np.linspace(xmin_cor1_central, xmax_cor1_central, 1000000)
+kde0_x_cor1_central_deg = kde0_cor1_central_deg(x_1_cor1_central_deg)
 # plt.plot(x_1_mlso_central_deg, kde0_x_mlso_central_deg, color='b', label='mlso central KDE scipy')
 
 xmin_forward_cor1_central = -17.24
@@ -1583,8 +1583,8 @@ xmax_forward_cor1_central = 106.13
 
 # Calculate Gaussian KDE for forward pB vs central B field dataset (cor-1 version)
 kde0_forward_cor1_central = gaussian_kde(err_forward_cor1_central_deg)
-x_1_forward_cor1_central_deg = np.linspace(xmin_forward_cor1_central, xmax_forward_cor1_central, 200)
-kde0_x_forward_cor1_central_deg = kde0_forward_central_deg(x_1_forward_cor1_central_deg)
+x_1_forward_cor1_central_deg = np.linspace(xmin_forward_cor1_central, xmax_forward_cor1_central, 1000000)
+kde0_x_forward_cor1_central_deg = kde0_forward_cor1_central(x_1_forward_cor1_central_deg)
 # plt.plot(x_1_forward_central_deg, kde0_x_forward_central_deg, color='b', label='forward central KDE scipy')
 
 xmin_random = -18.395
@@ -1592,7 +1592,7 @@ xmax_random = 108.39
 
 # Calculate Gaussian KDE for forward pB vs random B field dataset
 kde0_random_deg = gaussian_kde(err_random_deg)
-x_1_random_deg = np.linspace(xmin_random, xmax_random, 200)
+x_1_random_deg = np.linspace(xmin_random, xmax_random, 1000000)
 kde0_x_random_deg = kde0_random_deg(x_1_random_deg)
 
 
@@ -1619,30 +1619,143 @@ plt.close()
 
 
 # Generate figure for combined plot of COR-1 and MLSO K-COR datasets
-fig, ax = plt.subplots(1,2,figsize=(16,8))
+fig, ax = plt.subplots(1,2,figsize=(24,9))
 
 # Generate plots for MLSO K-COR dataset on left axis
 sns.distplot(err_mlso_central_deg,hist=True,label='MLSO K-COR',bins=30,ax=ax[0])
 sns.distplot(err_forward_central_deg,hist=True,label='PSI/FORWARD pB',bins=30,ax=ax[0])
 sns.distplot(err_random_deg,hist=False,label='Random',ax=ax[0])
-ax[0].set_xlabel('Angle Discrepancy')
-ax[0].set_ylabel('Probability Density')
-ax[0].set_title('QRaFT Feature Tracing Performance MLSO K-COR vs FORWARD')
+ax[0].set_xlabel('Angle Discrepancy',fontsize=22)
+ax[0].set_ylabel('Probability Density',fontsize=22)
+ax[0].set_title('QRaFT Feature Tracing Performance MLSO K-COR vs PSI',fontsize=22)
 ax[0].set_xlim(0,90)
 ax[0].set_ylim(0,0.07)
-ax[0].legend()
+ax[0].legend(fontsize=20)
 
 # Generate plots for COR1 dataset on right axis
 sns.distplot(err_cor1_central_deg,hist=True,label='COR-1',bins=30,ax=ax[1])
 sns.distplot(err_forward_cor1_central_deg,hist=True,label='PSI/FORWARD pB',bins=30,ax=ax[1])
 sns.distplot(err_random_deg,hist=False,label='Random',ax=ax[1])
 # sns.kdeplot(err_mlso_los_deg,label='KDE')
-ax[1].set_xlabel('Angle Discrepancy')
-ax[1].set_ylabel('Probability Density')
-ax[1].set_title('QRaFT Feature Tracing Performance COR-1 vs FORWARD')
+ax[1].set_xlabel('Angle Discrepancy',fontsize=22)
+ax[1].set_ylabel('Probability Density',fontsize=22)
+ax[1].set_title('QRaFT Feature Tracing Performance COR-1 vs PSI',fontsize=22)
 ax[1].set_xlim(0,90)
 ax[1].set_ylim(0,0.07)
-ax[1].legend()
+ax[1].legend(fontsize=20)
 plt.savefig(os.path.join(repo_path,'Output/Plots/COR1_vs_FORWARD_Feature_Tracing_Performance_Combined.png'))
 # plt.show()
 plt.close()
+
+
+
+# retrieve probability density data from seaborne distplots
+dist_values_cor1_central = sns.distplot(err_cor1_central_deg).get_lines()[0].get_data()[1]
+plt.close()
+dist_values_forward_cor1_central = sns.distplot(err_forward_cor1_central_deg).get_lines()[0].get_data()[1]
+plt.close()
+
+# dist_values_mlso_los = sns.distplot(err_mlso_los_deg).get_lines()[0].get_data()[1]
+# plt.close()
+# dist_values_forward_los = sns.distplot(err_forward_los_deg).get_lines()[0].get_data()[1]
+# plt.close()
+
+dist_values_random = sns.distplot(err_random_deg).get_lines()[0].get_data()[1]
+plt.close()
+
+
+
+
+"""
+print("")
+#compute JS Divergence
+# result_JSD_MLSO_FORWARD_LOS= JS_Div(dist_values_mlso_los, dist_values_forward_los)
+# print("JS Divergence between MLSO LOS and PSI/FORWARD LOS",result_JSD_MLSO_FORWARD_LOS)
+result_JSD_COR1_FORWARD_Central= JS_Div(dist_values_cor1_central, dist_values_forward_cor1_central)
+print("JS Divergence between COR-1 Central and PSI/FORWARD Central",result_JSD_COR1_FORWARD_Central)
+
+# result_JSD12= JS_Div(dist_values_mlso_los, dist_values_random)
+# print("JS Divergence between MLSO LOS and Random",result_JSD12)
+result_JSD_COR1_Random= JS_Div(dist_values_cor1_central, dist_values_random)
+print("JS Divergence between COR1 Central and Random",result_JSD_COR1_Random)
+
+# result_JSD12= JS_Div(dist_values_forward_los, dist_values_random)
+# print("JS Divergence between PSI/FORWARD LOS and Random",result_JSD12)
+result_JSD_COR1_FORWARD_Random= JS_Div(dist_values_forward_cor1_central, dist_values_random)
+print("JS Divergence between PSI/FORWARD Central (COR-1) and Random",result_JSD_COR1_FORWARD_Random)
+
+print("")
+
+#compute KL Divergence
+KL_Div_cor1_forward_central = KL_div(dist_values_cor1_central,dist_values_forward_cor1_central)
+print("KL Divergence between COR-1 Central and PSI/FORWARD Central",KL_Div_cor1_forward_central)
+# KL_Div_mlso_forward_los = KL_div(dist_values_mlso_los, dist_values_forward_los)
+# print("KL Divergence between MLSO LOS and PSI/FORWARD LOS",KL_Div_mlso_forward_los)
+
+KL_Div_cor1_central_random = KL_div(dist_values_cor1_central,dist_values_random)
+print("KL Divergence between COR-1 Central and Random",KL_Div_cor1_central_random)
+# KL_Div_mlso_los_random = KL_div(dist_values_mlso_los, dist_values_random)
+# print("KL Divergence between MLSO LOS and Random",KL_Div_mlso_los_random)
+
+KL_Div_cor1_forward_central_random = KL_div(dist_values_forward_cor1_central,dist_values_random)
+print("KL Divergence between PSI/FORWARD Central (COR-1) and Random",KL_Div_cor1_forward_central_random)
+# KL_Div_forward_los_random = KL_div(dist_values_forward_los, dist_values_random)
+# print("KL Divergence between PSI/FORWARD LOS and Random",KL_Div_forward_los_random)
+"""
+print("")
+
+print("COR-1 Central average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
+print("FORWARD Central average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
+print("Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
+
+print("COR-1 Central median discrepancy: " + str(np.round(np.median(err_cor1_central_deg),5)))
+print("FORWARD Central median discrepancy: " + str(np.round(np.median(err_forward_cor1_central_deg),5)))
+print("Random average discrepancy: " + str(np.round(np.median(err_random_deg),5)))
+print("")
+
+# print("KDE Results: ")
+# print("")
+
+# err_cor1_central_deg, err_forward_cor1_central_deg, err_random_deg
+# kde0_x_cor1_central_deg, kde0_x_forward_cor1_central_deg, kde0_x_random_deg
+#compute JS Divergence
+# result_JSD_MLSO_FORWARD_LOS= JS_Div(kde0_x_mlso_los_deg, kde0_x_forward_los_deg)
+# print("JS Divergence between MLSO LOS and PSI/FORWARD LOS",result_JSD_MLSO_FORWARD_LOS)
+result_JSD_COR1_FORWARD_Central= JS_Div(kde0_x_cor1_central_deg, kde0_x_forward_cor1_central_deg)
+print("JS Divergence between COR-1 Central and PSI/FORWARD Central: ",result_JSD_COR1_FORWARD_Central)
+
+# result_JSD12= JS_Div(kde0_x_mlso_los_deg, kde0_x_random_deg)
+# print("JS Divergence between MLSO LOS and Random",result_JSD12)
+result_JSD_COR1_Central_Random= JS_Div(kde0_x_cor1_central_deg, kde0_x_random_deg)
+print("JS Divergence between COR1 Central and Random: ",result_JSD_COR1_Central_Random)
+
+# result_JSD12= JS_Div(kde0_x_forward_los_deg, kde0_x_random_deg)
+# print("JS Divergence between PSI/FORWARD LOS and Random",result_JSD12)
+result_JSD_COR1_Forward_Central_Random= JS_Div(kde0_x_forward_cor1_central_deg, kde0_x_random_deg)
+print("JS Divergence between PSI/FORWARD Central and Random",result_JSD_COR1_Forward_Central_Random)
+
+print("")
+
+#compute KL Divergence
+KL_Div_cor1_forward_central = KL_div(kde0_x_cor1_central_deg, kde0_x_forward_cor1_central_deg)
+print("KL Divergence between COR1 Central and PSI/FORWARD Central: ",KL_Div_cor1_forward_central)
+# KL_Div_mlso_forward_los = KL_div(kde0_x_mlso_los_deg, kde0_x_forward_los_deg)
+# print("KL Divergence between MLSO LOS and PSI/FORWARD LOS",KL_Div_mlso_forward_los)
+
+KL_Div_cor1_central_random = KL_div(kde0_x_cor1_central_deg, kde0_x_random_deg)
+print("KL Divergence between COR1 Central and Random: ",KL_Div_cor1_central_random)
+# KL_Div_mlso_los_random = KL_div(kde0_x_mlso_los_deg, kde0_x_random_deg)
+# print("KL Divergence between MLSO LOS and Random",KL_Div_mlso_los_random)
+
+KL_Div_cor1_forward_central_random = KL_div(kde0_x_forward_cor1_central_deg, kde0_x_random_deg)
+print("KL Divergence between PSI/FORWARD Central (COR1) and Random: ",KL_Div_cor1_forward_central_random)
+# KL_Div_forward_los_random = KL_div(kde0_x_forward_los_deg, kde0_x_random_deg)
+# print("KL Divergence between PSI/FORWARD LOS and Random",KL_Div_forward_los_random)
+
+print("")
+print("yay")
+
+# result_JSD_MLSO_FORWARD_LOS= JS_Div(kde0_x_mlso_los_deg, dist_values_mlso_los)
+# print("JS Divergence between MLSO LOS KDE to SNS.DISTPLOT",result_JSD_MLSO_FORWARD_LOS)
+# result_JSD_MLSO_FORWARD_Central= JS_Div(kde0_x_mlso_central_deg, dist_values_mlso_central)
+# print("JS Divergence between MLSO Central KDE to SNS.DISTPLOT",result_JSD_MLSO_FORWARD_Central)

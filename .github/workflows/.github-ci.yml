@@ -37,6 +37,7 @@ jobs:
           source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
           conda init bash &&
           conda activate test_env &&
+          git_repo=$(git rev-parse --show-toplevel) &&
           (echo "ssw_path" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/string/strjustify.pro'" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/system/strrep_logenv.pro'" &&
@@ -58,11 +59,11 @@ jobs:
           echo ".compile -v '/Users/crura/SSW/packages/forward/idl/DEFAULTS/for_settingdefaults.pro'" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/util/default.pro'" &&
           echo ".compile -v '/Users/crura/IDLWorkspace/Default/linspace.pro'" &&
-          git_repo=$(git rev-parse --show-toplevel) &&
           echo ".compile -v '$git_repo/IDL_Scripts/write_psi_image_as_fits.pro'" &&
           echo ".compile -v '$git_repo/IDL_Scripts/write_psi_fits.pro'" &&
           echo ".compile -v '$git_repo/IDL_Scripts/write_psi_mlso_fits.pro'" &&
           echo ".compile -v '$git_repo/IDL_Scripts/rtp2xyz.pro'" &&
+          echo ".compile -v '$git_repo/IDL_Scripts/repstr.pro'" &&
           echo ".compile -v '$git_repo/generate_forward_model.pro'" &&
           echo ".compile -v '$git_repo/get_fordump.pro'" &&
           echo ".compile -v '$git_repo/image_coalignment.pro'" &&
@@ -85,7 +86,7 @@ jobs:
           source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
           conda init bash &&
           conda activate test_env &&
-          python Python_Scripts/plot.py
+          python Python_Scripts/plot_KDE_statistics.py
 
       - uses: actions/upload-artifact@v3
         with:

@@ -28,6 +28,7 @@
   echo ".compile -v '$git_repo/IDL_Scripts/write_psi_fits.pro'" &&
   echo ".compile -v '$git_repo/IDL_Scripts/write_psi_mlso_fits.pro'" &&
   echo ".compile -v '$git_repo/IDL_Scripts/rtp2xyz.pro'" &&
+  echo ".compile -v '$git_repo/IDL_Scripts/repstr.pro'" &&
   echo ".compile -v '$git_repo/generate_forward_model.pro'" &&
   echo ".compile -v '$git_repo/get_fordump.pro'" &&
   echo ".compile -v '$git_repo/image_coalignment.pro'" &&

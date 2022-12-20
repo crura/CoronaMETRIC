@@ -38,7 +38,7 @@ fits_dir_cor1 = os.path.join(fits_directory)
 
 data2 = fits.getdata(fits_dir_cor1)
 head2 = fits.getheader(fits_dir_cor1)
-# head2['detector'] = ('Cor-1')
+# head2['detector'] = ('KCor')
 cor1map = sunpy.map.Map(data2, head2)
 
 
@@ -50,7 +50,7 @@ head1['detector'] = ('Cor-1')
 psimap = sunpy.map.Map(data1, head1)
 
 
-
+str_strip = str(date_obs,'utf-8').split('T',1)[0]
 
 fig1 = plt.figure(figsize=(15, 8))
 ax1 = fig1.add_subplot(1, 2, 1, projection=cor1map)
@@ -68,7 +68,12 @@ psimap.plot_settings['norm'] = plt.Normalize(cor1map.min(), cor1map.max())
 psimap.plot(axes=ax2,title=False,norm=matplotlib.colors.LogNorm())
 R_SUN = occlt * (head1['rsun'] / head1['cdelt1'])
 ax2.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
-ax1.set_title('COR-1 Observation {}'.format(str(date_obs,'utf-8') + 'Z'), fontsize=18)
+ax1.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
+ax1.set_xlabel('Helioprojective Longitude (Solar-X)',fontsize=18)
+ax2.set_xlabel('Helioprojective Longitude (Solar-X)',fontsize=18)
+ax1.set_ylabel('Helioprojective Latitude (Solar-Y)',fontsize=18)
+ax2.set_ylabel('Helioprojective Latitude (Solar-Y)',fontsize=18)
+ax1.set_title('COR-1 Observation {}'.format(str_strip), fontsize=18)
 ax2.set_title('Corresponding PSI/FORWARD pB Eclipse Model', fontsize=18)
 
 string_print = str(date_obs,'utf-8').split('T')[0].replace('-','_') + 'cor1'

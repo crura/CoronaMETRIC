@@ -1,0 +1,44 @@
+#
+# GENERAL IMAGE SETTINGS:
+# data_source: type of image to be processed (MLSO2014, MLSO2016, ECL1, COR1)
+# Xcenter, Ycenter: position of the Sun disk center, pixels
+# Rot_angle: initial rotation angle (used for inital image plane derotation)
+# Rs: radius of the Sun disk to be excluded fom processing, pixels 
+# d_roi: distance (in pixels) in x and y directions from the disk center defining outer edges of the ROI
+# png_channel: PNG channel to be used if image data is in PNG format
+#
+# BLOB FILTERING PARAMETERS:
+# blob_filt_min, blob_detect_min: minimum size of image blobs to be included during noise filtering and detection
+# blob_detect_thresh_pairs: number of pairs of min amd max pixel values (in the processed image) used to detect features
+# blob_detect_thresholds: detection thresholds, sorted by [min, max] pairs. Total number of thresholds must be 2 x  blob_detect_thresh_pairs.
+#
+# FEATURE FILTERING parameters:
+# L_min, L_max: allowed range of feature length (in discrete rectangular coordinates)
+# Phi_min, Phi_max: excluded range of polar angles (in radians), used to remove persistent MLSO artifacts
+# Alpha_min, Alpha_max: allowed range of average relative angles (in radians) measured wrt local radial direciton 
+# Flux_rho_trend_min, Flux_rho_trend_max: allowed range of average fluxes along the feature computed using averaged radial trend
+#
+# FEATURE FITTING PARAMETERS:
+# blob_detect_n_segments: number of segments in each interpolated feature used to compute orientaiton angles
+# 
+data_source = PSI
+Xcenter = 600
+Ycenter = 600
+Rot_angle = 0.0 
+Rs = 155 
+d_roi = 300
+blob_filt_min = 5
+blob_detect_min = 5
+blob_detect_thresh_pairs = 2
+# not used; thresholds defined by ADAPT_THRESH()
+blob_detect_thresholds = -65.0 0.0 0.0 65.0
+png_channel = 0    
+L_min = 20
+L_max = 1000
+Phi_min = 0.0
+Phi_max = 0.0
+Alpha_min = -0.785398
+Alpha_max =  0.785398
+Flux_rho_trend_min = 150.0E-4
+Flux_rho_trend_max = 1E10
+blob_detect_n_segments = 20

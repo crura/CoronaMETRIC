@@ -36,7 +36,7 @@ function image_coalignment, directory
   dens = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_Electron_Density.csv')
   len = fix(sqrt(n_elements(forward_pb_image)))
   dens_2d = reform(dens.field1,len,len)
-  out_string = date_print + '_PSI';strcompress(string(CRLT_OBS),/remove_all) + '_' + strcompress(string(CRLN_OBS),/remove_all)
+  out_string = date_print + detector + '_PSI';strcompress(string(CRLT_OBS),/remove_all) + '_' + strcompress(string(CRLN_OBS),/remove_all)
   rsun_range = range + range
   dx = rsun_range/len
   ; convert x,y arrays to rsun

@@ -14,8 +14,9 @@ rsun = head_struct.rsun / wcs.cdelt[0] ;number of pixels in radius of sun
 shape = fix(wcs.NAXIS[0])
 crln_obs = position.crln_obs
 crlt_obs = position.crlt_obs
+detector = head_struct.detector
 
-if (head_struct.detector eq 'COR1') then begin
+if (detector eq 'COR1') then begin
   ; rad_occlt_pix = sxpar(head,'RCAM_DCR')
   print,'COR1'
   occlt = 1.30; citing https://cor1.gsfc.nasa.gov/docs/spie_paper.pdf page 3
@@ -44,7 +45,7 @@ for_drive,'PSIMAS',instrument='WL',line='PB',gridtype='PLANEOFSKY',pos=0.0000000
 restore,'/Users/crura/SSW/packages/forward/output.sav',/v
 write_csv, git_repo + '/Data/Forward_PB_data.csv',quantmap.data
 forward_pb_image = quantmap.data
-save,crln_obs,crlt_obs,occlt,range,crlt_obs_print,crln_obs_print,forward_pb_image,date_obs,fits_directory, shape, rsun, date_print, filename=git_repo + '/Data/model_parameters.sav'
+save,crln_obs,crlt_obs,occlt,range,crlt_obs_print,crln_obs_print,forward_pb_image,date_obs,fits_directory, shape, rsun, date_print, detector, filename=git_repo + '/Data/model_parameters.sav'
 restore, '/Users/crura/SSW/packages/forward/datadump',/v
 spawn, 'cp /Users/crura/SSW/packages/forward/datadump /Users/crura/Desktop/Research/Data/datadump_' + crlt_obs_print + '_' + crln_obs_print
 hi = get_fordump()

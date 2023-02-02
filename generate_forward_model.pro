@@ -17,7 +17,7 @@ crlt_obs = position.crlt_obs
 
 if (head_struct.detector eq 'COR1') then begin
   ; rad_occlt_pix = sxpar(head,'RCAM_DCR')
-  print('COR1')
+  print,'COR1'
   occlt = 1.30; citing https://cor1.gsfc.nasa.gov/docs/spie_paper.pdf page 3
 endif else begin
   rad_occlt_pix = sxpar(head,'RCAM_DCR')

@@ -14,8 +14,16 @@ rsun = head_struct.rsun / wcs.cdelt[0] ;number of pixels in radius of sun
 shape = fix(wcs.NAXIS[0])
 crln_obs = position.crln_obs
 crlt_obs = position.crlt_obs
-; rad_occlt_pix = sxpar(head,'RCAM_DCR')
-occlt = 1.4500000;rad_occlt_pix/rsun;1.0600000
+
+if (head_struct.detector eq 'COR1') then begin
+  ; rad_occlt_pix = sxpar(head,'RCAM_DCR')
+  print('COR1')
+  occlt = 1.30; citing https://cor1.gsfc.nasa.gov/docs/spie_paper.pdf page 3
+endif else begin
+  rad_occlt_pix = sxpar(head,'RCAM_DCR')
+  occlt = rad_occlt_pix/rsun;1.0600000
+endelse
+
 range = shape/rsun; 6.0799999
 time = wcs.time
 date_obs = time.observ_date

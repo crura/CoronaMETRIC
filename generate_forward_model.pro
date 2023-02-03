@@ -11,7 +11,7 @@ head_struct = fitshead2struct(head)
 
 telescope = head_struct.telescop
 if (telescope eq 'COSMO K-Coronagraph') then begin
-  SXADDPAR, head, 'detector', 'MLSOKcor'
+  SXADDPAR, head, 'detector', 'KCor'
   head_struct = fitshead2struct(head)
   telescope = head_struct.telescop
 endif

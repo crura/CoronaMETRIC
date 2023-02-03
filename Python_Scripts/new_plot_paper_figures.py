@@ -180,10 +180,6 @@ def display_fits_images(fits_files, n, outpath):
     # plt.show()
     # plt.close()
 
-# outstring_list_1 = outstring_list_1 + directory_list_1 + outstring_list_2 + directory_list_2
-outstring_list_1.append(directory_list_1[0])
-outstring_list_1.append(outstring_list_2[0])
-outstring_list_1.append(directory_list_2[0])
 
 
 

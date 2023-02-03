@@ -159,7 +159,7 @@ def create_six_figure_plot(file_string_list, occlt, outpath):
     # plt.show()
 
 
-def display_fits_images(fits_files, n, outpath):
+def display_fits_images(fits_files, outpath):
     # fig, axes = plt.subplots(nrows=int(n/2), ncols=2, figsize=(10, 10))
     fig = plt.figure(figsize=(10, 10))
 
@@ -169,7 +169,7 @@ def display_fits_images(fits_files, n, outpath):
         data = fits.getdata(fits_files[i])
         head = fits.getheader(fits_files[i])
         map = sunpy.map.Map(data, head)
-        axes = fig.add_subplot(n, 2, i+1, projection=map)
+        axes = fig.add_subplot(int(len(fits_files)), 2, i+1, projection=map)
         map.plot(axes=axes,title=False,norm=matplotlib.colors.LogNorm())
         rsun = head['rsun'] / head['cdelt1'] # number of pixels in radius of sun
         axes.add_patch(Circle((int(data.shape[0]/2),int(data.shape[1]/2)), rsun, color='black',zorder=100))
@@ -183,7 +183,7 @@ def display_fits_images(fits_files, n, outpath):
 
 
 
-display_fits_images(outstring_list_1,4,os.path.join(repo_path,'Output/Plots/Test_Plot.png'))
+display_fits_images(outstring_list_1 ,os.path.join(repo_path,'Output/Plots/Test_Plot.png'))
 
 
 # params = date_print + str(detector,'utf-8') + '_PSI'

@@ -73,7 +73,121 @@ print(directory_list_1, outstring_list_1, directory_list_2, outstring_list_2)
 
 os.path.join(repo_path,'Data/QRaFT/errors.sav')
 
+def create_six_figure_plot(file_string_list, occlt, outpath):
 
+    fits_dir_1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
+
+    data1 = fits.getdata(fits_dir_psi)
+    head1 = fits.getheader(fits_dir_psi)
+    head1['detector'] = ('KCor')
+    psimap = sunpy.map.Map(data1, head1)
+    # psimap.plot_settings['norm'] = plt.Normalize(psimap.min(), psimap.max())
+
+    fig2 = plt.figure(figsize=(10, 10))
+    ax1 = fig2.add_subplot(3, 2, 1, projection=psimap)
+    psimap.plot(axes=ax1,title=False,norm=matplotlib.colors.LogNorm())
+    R_SUN = head1['R_SUN']
+    ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+    fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_pB.fits')
+
+    data2 = fits.getdata(fits_dir_psi)
+    head2 = fits.getheader(fits_dir_psi)
+    head2['detector'] = ('KCor')
+    psimap = sunpy.map.Map(data2, head2)
+
+    ax2 = fig2.add_subplot(3, 2, 2, projection=psimap)
+    psimap.plot(axes=ax2,title=False,norm=matplotlib.colors.LogNorm())
+    R_SUN = head2['R_SUN']
+    ax2.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+    fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_pB.fits')
+
+    data3 = fits.getdata(fits_dir_psi)
+    head3 = fits.getheader(fits_dir_psi)
+    head3['detector'] = ('KCor')
+    psimap = sunpy.map.Map(data3, head3)
+
+    ax3 = fig2.add_subplot(3, 2, 3, projection=psimap)
+    psimap.plot(axes=ax3,title=False,norm=matplotlib.colors.LogNorm())
+    R_SUN = head3['R_SUN']
+    ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+    fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_pB.fits')
+
+    data4 = fits.getdata(fits_dir_psi)
+    head4 = fits.getheader(fits_dir_psi)
+    head4['detector'] = ('KCor')
+    psimap = sunpy.map.Map(data4, head4)
+
+    ax4 = fig2.add_subplot(3, 2, 4, projection=psimap)
+    psimap.plot(axes=ax4,title=False,norm=matplotlib.colors.LogNorm())
+    R_SUN = head4['R_SUN']
+    ax4.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+    fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_pB.fits')
+
+    data5 = fits.getdata(fits_dir_psi)
+    head5 = fits.getheader(fits_dir_psi)
+    head5['detector'] = ('KCor')
+    psimap = sunpy.map.Map(data5, head5)
+
+
+    ax5 = fig2.add_subplot(3, 2, 5, projection=psimap)
+    psimap.plot(axes=ax5,title=False,norm=matplotlib.colors.LogNorm())
+    R_SUN = head5['R_SUN']
+    ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+
+
+    fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_pB.fits')
+
+    data6 = fits.getdata(fits_dir_psi)
+    head6 = fits.getheader(fits_dir_psi)
+    head6['detector'] = ('KCor')
+    psimap = sunpy.map.Map(data6, head6)
+
+    ax6 = fig2.add_subplot(3, 2, 6, projection=psimap)
+    ax6.set_xlabel(' ')
+    psimap.plot(axes=ax6,title=False,norm=matplotlib.colors.LogNorm())
+    R_SUN = head6['R_SUN']
+    ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
+    plt.subplots_adjust(bottom=0.05, top=0.95)
+    plt.savefig(os.path.join(repo_path,'Output/Plots/PSI_Plots.png'))
+    # plt.show()
+
+
+def display_fits_images(fits_files, n, outpath):
+    # fig, axes = plt.subplots(nrows=int(n/2), ncols=2, figsize=(10, 10))
+    fig = plt.figure(figsize=(10, 10))
+
+
+    for i in range(len(fits_files)):
+
+        data = fits.getdata(fits_files[i])
+        head = fits.getheader(fits_files[i])
+        map = sunpy.map.Map(data, head)
+        axes = fig.add_subplot(n, 2, i+1, projection=map)
+        map.plot(axes=axes,title=False,norm=matplotlib.colors.LogNorm())
+        rsun = head['rsun'] / head['cdelt1'] # number of pixels in radius of sun
+        axes.add_patch(Circle((int(data.shape[0]/2),int(data.shape[1]/2)), rsun, color='black',zorder=100))
+        # axes[i].imshow(data, cmap='gray')
+        # axes[i].set_title(fits_file)
+
+    plt.savefig(outpath)
+    # plt.show()
+    # plt.close()
+
+# outstring_list_1 = outstring_list_1 + directory_list_1 + outstring_list_2 + directory_list_2
+outstring_list_1.append(directory_list_1[0])
+outstring_list_1.append(outstring_list_2[0])
+outstring_list_1.append(directory_list_2[0])
+
+
+
+display_fits_images(outstring_list_1,4,os.path.join(repo_path,'Output/Plots/Test_Plot.png'))
 
 
 # params = date_print + str(detector,'utf-8') + '_PSI'

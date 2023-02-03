@@ -31,7 +31,7 @@ fits_directory = str(idl_save['fits_directory'][0],'utf-8')
 occlt = idl_save['occlt']
 shape = idl_save['shape']
 detector = idl_save['detector']
-params = date_print + str(detector,'utf-8') + '_PSI'
+params = '__' + date_print + str(detector,'utf-8') + '__PSI'
 #  File "/Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Python_Scripts/plot.py", line 34, in <module>
 #     params = date_print + detector + '_PSI'
 # TypeError: can only concatenate str (not "bytes") to str

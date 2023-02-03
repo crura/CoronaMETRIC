@@ -31,7 +31,10 @@ fits_directory = str(idl_save['fits_directory'][0],'utf-8')
 occlt = idl_save['occlt']
 shape = idl_save['shape']
 detector = idl_save['detector']
-params = date_print + detector + '_PSI'
+params = date_print + str(detector,'utf-8') + '_PSI'
+#  File "/Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Python_Scripts/plot.py", line 34, in <module>
+#     params = date_print + detector + '_PSI'
+# TypeError: can only concatenate str (not "bytes") to str
 
 
 
@@ -79,6 +82,6 @@ ax2.set_title('Corresponding PSI/FORWARD pB Eclipse Model', fontsize=18)
 
 string_print = str(date_obs,'utf-8').split('T')[0].replace('-','_') + 'cor1'
 
-plt.savefig(os.path.join(repo_path,'Output/Plots/Model_Comparison_{}.png'.format(string_print)))
-# plt.show()
+# plt.savefig(os.path.join(repo_path,'Output/Plots/Model_Comparison_{}.png'.format(string_print)))
+plt.show()
 plt.close()

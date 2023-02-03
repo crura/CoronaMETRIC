@@ -30,7 +30,7 @@ date_print = str(idl_save['date_print'],'utf-8')
 fits_directory = str(idl_save['fits_directory'][0],'utf-8')
 occlt = idl_save['occlt']
 shape = idl_save['shape']
-params = date_print + '_PSI'
+params = date_print + detector + '_PSI'
 
 
 

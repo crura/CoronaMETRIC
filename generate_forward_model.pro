@@ -8,6 +8,15 @@ spawn, 'git rev-parse --show-toplevel', git_repo
 fits_directory = git_repo + '/' + directory; '/Data/MLSO/20170911_202927_kcor_l2_avg.fts'
 head = headfits(fits_directory)
 head_struct = fitshead2struct(head)
+
+telescope = head_struct.telescop
+if (telescope eq 'COSMO K-Coronagraph') then begin
+  SXADDPAR, head, 'detector', 'MLSO Kcor'
+  head_struct = fitshead2struct(head)
+  telescope = head_struct.telescop
+endif
+
+
 wcs = fitshead2wcs(head)
 position = wcs.position
 rsun = head_struct.rsun / wcs.cdelt[0] ;number of pixels in radius of sun

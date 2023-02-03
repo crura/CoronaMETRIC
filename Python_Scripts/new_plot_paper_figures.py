@@ -33,6 +33,7 @@ err_forward_los = idl_save_qraft['ERR_ARR_LOS_FORWARD']
 err_random = idl_save_qraft['ERR_ARR_RND']
 
 idl_save = readsav(os.path.join(repo_path,'Data/model_parameters.sav'))
+idl_save_outstring = readsav(os.path.join(repo_path,'Data/outstrings.sav'))
 date_obs =idl_save['DATE_OBS']
 # crln_obs_print = idl_save['crln_obs_print']
 # crlt_obs_print = idl_save['crlt_obs_print']
@@ -41,7 +42,8 @@ date_obs =idl_save['DATE_OBS']
 # occlt = idl_save['occlt']
 # shape = idl_save['shape']
 # detector = idl_save['detector']
-outstring_list = idl_save['outstring_list']
+outstring_list = idl_save_outstring['outstring_list']
+print(outstring_list)
 
 
 
@@ -49,4 +51,4 @@ outstring_list = idl_save['outstring_list']
 
 
 
-params = date_print + str(detector,'utf-8') + '_PSI'
+# params = date_print + str(detector,'utf-8') + '_PSI'

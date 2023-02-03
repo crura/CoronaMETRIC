@@ -5,7 +5,7 @@ pro run_code
   outstring_list = ['']
   ; set path variable for rest of idl code defined by git
   spawn, 'git rev-parse --show-toplevel', git_repo
-  save,outstring_list, filename=git_repo + '/Data/outstrings.sav'
+  save,outstring_list, directory_list, directory_list_2, filename=git_repo + '/Data/outstrings.sav'
 
   FOREACH element, directory_list DO BEGIN
     hi = generate_forward_model(element)

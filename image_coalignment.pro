@@ -382,6 +382,6 @@ function image_coalignment, directory
 
   save,bx_central_coaligned,by_central_coaligned,bz_central_coaligned,bx_integrated_coaligned,by_integrated_coaligned,bz_integrated_coaligned,psi_central_dens_coaligned,psi_integrated_dens_coaligned,psi_forward_pb_coaligned,filename=save_path
   save,crln_obs,crlt_obs,occlt,range,crlt_obs_print,crln_obs_print,forward_pb_image,date_obs,fits_directory, shape, rsun, date_print, detector, filename=git_repo + '/Data/model_parameters.sav'
-  save, outstring_list, filename = git_repo + '/Data/outstrings.sav'
+  save, outstring_list, directory_list, directory_list_2, filename = git_repo + '/Data/outstrings.sav'
   return, 0
 END

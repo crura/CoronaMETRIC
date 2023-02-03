@@ -43,10 +43,35 @@ date_obs =idl_save['DATE_OBS']
 # shape = idl_save['shape']
 # detector = idl_save['detector']
 outstring_list = idl_save_outstring['outstring_list']
-print(outstring_list)
+directory_list_1 = idl_save_outstring['directory_list']
+directory_list_2 = idl_save_outstring['directory_list_2']
+
+for i in range(len(directory_list_1)):
+    directory_list_1[i] = os.path.join(repo_path, str(directory_list_1[i], 'utf-8'))
+
+for i in range(len(directory_list_2)):
+    directory_list_2[i] = os.path.join(repo_path, str(directory_list_2[i], 'utf-8'))
 
 
+# remove blank first element of list
+for i in range(len(outstring_list)):
+    if outstring_list[i] == '':
+        outstring_list_new = np.delete(outstring_list, i)
+    else:
+        pass
+# translate all utf-8 strings into normal strings
+for i in range(len(outstring_list_new)):
+    outstring_list_new[i] = str(outstring_list_new[i],'utf-8')
 
+# filter filenames into separate lists based on detector
+keyword = outstring_list_new[0].split('__')[2]
+outstring_list_1 = [item for item in outstring_list_new if keyword in item]
+outstring_list_2 = [item for item in outstring_list_new if keyword not in item]
+
+print(directory_list_1, outstring_list_1, directory_list_2, outstring_list_2)
+
+
+os.path.join(repo_path,'Data/QRaFT/errors.sav')
 
 
 

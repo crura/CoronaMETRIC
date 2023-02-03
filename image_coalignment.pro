@@ -367,6 +367,7 @@ function image_coalignment, directory
   BANG=crlt_obs
   output = git_repo + '/Output/fits_images/' + out_string + '_pB.fits'
   WRITE_PSI_IMAGE_AS_FITS,output,psi_forward_pb_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/ForceXyRs,/GetCoords,ObsDistanceAU=1
+  outstring_list = [outstring_list, output]
 
   writefits, output, psi_forward_pb_coaligned, head_fits_mlso
 
@@ -379,6 +380,7 @@ function image_coalignment, directory
 
 
   save,bx_central_coaligned,by_central_coaligned,bz_central_coaligned,bx_integrated_coaligned,by_integrated_coaligned,bz_integrated_coaligned,psi_central_dens_coaligned,psi_integrated_dens_coaligned,psi_forward_pb_coaligned,filename=save_path
+  save,crln_obs,crlt_obs,occlt,range,crlt_obs_print,crln_obs_print,forward_pb_image,date_obs,fits_directory, shape, rsun, date_print, detector, outstring_list, filename=git_repo + '/Data/model_parameters.sav'
 
   return, 0
 END

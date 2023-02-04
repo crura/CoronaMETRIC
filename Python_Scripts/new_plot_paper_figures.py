@@ -169,10 +169,26 @@ def display_fits_images(fits_files, outpath):
 
         data = fits.getdata(fits_files[i])
         head = fits.getheader(fits_files[i])
+
         map = sunpy.map.Map(data, head)
-        axes = fig.add_subplot(int(len(fits_files)), 2, i+1, projection=map)
-        map.plot(axes=axes,title=False,norm=matplotlib.colors.LogNorm())
-        rsun = head['rsun'] / head['cdelt1'] # number of pixels in radius of sun
+
+        telescope = head['telescop']
+        instrument = head['instrume']
+        print(telescope)
+        # print(head)
+        if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
+          head['detector'] = ('KCor')
+
+        if head['detector'] == 'COR1':
+            map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
+            rsun = (head['rsun'] / head['cdelt1']) * 1.45 # number of pixels in radius of sun
+        else:
+            rsun = head['rsun'] / head['cdelt1'] # number of pixels in radius of sun
+        axes = fig.add_subplot(int(len(fits_files)/2), 2, i+1, projection=map)
+        if head['detector'] == 'PSI-MAS Forward Model' or head['telescop'] == 'PSI-MAS Forward Model':
+            map.plot(axes=axes,title=False,norm=matplotlib.colors.LogNorm())
+        else:
+            map.plot(axes=axes,title=False)
         axes.add_patch(Circle((int(data.shape[0]/2),int(data.shape[1]/2)), rsun, color='black',zorder=100))
         # axes[i].imshow(data, cmap='gray')
         # axes[i].set_title(fits_file)
@@ -183,12 +199,11 @@ def display_fits_images(fits_files, outpath):
     # plt.close()
 
 
-
-
 display_fits_images(outstring_list_1 ,os.path.join(repo_path,'Output/Plots/Test_Plot.png'))
 display_fits_images(directory_list_1 ,os.path.join(repo_path,'Output/Plots/Test_Plot2.png'))
 display_fits_images(outstring_list_2 ,os.path.join(repo_path,'Output/Plots/Test_Plot3.png'))
 display_fits_images(directory_list_2 ,os.path.join(repo_path,'Output/Plots/Test_Plot4.png'))
+
 
 
 # params = date_print + str(detector,'utf-8') + '_PSI'

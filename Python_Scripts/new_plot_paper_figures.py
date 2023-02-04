@@ -46,6 +46,7 @@ date_obs =idl_save['DATE_OBS']
 outstring_list = idl_save_outstring['outstring_list']
 directory_list_1 = idl_save_outstring['directory_list']
 directory_list_2 = idl_save_outstring['directory_list_2']
+occlt_list = idl_save_outstring['occlt_list']
 
 for i in range(len(directory_list_1)):
     directory_list_1[i] = os.path.join(repo_path, str(directory_list_1[i], 'utf-8'))
@@ -64,103 +65,33 @@ for i in range(len(outstring_list)):
 for i in range(len(outstring_list_new)):
     outstring_list_new[i] = str(outstring_list_new[i],'utf-8')
 
+# remove blank first element of list
+for i in range(len(occlt_list)):
+    if occlt_list[i] == '':
+        occlt_list_new = np.delete(occlt_list, i)
+    else:
+        pass
+# translate all utf-8 strings into normal strings
+for i in range(len(occlt_list_new)):
+    occlt_list_new[i] = float(occlt_list_new[i])
+
 # filter filenames into separate lists based on detector
 keyword = outstring_list_new[0].split('__')[2]
-outstring_list_1 = [item for item in outstring_list_new if keyword in item]
-outstring_list_2 = [item for item in outstring_list_new if keyword not in item]
+
+indexes1, outstring_list_1 = zip(*[(index, item) for index, item in enumerate(outstring_list_new) if keyword in item])
+indexes2, outstring_list_2 = zip(*[(index, item) for index, item in enumerate(outstring_list_new) if keyword not in item])
+
+occlt_list_1 = [occlt_list_new[index] for index in indexes1]
+occlt_list_2 = [occlt_list_new[index] for index in indexes2]
 
 print(directory_list_1, outstring_list_1, directory_list_2, outstring_list_2)
+print(occlt_list_1, occlt_list_2)
 
 
 os.path.join(repo_path,'Data/QRaFT/errors.sav')
 
-def create_six_figure_plot(file_string_list, occlt, outpath):
 
-    fits_dir_1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
-
-    data1 = fits.getdata(fits_dir_psi)
-    head1 = fits.getheader(fits_dir_psi)
-    head1['detector'] = ('KCor')
-    psimap = sunpy.map.Map(data1, head1)
-    # psimap.plot_settings['norm'] = plt.Normalize(psimap.min(), psimap.max())
-
-    fig2 = plt.figure(figsize=(10, 10))
-    ax1 = fig2.add_subplot(3, 2, 1, projection=psimap)
-    psimap.plot(axes=ax1,title=False,norm=matplotlib.colors.LogNorm())
-    R_SUN = head1['R_SUN']
-    ax1.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
-
-    fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.05600_236.978_pB.fits')
-
-    data2 = fits.getdata(fits_dir_psi)
-    head2 = fits.getheader(fits_dir_psi)
-    head2['detector'] = ('KCor')
-    psimap = sunpy.map.Map(data2, head2)
-
-    ax2 = fig2.add_subplot(3, 2, 2, projection=psimap)
-    psimap.plot(axes=ax2,title=False,norm=matplotlib.colors.LogNorm())
-    R_SUN = head2['R_SUN']
-    ax2.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
-
-
-    fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.15300_183.443_pB.fits')
-
-    data3 = fits.getdata(fits_dir_psi)
-    head3 = fits.getheader(fits_dir_psi)
-    head3['detector'] = ('KCor')
-    psimap = sunpy.map.Map(data3, head3)
-
-    ax3 = fig2.add_subplot(3, 2, 3, projection=psimap)
-    psimap.plot(axes=ax3,title=False,norm=matplotlib.colors.LogNorm())
-    R_SUN = head3['R_SUN']
-    ax3.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
-
-
-    fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.22000_126.906_pB.fits')
-
-    data4 = fits.getdata(fits_dir_psi)
-    head4 = fits.getheader(fits_dir_psi)
-    head4['detector'] = ('KCor')
-    psimap = sunpy.map.Map(data4, head4)
-
-    ax4 = fig2.add_subplot(3, 2, 4, projection=psimap)
-    psimap.plot(axes=ax4,title=False,norm=matplotlib.colors.LogNorm())
-    R_SUN = head4['R_SUN']
-    ax4.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
-
-
-    fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.24700_77.0150_pB.fits')
-
-    data5 = fits.getdata(fits_dir_psi)
-    head5 = fits.getheader(fits_dir_psi)
-    head5['detector'] = ('KCor')
-    psimap = sunpy.map.Map(data5, head5)
-
-
-    ax5 = fig2.add_subplot(3, 2, 5, projection=psimap)
-    psimap.plot(axes=ax5,title=False,norm=matplotlib.colors.LogNorm())
-    R_SUN = head5['R_SUN']
-    ax5.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
-
-
-    fits_dir_psi = os.path.join(repo_path,'Output/fits_images/7.23800_11.5530_pB.fits')
-
-    data6 = fits.getdata(fits_dir_psi)
-    head6 = fits.getheader(fits_dir_psi)
-    head6['detector'] = ('KCor')
-    psimap = sunpy.map.Map(data6, head6)
-
-    ax6 = fig2.add_subplot(3, 2, 6, projection=psimap)
-    ax6.set_xlabel(' ')
-    psimap.plot(axes=ax6,title=False,norm=matplotlib.colors.LogNorm())
-    R_SUN = head6['R_SUN']
-    ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
-    plt.subplots_adjust(bottom=0.05, top=0.95)
-    plt.savefig(os.path.join(repo_path,'Output/Plots/PSI_Plots.png'))
-    # plt.show()
-
-
-def display_fits_images(fits_files, outpath):
+def display_fits_images(fits_files, occlt_list, outpath):
     # fig, axes = plt.subplots(nrows=int(n/2), ncols=2, figsize=(10, 10))
     fig = plt.figure(figsize=(10, 10))
 
@@ -181,9 +112,9 @@ def display_fits_images(fits_files, outpath):
 
         if head['detector'] == 'COR1':
             map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
-            rsun = (head['rsun'] / head['cdelt1']) * 1.45 # number of pixels in radius of sun
+            rsun = (head['rsun'] / head['cdelt1']) * occlt_list[i] # number of pixels in radius of sun
         else:
-            rsun = head['rsun'] / head['cdelt1'] # number of pixels in radius of sun
+            rsun = (head['rsun'] / head['cdelt1']) * occlt_list[i] # number of pixels in radius of sun
         axes = fig.add_subplot(int(len(fits_files)/2), 2, i+1, projection=map)
         if head['detector'] == 'PSI-MAS Forward Model' or head['telescop'] == 'PSI-MAS Forward Model':
             map.plot(axes=axes,title=False,norm=matplotlib.colors.LogNorm())

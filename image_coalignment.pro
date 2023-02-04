@@ -369,6 +369,7 @@ function image_coalignment, directory
   output = git_repo + '/Output/fits_images/' + out_string + '_pB.fits'
   WRITE_PSI_IMAGE_AS_FITS,output,psi_forward_pb_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/ForceXyRs,/GetCoords,ObsDistanceAU=1
   outstring_list = [outstring_list, output]
+  occlt_list = [occlt_list, occlt]
 
   writefits, output, psi_forward_pb_coaligned, head_fits_mlso
 

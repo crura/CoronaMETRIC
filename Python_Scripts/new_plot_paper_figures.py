@@ -184,6 +184,9 @@ def display_fits_images(fits_files, outpath):
 
 
 display_fits_images(outstring_list_1 ,os.path.join(repo_path,'Output/Plots/Test_Plot.png'))
+display_fits_images(directory_list_1 ,os.path.join(repo_path,'Output/Plots/Test_Plot2.png'))
+display_fits_images(outstring_list_2 ,os.path.join(repo_path,'Output/Plots/Test_Plot3.png'))
+display_fits_images(directory_list_2 ,os.path.join(repo_path,'Output/Plots/Test_Plot4.png'))
 
 
 # params = date_print + str(detector,'utf-8') + '_PSI'

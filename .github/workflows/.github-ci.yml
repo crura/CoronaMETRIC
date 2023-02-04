@@ -87,7 +87,7 @@ jobs:
           conda init bash &&
           conda activate test_env &&
           python Python_Scripts/plot_KDE_statistics.py
-          python Python_Scripts/plot_paper_figures.py
+          python Python_Scripts/new_plot_paper_figures.py
 
       - uses: actions/upload-artifact@v3
         with:

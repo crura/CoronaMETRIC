@@ -19,6 +19,7 @@ from scipy.interpolate import interp1d
 import matplotlib
 matplotlib.use('TkAgg')
 mpl.use('TkAgg')
+mpl.rcParams.update(mpl.rcParamsDefault)
 
 
 repo = git.Repo('.', search_parent_directories=True)
@@ -176,6 +177,7 @@ def display_fits_images(fits_files, outpath):
         # axes[i].imshow(data, cmap='gray')
         # axes[i].set_title(fits_file)
 
+    plt.subplots_adjust(bottom=0.05, top=0.95)
     plt.savefig(outpath)
     # plt.show()
     # plt.close()

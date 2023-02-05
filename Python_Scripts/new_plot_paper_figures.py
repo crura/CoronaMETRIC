@@ -67,13 +67,11 @@ for i in range(len(outstring_list_new)):
 
 # remove blank first element of list
 for i in range(len(occlt_list)):
-    if occlt_list[i] == '':
+    if occlt_list[i] == 0:
         occlt_list_new = np.delete(occlt_list, i)
     else:
         pass
-# translate all utf-8 strings into normal strings
-for i in range(len(occlt_list_new)):
-    occlt_list_new[i] = float(occlt_list_new[i])
+
 
 # filter filenames into separate lists based on detector
 keyword = outstring_list_new[0].split('__')[2]

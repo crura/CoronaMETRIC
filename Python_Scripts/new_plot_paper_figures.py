@@ -128,10 +128,10 @@ def display_fits_images(fits_files, occlt_list, outpath):
     # plt.close()
 
 
-display_fits_images(outstring_list_1, occlt_list_1,os.path.join(repo_path,'Output/Plots/Test_Plot.png'))
-display_fits_images(directory_list_1, occlt_list_1 ,os.path.join(repo_path,'Output/Plots/Test_Plot2.png'))
-display_fits_images(outstring_list_2, occlt_list_2 ,os.path.join(repo_path,'Output/Plots/Test_Plot3.png'))
-display_fits_images(directory_list_2, occlt_list_2 ,os.path.join(repo_path,'Output/Plots/Test_Plot4.png'))
+display_fits_images(outstring_list_1, occlt_list_1,os.path.join(repo_path,'Output/Plots/COR1_PSI_Plots.png'))
+display_fits_images(directory_list_1, occlt_list_1 ,os.path.join(repo_path,'Output/Plots/COR1_Plots.png'))
+display_fits_images(outstring_list_2, occlt_list_2 ,os.path.join(repo_path,'Output/Plots/MLSO_PSI_Plots.png'))
+display_fits_images(directory_list_2, occlt_list_2 ,os.path.join(repo_path,'Output/Plots/MLSO_Plots.png'))
 
 
 

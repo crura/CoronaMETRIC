@@ -30,6 +30,7 @@ function linspace, x1, x2, n, $
   GHOST=ghost, $
   UNIQUE=unique
   on_error,2
+  ; change something 
 
   if (n_elements(ghost) eq 0) then begin
     nghost = [0,0]

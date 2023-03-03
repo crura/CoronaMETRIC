@@ -237,6 +237,7 @@ plt.savefig(os.path.join(repo_path,'Output/Plots/Polar_Observations_Plot.png'))
 # create_six_fig_plot(Bz_list_1, By_list_1, os.path.join(repo_path,'Output/Plots/Test_Vector_Plot.png'))
 
 # Generate Vector Plot
+"""
 path = os.path.join(repo_path,'Output/fits_images')
 directory = os.fsencode(path)
 directorylist = []
@@ -265,3 +266,4 @@ if head['INSTRUME'] == 'COSMO K-Coronagraph':
     rsun = head['RCAM_DCR']
     detector = 'KCor'
     create_six_fig_plot(Bz_list_2, By_list_2, os.path.join(repo_path,'Output/Plots/Test_Vector_Plot_MLSO.png'), rsun, detector)
+"""

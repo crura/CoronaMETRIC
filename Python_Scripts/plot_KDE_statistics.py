@@ -453,10 +453,31 @@ def calculate_KDE(err_array):
     kde0 = kde(x_1)
     return kde0
 
+def calculate_KDE_statistics(KDE_1, KDE_2):
+
+    #compute JS Divergence
+    result_JSD = JS_Div(KDE_1, KDE_2)
+
+    #compute KL Divergence
+    result_KLD = KL_div(KDE_1, KDE_2)
+
+    return result_JSD, result_KLD
+
 KDE_cor1_central_deg_new = calculate_KDE(err_cor1_central_deg_new)
 KDE_forward_cor1_central_deg_new = calculate_KDE(err_forward_cor1_central_deg_new)
 KDE_random_deg_new = calculate_KDE(err_random_deg_new)
 
+JSD_cor1_forward_central_new, KLD_cor1_forward_central_new = calculate_KDE_statistics(KDE_cor1_central_deg_new, KDE_forward_cor1_central_deg_new)
+JSD_cor1_central_random_new, KLD_cor1_central_random_new = calculate_KDE_statistics(KDE_cor1_central_deg_new, KDE_random_deg_new)
+JSD_COR1_Forward_Central_Random_new, KLDcor1_forward_central_random_new = calculate_KDE_statistics(KDE_forward_cor1_central_deg_new, KDE_random_deg_new)
+
+combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
+                    cor1_v_psi=[KLD_cor1_forward_central_new, JSD_cor1_forward_central_new],
+                    cor1_v_random=[KLD_cor1_central_random_new, JSD_cor1_central_random_new],
+                    psi_v_random=[KLDcor1_forward_central_random_new, JSD_COR1_Forward_Central_Random_new])
+
+stats_df = pd.DataFrame(combined_dict)
+print(stats_df.to_latex(index=False))
 
 # Generate plots for Central arrays
 mpl.rcParams.update(mpl.rcParamsDefault)

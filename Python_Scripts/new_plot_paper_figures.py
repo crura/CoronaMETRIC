@@ -24,6 +24,7 @@ import astropy.units as u
 matplotlib.use('TkAgg')
 mpl.use('TkAgg')
 mpl.rcParams.update(mpl.rcParamsDefault)
+from functions import create_six_fig_plot
 
 
 repo = git.Repo('.', search_parent_directories=True)
@@ -120,6 +121,8 @@ def display_fits_images(fits_files, occlt_list, outpath):
         axes = fig.add_subplot(int(len(fits_files)/2), 2, i+1, projection=map)
         if head['detector'] == 'PSI-MAS Forward Model' or head['telescop'] == 'PSI-MAS Forward Model':
             map.plot(axes=axes,title=False,norm=matplotlib.colors.LogNorm())
+        elif head['detector'] == 'COR1':
+            map.plot(axes=axes,title=False,clip_interval=(1, 99.99)*u.percent)
         else:
             map.plot(axes=axes,title=False)
         axes.add_patch(Circle((int(data.shape[0]/2),int(data.shape[1]/2)), rsun, color='black',zorder=100))
@@ -216,3 +219,49 @@ plt.savefig(os.path.join(repo_path,'Output/Plots/Polar_Observations_Plot.png'))
 # plt.show()
 
 # params = date_print + str(detector,'utf-8') + '_PSI'
+
+#
+# path = os.path.join(repo_path,'Output/fits_images')
+# directory = os.fsencode(path)
+# directorylist = []
+# for file in os.listdir(directory):
+#     filename = os.fsdecode(file)
+#     directorylist.append(os.path.join(path,filename))
+# keyword_By_1 = 'COR1__PSI_By.fits'
+# indexes_By_1, By_list_1 = zip(*[(index, item) for index, item in enumerate(directorylist) if keyword_By_1 in item])
+#
+# keyword_Bz_1 = 'COR1__PSI_Bz.fits'
+# indexes_Bz_1, Bz_list_1 = zip(*[(index, item) for index, item in enumerate(directorylist) if keyword_Bz_1 in item])
+#
+#
+# create_six_fig_plot(Bz_list_1, By_list_1, os.path.join(repo_path,'Output/Plots/Test_Vector_Plot.png'))
+
+# Generate Vector Plot
+path = os.path.join(repo_path,'Output/fits_images')
+directory = os.fsencode(path)
+directorylist = []
+for file in os.listdir(directory):
+    filename = os.fsdecode(file)
+    directorylist.append(os.path.join(path,filename))
+keyword_By_1 = 'COR1__PSI_By.fits'
+indexes_By_1, By_list_1 = zip(*[(index, item) for index, item in enumerate(directorylist) if keyword_By_1 in item])
+
+keyword_Bz_1 = 'COR1__PSI_Bz.fits'
+indexes_Bz_1, Bz_list_1 = zip(*[(index, item) for index, item in enumerate(directorylist) if keyword_Bz_1 in item])
+
+head = fits.getheader(Bz_list_1[0])
+if head['detector'] == 'COR1':
+    rsun = (head['rsun'] / head['cdelt1']) * 1.45 # number of pixels in radius of sun
+    detector = 'COR1'
+    create_six_fig_plot(Bz_list_1, By_list_1, os.path.join(repo_path,'Output/Plots/Test_Vector_Plot.png'), rsun, detector)
+
+keyword_By_2 = 'KCor__PSI_By.fits'
+indexes_By_2, By_list_2 = zip(*[(index, item) for index, item in enumerate(directorylist) if keyword_By_2 in item])
+
+keyword_Bz_2 = 'KCor__PSI_Bz.fits'
+indexes_Bz_2, Bz_list_2 = zip(*[(index, item) for index, item in enumerate(directorylist) if keyword_Bz_2 in item])
+head = fits.getheader(Bz_list_2[0])
+if head['INSTRUME'] == 'COSMO K-Coronagraph':
+    rsun = head['RCAM_DCR']
+    detector = 'KCor'
+    create_six_fig_plot(Bz_list_2, By_list_2, os.path.join(repo_path,'Output/Plots/Test_Vector_Plot_MLSO.png'), rsun, detector)

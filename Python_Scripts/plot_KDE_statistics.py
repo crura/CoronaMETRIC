@@ -478,6 +478,7 @@ combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
 
 pd.set_option('display.float_format', '{:.3E}'.format)
 stats_df = pd.DataFrame(combined_dict)
+stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
 print(stats_df.to_latex(index=False))
 
 # Generate plots for Central arrays

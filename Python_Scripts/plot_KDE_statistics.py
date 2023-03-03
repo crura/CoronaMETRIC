@@ -476,6 +476,7 @@ combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
                     cor1_v_random=[KLD_cor1_central_random_new, JSD_cor1_central_random_new],
                     psi_v_random=[KLDcor1_forward_central_random_new, JSD_COR1_Forward_Central_Random_new])
 
+pd.set_option('display.float_format', '{:.3E}'.format)
 stats_df = pd.DataFrame(combined_dict)
 print(stats_df.to_latex(index=False))
 

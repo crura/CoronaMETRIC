@@ -17,6 +17,43 @@ import unittest
 from pathlib import Path
 from scipy.interpolate import interp1d
 import matplotlib
+from scipy.stats import gaussian_kde
+
+
+def calculate_KDE(err_array):
+    # set minimum and maximum x values for gaussian kde calculation
+    xmin = min(err_array)
+    xmax = max(err_array)
+
+    # Calculate Gaussian KDE for cor1 pB vs central B field dataset
+    kde = gaussian_kde(err_array)
+    x_1 = np.linspace(xmin, xmax, 1000000)
+    kde0 = kde(x_1)
+    return kde0
+
+def KL_div(p_probs, q_probs):
+    KL_div = p_probs * np.log(p_probs / q_probs)
+    return np.sum(KL_div)
+
+#define JS Divergence
+def JS_Div(p, q):
+    p = np.asarray(p)
+    q = np.asarray(q)
+    # normalize
+    p /= p.sum()
+    q /= q.sum()
+    m = (p + q) / 2
+    return (KL_div(p, m) + KL_div(q, m)) / 2
+
+def calculate_KDE_statistics(KDE_1, KDE_2):
+
+    #compute JS Divergence
+    result_JSD = JS_Div(KDE_1, KDE_2)
+
+    #compute KL Divergence
+    result_KLD = KL_div(KDE_1, KDE_2)
+
+    return result_JSD, result_KLD
 
 def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
     file1_z, file2_z, file3_z, file4_z, file5_z, file6_z = files_z

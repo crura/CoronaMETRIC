@@ -17,6 +17,8 @@ import unittest
 from pathlib import Path
 from scipy.interpolate import interp1d
 import matplotlib
+from os.path import join, isfile
+from os import listdir
 matplotlib.use('TkAgg')
 mpl.use('TkAgg')
 
@@ -31,6 +33,9 @@ err_mlso_los = idl_save['ERR_ARR_LOS_MLSO']
 err_forward_central = idl_save['ERR_ARR_FORWARD']
 err_forward_los = idl_save['ERR_ARR_LOS_FORWARD']
 err_random = idl_save['ERR_ARR_RND']
+
+datapath = join(repo_path, 'Data/QRaFT/COR-1_Errors_New')
+datafiles = [join(datapath,f) for f in listdir(datapath) if isfile(join(datapath,f)) and f !='.DS_Store']
 
 # Generate plots for Central arrays
 mpl.rcParams.update(mpl.rcParamsDefault)

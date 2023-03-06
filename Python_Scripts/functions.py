@@ -27,9 +27,9 @@ def calculate_KDE(err_array):
 
     # Calculate Gaussian KDE for cor1 pB vs central B field dataset
     kde = gaussian_kde(err_array)
-    x_1 = np.linspace(xmin, xmax, 1000000)
+    x_1 = np.linspace(xmin, xmax, 1000)
     kde0 = kde(x_1)
-    return kde0
+    return x_1, kde0
 
 def KL_div(p_probs, q_probs):
     KL_div = p_probs * np.log(p_probs / q_probs)

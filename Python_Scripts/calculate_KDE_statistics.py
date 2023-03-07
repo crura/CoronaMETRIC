@@ -141,7 +141,26 @@ stats_df = pd.DataFrame(combined_dict)
 stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
 print(stats_df.to_latex(index=False))
 
+print("")
 
+cor1_avg = np.round(np.average(abs(err_cor1_central_deg_new)),5)
+forward_avg = np.round(np.average(abs(err_forward_cor1_central_deg_new)),5)
+random_avg = np.round(np.average(abs(err_random_deg_new)),5)
+
+cor1_med = np.round(np.median(abs(err_cor1_central_deg_new)),5)
+forward_med = np.round(np.median(abs(err_forward_cor1_central_deg_new)),5)
+random_med = np.round(np.median(abs(err_random_deg_new)),5)
+
+
+combined_dict = dict(metric=['average discrepancy', 'median discrepancy'],
+                    cor1=[cor1_avg, cor1_med],
+                   psi=[forward_avg, forward_med],
+                    random=[random_avg, random_med])
+
+pd.set_option('display.float_format', '{:.3f}'.format)
+stats_df = pd.DataFrame(combined_dict)
+#stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
+print(stats_df.to_latex(index=False))
 """
 # Generate figure for combined plot of COR-1 and MLSO K-COR datasets
 fig, ax = plt.subplots(1,2,figsize=(24,9))

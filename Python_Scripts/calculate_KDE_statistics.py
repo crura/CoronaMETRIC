@@ -30,7 +30,7 @@ from os import listdir
 from scipy.stats import gaussian_kde
 #matplotlib.use('TkAgg')
 #mpl.use('TkAgg')
-from functions import KL_div, JS_Div, calculate_KDE, calculate_KDE_statistics
+from functions import KL_div, JS_Div, calculate_KDE, calculate_KDE_statistics, create_results_dictionary
 import seaborn as sns
 
 
@@ -47,14 +47,27 @@ err_forward_cor1_central_new = np.array([])
 err_forward_cor1_los_new = np.array([])
 err_random_new = np.array([])
 
+date_dict = {}
+
 for i in datafiles:
+    date_str = i.rstrip('_errors.sav')[-10:]
+    sub_dict = {}
     idl_save = readsav(i)
+    sub_dict['err_cor1_central'] = idl_save['ERR_SIGNED_ARR_COR1']
+    sub_dict['err_cor1_los'] = idl_save['ERR_SIGNED_ARR_LOS_COR1']
+    sub_dict['err_random'] = idl_save['ERR_SIGNED_ARR_RND']
+    sub_dict['err_psi_central'] = idl_save['ERR_SIGNED_ARR_FORWARD']
+    sub_dict['err_psi_los'] = idl_save['ERR_SIGNED_ARR_LOS_FORWARD']
     err_cor1_central_new = np.concatenate([err_cor1_central_new, idl_save['ERR_SIGNED_ARR_COR1']])
     err_cor1_los_new = np.concatenate([err_cor1_los_new,idl_save['ERR_SIGNED_ARR_LOS_COR1']])
     err_forward_cor1_central_new = np.concatenate([err_forward_cor1_central_new,idl_save['ERR_SIGNED_ARR_FORWARD']])
     err_forward_cor1_los_new = np.concatenate([err_forward_cor1_los_new,idl_save['ERR_SIGNED_ARR_LOS_FORWARD']])
     err_random_new = np.concatenate([err_random_new,idl_save['ERR_SIGNED_ARR_RND']])
+    date_dict[date_str] = sub_dict
 
+for i in date_dict.keys():
+    hi = create_results_dictionary(date_dict[i], i)
+    print(hi)
 
 # convert arrays from radians to degrees
 err_cor1_central_deg_new = err_cor1_central_new[np.where(err_cor1_central_new != 0)]*180/np.pi

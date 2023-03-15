@@ -18,6 +18,7 @@ from pathlib import Path
 from scipy.interpolate import interp1d
 import matplotlib
 from scipy.stats import gaussian_kde
+import seaborn as sns
 
 
 def calculate_KDE(err_array):
@@ -54,6 +55,76 @@ def calculate_KDE_statistics(KDE_1, KDE_2):
     result_KLD = KL_div(KDE_1, KDE_2)
 
     return result_JSD, result_KLD
+
+def create_results_dictionary(input_dict, date):
+    # convert arrays from radians to degrees
+
+    err_cor1_central_new = input_dict['err_cor1_central']
+    err_forward_cor1_central_new = input_dict['err_psi_central']
+    err_random_new = input_dict['err_random']
+
+    err_cor1_central_deg_new = err_cor1_central_new[np.where(err_cor1_central_new != 0)]*180/np.pi
+    err_forward_cor1_central_deg_new = err_forward_cor1_central_new[np.where(err_forward_cor1_central_new != 0)]*180/np.pi
+    err_random_deg_new = err_random_new[np.where(err_random_new != 0)]*180/np.pi
+
+
+    x_1_cor1_central_deg_new, KDE_cor1_central_deg_new = calculate_KDE(err_cor1_central_deg_new)
+    x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new = calculate_KDE(err_forward_cor1_central_deg_new)
+    x_1_random_deg_new, KDE_random_deg_new = calculate_KDE(err_random_deg_new)
+
+    JSD_cor1_forward_central_new, KLD_cor1_forward_central_new = calculate_KDE_statistics(KDE_cor1_central_deg_new, KDE_forward_cor1_central_deg_new)
+    JSD_cor1_central_random_new, KLD_cor1_central_random_new = calculate_KDE_statistics(KDE_cor1_central_deg_new, KDE_random_deg_new)
+    JSD_COR1_Forward_Central_Random_new, KLDcor1_forward_central_random_new = calculate_KDE_statistics(KDE_forward_cor1_central_deg_new, KDE_random_deg_new)
+
+    combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
+                        cor1_v_psi=[KLD_cor1_forward_central_new, JSD_cor1_forward_central_new],
+                       cor1_v_random=[KLD_cor1_central_random_new, JSD_cor1_central_random_new],
+                        psi_v_random=[KLDcor1_forward_central_random_new, JSD_COR1_Forward_Central_Random_new])
+
+    pd.set_option('display.float_format', '{:.3E}'.format)
+    stats_df = pd.DataFrame(combined_dict)
+    stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
+    print(stats_df.to_latex(index=False))
+
+    what = sns.histplot(err_random_deg_new,kde=True, bins=30)
+    norm_max_random = max(what.get_lines()[0].get_data()[1])
+    plt.close()
+
+    what2 = sns.histplot(err_cor1_central_deg_new,kde=True, bins=30)
+    norm_max_cor1 = max(what2.get_lines()[0].get_data()[1])
+    plt.close()
+
+    what3 = sns.histplot(err_forward_cor1_central_deg_new,kde=True, bins=30)
+    norm_max_forward = max(what3.get_lines()[0].get_data()[1])
+    plt.close()
+
+    fig = plt.figure(figsize=(10,10))
+    ax = fig.subplots(1,1)
+    sns.histplot(err_cor1_central_deg_new,kde=True,label='COR-1',bins=30,ax=ax,color='tab:blue')
+    sns.histplot(err_forward_cor1_central_deg_new,kde=True,label='PSI/FORWARD pB',bins=30,ax=ax,color='tab:orange')
+    #sns.histplot(err_random_deg_new,kde=True, bins=30, label='Random',ax=ax, color='tab:green')
+    #x_axis = np.linspace(-90, 90, len(KDE_cor1_central_deg_new))
+    plt.plot(x_1_cor1_central_deg_new, (KDE_cor1_central_deg_new/max(KDE_cor1_central_deg_new))*norm_max_cor1, color='tab:blue')
+    plt.plot(x_1_random_deg_new, (KDE_random_deg_new/max(KDE_random_deg_new))*norm_max_random, color='tab:green', label='random')
+    plt.plot(x_1_forward_cor1_central_deg_new, (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward, color='tab:orange')
+    norm_kde_random = (KDE_random_deg_new/max(KDE_random_deg_new))*norm_max_random
+    norm_kde_forward = (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward
+    norm_kde_cor1 = (KDE_cor1_central_deg_new/max(KDE_cor1_central_deg_new))*norm_max_cor1
+    #sns.kdeplot()
+    ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
+    ax.set_ylabel('Pixel Count',fontsize=14)
+    ax.set_title('QRaFT Feature Tracing Performance Against Central POS $B$ Field {}'.format(date),fontsize=15)
+    ax.set_xlim(-95,95)
+    #ax.set_ylim(0,0.07)
+    ax.legend(fontsize=13)
+
+    # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
+    # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
+    # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
+    #plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_COR1_vs_FORWARD_Feature_Tracing_Performance.png'))
+    plt.show()
+
+    return combined_dict
 
 def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
     file1_z, file2_z, file3_z, file4_z, file5_z, file6_z = files_z

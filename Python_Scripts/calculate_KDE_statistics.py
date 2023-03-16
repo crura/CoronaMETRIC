@@ -58,6 +58,8 @@ for i in datafiles:
     sub_dict['err_random'] = idl_save['ERR_SIGNED_ARR_RND']
     sub_dict['err_psi_central'] = idl_save['ERR_SIGNED_ARR_FORWARD']
     sub_dict['err_psi_los'] = idl_save['ERR_SIGNED_ARR_LOS_FORWARD']
+    sub_dict['L_cor1'] = idl_save['L_COR1']
+    sub_dict['L_forward'] = idl_save['L_FORWARD']
     err_cor1_central_new = np.concatenate([err_cor1_central_new, idl_save['ERR_SIGNED_ARR_COR1']])
     err_cor1_los_new = np.concatenate([err_cor1_los_new,idl_save['ERR_SIGNED_ARR_LOS_COR1']])
     err_forward_cor1_central_new = np.concatenate([err_forward_cor1_central_new,idl_save['ERR_SIGNED_ARR_FORWARD']])
@@ -67,6 +69,7 @@ for i in datafiles:
 
 for i in date_dict.keys():
     hi = create_results_dictionary(date_dict[i], i)
+    hi2 = create_results_dictionary(date_dict[i], i, True)
     print(hi)
 
 # convert arrays from radians to degrees

@@ -58,16 +58,25 @@ def calculate_KDE_statistics(KDE_1, KDE_2):
 
     return result_JSD, result_KLD
 
-def create_results_dictionary(input_dict, date):
+def create_results_dictionary(input_dict, date, masked=False):
     # convert arrays from radians to degrees
 
     err_cor1_central_new = input_dict['err_cor1_central']
     err_forward_cor1_central_new = input_dict['err_psi_central']
     err_random_new = input_dict['err_random']
+    L_cor1 = input_dict['L_cor1']
+    L_forward = input_dict['L_forward']
 
     err_cor1_central_deg_new = err_cor1_central_new[np.where(err_cor1_central_new != 0)]*180/np.pi
     err_forward_cor1_central_deg_new = err_forward_cor1_central_new[np.where(err_forward_cor1_central_new != 0)]*180/np.pi
     err_random_deg_new = err_random_new[np.where(err_random_new != 0)]*180/np.pi
+    L_cor1_new = L_cor1[np.where(err_cor1_central_new != 0)]
+    L_forward_new = L_forward[np.where(err_forward_cor1_central_new != 0)]
+
+    if masked:
+        mask = 50
+        err_cor1_central_deg_new = err_cor1_central_deg_new[np.where(L_cor1_new > mask)]
+        err_forward_cor1_central_deg_new = err_forward_cor1_central_deg_new[np.where(L_forward_new > mask)]
 
 
     x_1_cor1_central_deg_new, KDE_cor1_central_deg_new = calculate_KDE(err_cor1_central_deg_new)
@@ -115,7 +124,10 @@ def create_results_dictionary(input_dict, date):
     #sns.kdeplot()
     ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
     ax.set_ylabel('Pixel Count',fontsize=14)
-    ax.set_title('QRaFT Feature Tracing Performance Against Central POS $B$ Field {}'.format(date),fontsize=15)
+    if masked:
+        ax.set_title('QRaFT Feature Tracing Performance Against Central POS $B$ Field {} (L > {})'.format(date, mask),fontsize=15)
+    else:
+        ax.set_title('QRaFT Feature Tracing Performance Against Central POS $B$ Field {}'.format(date),fontsize=15)
     ax.set_xlim(-95,95)
     #ax.set_ylim(0,0.07)
     ax.legend(fontsize=13)
@@ -123,10 +135,14 @@ def create_results_dictionary(input_dict, date):
     # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
     # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
     # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
-    plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_COR1_vs_FORWARD_Feature_Tracing_Performance_{}.png'.format(date)))
+    if masked:
+        plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_COR1_vs_FORWARD_Feature_Tracing_Performance_{}_L_gt_{}.png'.format(date, mask)))
+    else:
+        plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_COR1_vs_FORWARD_Feature_Tracing_Performance_{}.png'.format(date)))
     plt.show()
 
     return combined_dict
+
 
 def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
     file1_z, file2_z, file3_z, file4_z, file5_z, file6_z = files_z

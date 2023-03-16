@@ -20,6 +20,8 @@ import matplotlib
 from scipy.stats import gaussian_kde
 import seaborn as sns
 
+repo = git.Repo('.', search_parent_directories=True)
+repo_path = repo.working_tree_dir
 
 def calculate_KDE(err_array):
     # set minimum and maximum x values for gaussian kde calculation
@@ -121,7 +123,7 @@ def create_results_dictionary(input_dict, date):
     # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
     # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
     # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
-    #plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_COR1_vs_FORWARD_Feature_Tracing_Performance.png'))
+    plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_COR1_vs_FORWARD_Feature_Tracing_Performance_{}.png'.format(date)))
     plt.show()
 
     return combined_dict

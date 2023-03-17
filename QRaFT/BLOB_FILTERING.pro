@@ -11,7 +11,7 @@ function BLOB_FILTERING, IMG, thresh, thresh_mode, min_blob, blobs=blobs
   ;
   ;     As a result, the algorithm keeps only sufficiently large and  intense image regions
   ;     and eliminates (sets to 0) the smallest and weakest ones. It can be used for removing
-  ;     spicky noise and other kinds of small-scale contamination from solar images.
+  ;     spicky noise and other small-scale contaminations from solar images.
   ;
   ;     The blob decomposition step is implemented using the IDL's LABEL_REGION() funciton.
   ;

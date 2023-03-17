@@ -47,6 +47,10 @@ err_forward_cor1_central_new = np.array([])
 err_forward_cor1_los_new = np.array([])
 err_random_new = np.array([])
 
+err_cor1_central_masked = np.array([])
+err_forward_central_masked = np.array([])
+err_random_centrak_masked = np.array([])
+
 date_dict = {}
 
 for i in datafiles:
@@ -68,14 +72,30 @@ for i in datafiles:
     date_dict[date_str] = sub_dict
 
 for i in date_dict.keys():
-    hi = create_results_dictionary(date_dict[i], i)
-    hi2 = create_results_dictionary(date_dict[i], i, True)
-    print(hi)
+    results, data = create_results_dictionary(date_dict[i], i)
+    results_masked, data_masked, mask = create_results_dictionary(date_dict[i], i, True)
+    err_cor1_central_masked = np.concatenate([err_cor1_central_masked, data_masked['cor1_central']])
+    err_forward_central_masked = np.concatenate([err_forward_central_masked, data_masked['forward_central']])
+    err_random_centrak_masked = np.concatenate([err_random_centrak_masked, data_masked['random']])
+    #print(results)
+
+"""
+combined_maksed_dict = {}
+combined_maksed_dict['err_cor1_central_masked'] = err_cor1_central_masked
+combined_maksed_dict['err_forward_central_masked'] = err_forward_central_masked
+results_cor1_masked_combined, data_all = create_results_dictionary([combined_maksed_dict], 'combined')
+"""
 
 # convert arrays from radians to degrees
 err_cor1_central_deg_new = err_cor1_central_new[np.where(err_cor1_central_new != 0)]*180/np.pi
 err_forward_cor1_central_deg_new = err_forward_cor1_central_new[np.where(err_forward_cor1_central_new != 0)]*180/np.pi
 err_random_deg_new = err_random_new[np.where(err_random_new != 0)]*180/np.pi
+
+
+err_cor1_central_deg_new_combined = err_cor1_central_deg_new.copy()
+err_forward_cor1_central_deg_new_combined = err_forward_cor1_central_deg_new.copy()
+err_random_deg_new = err_random_deg_new.copy()
+print('lengths of unfiltered dataset: ', err_cor1_central_deg_new.shape, err_forward_cor1_central_deg_new.shape, err_random_deg_new.shape)
 
 
 x_1_cor1_central_deg_new, KDE_cor1_central_deg_new = calculate_KDE(err_cor1_central_deg_new)
@@ -207,3 +227,94 @@ ax[1].legend(fontsize=20)
 plt.show()
 plt.close()
 """
+
+
+
+
+
+
+
+
+x_1_cor1_central_deg_new, KDE_cor1_central_deg_new = calculate_KDE(err_cor1_central_masked)
+x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new = calculate_KDE(err_forward_central_masked)
+x_1_random_deg_new, KDE_random_deg_new = calculate_KDE(err_random_centrak_masked)
+
+JSD_cor1_forward_central_new, KLD_cor1_forward_central_new = calculate_KDE_statistics(KDE_cor1_central_deg_new, KDE_forward_cor1_central_deg_new)
+JSD_cor1_central_random_new, KLD_cor1_central_random_new = calculate_KDE_statistics(KDE_cor1_central_deg_new, KDE_random_deg_new)
+JSD_COR1_Forward_Central_Random_new, KLDcor1_forward_central_random_new = calculate_KDE_statistics(KDE_forward_cor1_central_deg_new, KDE_random_deg_new)
+
+combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
+                    cor1_v_psi=[KLD_cor1_forward_central_new, JSD_cor1_forward_central_new],
+                   cor1_v_random=[KLD_cor1_central_random_new, JSD_cor1_central_random_new],
+                    psi_v_random=[KLDcor1_forward_central_random_new, JSD_COR1_Forward_Central_Random_new])
+
+pd.set_option('display.float_format', '{:.3E}'.format)
+stats_df = pd.DataFrame(combined_dict)
+stats_df.columns = ['metric', 'cor1 vs psi pB (L > {})'.format(mask), 'cor1 vs random (L> {})'.format(mask), 'psi pB vs random (L > {})'.format(mask)]
+print(stats_df.to_latex(index=False))
+
+"""
+xmin_random = min(err_random_centrak_masked)
+xmax_random = max(err_random_centrak_masked)
+kde0_random_deg = gaussian_kde(err_random_centrak_masked)
+x_1_random_deg = np.linspace(xmin_random, xmax_random, 200)
+kde0_x_random_deg = kde0_random_deg(x_1_random_deg)
+"""
+
+what = sns.histplot(err_random_centrak_masked,kde=True, bins=30)
+norm_max_random = max(what.get_lines()[0].get_data()[1])
+plt.close()
+
+what2 = sns.histplot(err_cor1_central_masked,kde=True, bins=30)
+norm_max_cor1 = max(what2.get_lines()[0].get_data()[1])
+plt.close()
+
+what3 = sns.histplot(err_forward_central_masked,kde=True, bins=30)
+norm_max_forward = max(what3.get_lines()[0].get_data()[1])
+plt.close()
+
+fig = plt.figure(figsize=(10,10))
+ax = fig.subplots(1,1)
+sns.histplot(err_cor1_central_masked,kde=True,label='COR-1',bins=30,ax=ax,color='tab:blue')
+sns.histplot(err_forward_central_masked,kde=True,label='PSI/FORWARD pB',bins=30,ax=ax,color='tab:orange')
+#sns.histplot(err_random_centrak_masked,kde=True, bins=30, label='Random',ax=ax, color='tab:green')
+#x_axis = np.linspace(-90, 90, len(KDE_cor1_central_deg_new))
+plt.plot(x_1_cor1_central_deg_new, (KDE_cor1_central_deg_new/max(KDE_cor1_central_deg_new))*norm_max_cor1, color='tab:blue')
+plt.plot(x_1_random_deg_new, (KDE_random_deg_new/max(KDE_random_deg_new))*norm_max_random, color='tab:green', label='random')
+plt.plot(x_1_forward_cor1_central_deg_new, (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward, color='tab:orange')
+norm_kde_random = (KDE_random_deg_new/max(KDE_random_deg_new))*norm_max_random
+norm_kde_forward = (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward
+norm_kde_cor1 = (KDE_cor1_central_deg_new/max(KDE_cor1_central_deg_new))*norm_max_cor1
+#sns.kdeplot()
+ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
+ax.set_ylabel('Pixel Count',fontsize=14)
+ax.set_title('QRaFT Feature Tracing Performance Against Central POS $B$ Field (L > {})'.format(mask),fontsize=15)
+ax.set_xlim(-95,95)
+#ax.set_ylim(0,0.07)
+ax.legend(fontsize=13)
+
+# plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
+# plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
+# plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
+plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_COR1_vs_FORWARD_Feature_Tracing_Performance_masked_L{}.png'.format(mask)))
+plt.show()
+
+
+cor1_avg = np.round(np.average(abs(err_cor1_central_masked)),5)
+forward_avg = np.round(np.average(abs(err_forward_central_masked)),5)
+random_avg = np.round(np.average(abs(err_random_centrak_masked)),5)
+
+cor1_med = np.round(np.median(abs(err_cor1_central_masked)),5)
+forward_med = np.round(np.median(abs(err_forward_central_masked)),5)
+random_med = np.round(np.median(abs(err_random_centrak_masked)),5)
+
+
+combined_dict = dict(metric=['average discrepancy (L>{})'.format(mask), 'median discrepancy (L>{})'.format(mask)],
+                    cor1=[cor1_avg, cor1_med],
+                   psi=[forward_avg, forward_med],
+                    random=[random_avg, random_med])
+
+pd.set_option('display.float_format', '{:.3f}'.format)
+stats_df = pd.DataFrame(combined_dict)
+#stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
+print(stats_df.to_latex(index=False))

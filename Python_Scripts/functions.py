@@ -91,6 +91,11 @@ def create_results_dictionary(input_dict, date, masked=False):
                         cor1_v_psi=[KLD_cor1_forward_central_new, JSD_cor1_forward_central_new],
                        cor1_v_random=[KLD_cor1_central_random_new, JSD_cor1_central_random_new],
                         psi_v_random=[KLDcor1_forward_central_random_new, JSD_COR1_Forward_Central_Random_new])
+    
+    data_dict = {}
+    data_dict['cor1_central'] = err_cor1_central_deg_new
+    data_dict['forward_central'] = err_forward_cor1_central_deg_new
+    data_dict['random'] = err_random_deg_new
 
     pd.set_option('display.float_format', '{:.3E}'.format)
     stats_df = pd.DataFrame(combined_dict)
@@ -141,7 +146,10 @@ def create_results_dictionary(input_dict, date, masked=False):
         plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_COR1_vs_FORWARD_Feature_Tracing_Performance_{}.png'.format(date)))
     plt.show()
 
-    return combined_dict
+    if masked:
+        return combined_dict, data_dict, mask
+    else:
+        return combined_dict, data_dict
 
 
 def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):

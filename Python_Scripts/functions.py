@@ -332,5 +332,6 @@ def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
     plt.savefig(outpath)
     # plt.show()
     plt.close()
+    
 
     return fig

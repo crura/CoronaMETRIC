@@ -91,7 +91,7 @@ def create_results_dictionary(input_dict, date, masked=False):
                         cor1_v_psi=[KLD_cor1_forward_central_new, JSD_cor1_forward_central_new],
                        cor1_v_random=[KLD_cor1_central_random_new, JSD_cor1_central_random_new],
                         psi_v_random=[KLDcor1_forward_central_random_new, JSD_COR1_Forward_Central_Random_new])
-    
+
     data_dict = {}
     data_dict['cor1_central'] = err_cor1_central_deg_new
     data_dict['forward_central'] = err_forward_cor1_central_deg_new

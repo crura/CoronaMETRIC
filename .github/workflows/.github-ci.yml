@@ -69,6 +69,8 @@ jobs:
           echo ".compile -v '$git_repo/image_coalignment.pro'" &&
           echo ".compile -v '$git_repo/save_parameters.pro'" &&
           echo ".compile -v '$git_repo/run_code.pro'" &&
+          echo ".compile -v '$git_repo/QRaFT/open_PSI.pro'" &&
+          echo ".compile -v '$git_repo/QRaFT/QRaFT_PSI.pro'" &&
           echo "run_code" &&
           cat) |
           /Users/crura/Documents/bin/ssw

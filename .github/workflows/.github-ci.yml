@@ -119,7 +119,7 @@ jobs:
           echo ".compile -v '$git_repo/image_coalignment.pro'" &&
           echo ".compile -v '$git_repo/save_parameters.pro'" &&
           echo ".compile -v '$git_repo/run_code.pro'" &&
-          echo "cd '$git_repo/QRaFT'" &&
+          echo "cd $git_repo/QRaFT" &&
           echo ".compile -v '$git_repo/QRaFT/open_PSI.pro'" &&
           echo ".compile -v '$git_repo/QRaFT/QRaFT_PSI.pro'" &&
           echo "script4,  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_COR1, L_FORWARD, /manual" &&

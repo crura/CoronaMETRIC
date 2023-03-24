@@ -263,11 +263,11 @@ PRO script3,  err_arr_MLSO,  err_arr_LOS_MLSO, err_arr_FORWARD,  err_arr_LOS_FOR
 
 End
 ;----------------------------------------
-PRO script4,  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_COR1, L_FORWARD, manual=manual
+PRO script4, input_directory,  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_COR1, L_FORWARD, manual=manual
 
  ;dirs = "c:\Users\vadim\Documents\SCIENCE PROJECTS\N Arge\PSI\COR1_PSI_FORWARD_coaligned\slices_1\" + ['1\','2\','3\','4\','5\','6\']
-  dirs = "/Users/crura/Desktop/Research/github/Test_Suite/Image-Coalignment/QRaFT/COR1_PSI_FORWARD_slices_1/"
-  
+  dirs = input_directory;"/Users/crura/Desktop/Research/github/Test_Suite/Image-Coalignment/QRaFT/COR1_PSI_FORWARD_slices_1/"
+
 
   err_arr_COR1_ = [0.0]
   err_arr_LOS_COR1_ = [0.0]
@@ -376,4 +376,3 @@ End
 ;  plot,hist_x_pB, hist_y_pB/total(hist_y_pB), xtitle='Discrepancy [degrees]', ytitle='Occurrence rate', psym=10, color=0
 ;  oplot, hist_x_pB, hist_y_pB/total(hist_y_pB),  psym=10, color=2, thick=2
 ;  oplot, hist_x_MLSO, hist_y_MLSO/total(hist_y_MLSO),  psym=10, color=4, thick=3, lines=2
-

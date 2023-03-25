@@ -280,17 +280,18 @@ PRO script4, input_directory,  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,
   for i=0, n_elements(dirs)-1 do begin
      print, dirs[i]
      f_COR1 = file_search(dirs[i]+'*rep_med*')
-     f_pB = file_search(dirs[i]+'*_pB.fits')
-     f_ne = file_search(dirs[i]+'*_ne.fits')
-     f_ne_LOS = file_search(dirs[i]+'*_ne_LOS.fits')
+     f_pB = file_search(dirs[i]+'*COR1__PSI_pB.fits')
+     f_ne = file_search(dirs[i]+'*COR1__PSI_ne.fits')
+     f_ne_LOS = file_search(dirs[i]+'*COR1__PSI_ne_LOS.fits')
 
-     f_By =  file_search(dirs[i]+'*_By.fits')
-     f_Bz =  file_search(dirs[i]+'*_Bz.fits')
-     f_By_LOS =  file_search(dirs[i]+'*_By_LOS.fits')
-     f_Bz_LOS =  file_search(dirs[i]+'*_Bz_LOS.fits')
+     f_By =  file_search(dirs[i]+'*COR1__PSI_By.fits')
+     f_Bz =  file_search(dirs[i]+'*COR1__PSI_Bz.fits')
+     f_By_LOS =  file_search(dirs[i]+'*COR1__PSI_By_LOS.fits')
+     f_Bz_LOS =  file_search(dirs[i]+'*COR1__PSI_Bz_LOS.fits')
 
-	 date_str =  strmid(file_basename(f_pB),0,10)
-     f_err_sav = file_dirname(f_pB) + '\'  + date_str+  '_errors.sav'
+	 date_str =  strmid(file_basename(f_pB),2,10)
+	 detector_str = strmid(file_basename(f_pB),14,19)
+     f_err_sav = file_dirname(f_pB) + '\'  + date_str+ '_' + detector_str +  '_errors.sav'
 
       res_COR1 = compare_angles( f_COR1,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, data_source='COR1', thresh_k = 1.5, manual=manual)  ;hist_x=hist_x, hist_y=hist_y
       res_FORWARD = compare_angles( f_pB,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, data_source='COR1', thresh_k = 0.2, manual=manual)  ;hist_x=hist_x, hist_y=hist_y

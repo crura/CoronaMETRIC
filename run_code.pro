@@ -15,7 +15,7 @@ pro run_code
   ENDFOREACH
 
   FOREACH element2, directory_list_2 DO BEGIN
-    spawn, 'cp ' + element + ' ' + git_repo + '/Output/fits_images'
+    spawn, 'cp ' + element2 + ' ' + git_repo + '/Output/fits_images'
     hi2 = generate_forward_model(element2)
   ENDFOREACH
 

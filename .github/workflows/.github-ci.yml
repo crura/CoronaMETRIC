@@ -122,7 +122,7 @@ jobs:
           echo ".compile -v '$git_repo/run_code.pro'" &&
           echo ".compile -v '$git_repo/QRaFT/open_PSI.pro'" &&
           echo ".compile -v '$git_repo/QRaFT/QRaFT_PSI.pro'" &&
-          echo "script4, '$git_repo/Output/fits_images',  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_COR1, L_FORWARD, /manual" &&
+          echo "script4, '$git_repo/Output/fits_images/',  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_COR1, L_FORWARD, /manual" &&
           cat) |
           /Users/crura/Documents/bin/ssw
 

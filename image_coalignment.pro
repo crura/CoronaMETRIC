@@ -5,9 +5,6 @@ function image_coalignment, directory
   restore, git_repo + '/Data/outstrings.sav', /v
   spawn, 'mkdir -p ' + git_repo + '/Output'
   spawn, 'mkdir -p ' + git_repo + '/Output/fits_images'
-
-  ; copy input files and paste to output fits images
-  spawn, 'cp ' + fits_directory +' ' + git_repo + '/Output/fits_images'
   ;.compile -v '/Users/crura/SSW/gen/idl/util/default.pro'
   ;.compile -v '/Users/crura/IDLWorkspace/Default/linspace.pro'
   ;.compile -v '/Users/crura/Desktop/Research/Magnetic_Field/write_psi_image_as_fits.pro'

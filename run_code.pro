@@ -6,13 +6,16 @@ pro run_code
   occlt_list = ['']
   ; set path variable for rest of idl code defined by git
   spawn, 'git rev-parse --show-toplevel', git_repo
+  spawn, 'mkdir -p ' + git_repo + '/Output/fits_images'
   save,outstring_list, directory_list, directory_list_2, occlt_list, filename=git_repo + '/Data/outstrings.sav'
 
   FOREACH element, directory_list DO BEGIN
+    spawn, 'cp ' + element + ' ' + git_repo + '/Output/fits_images'
     hi = generate_forward_model(element)
   ENDFOREACH
 
   FOREACH element2, directory_list_2 DO BEGIN
+    spawn, 'cp ' + element + ' ' + git_repo + '/Output/fits_images'
     hi2 = generate_forward_model(element2)
   ENDFOREACH
 

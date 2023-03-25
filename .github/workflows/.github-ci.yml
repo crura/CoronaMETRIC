@@ -87,6 +87,7 @@ jobs:
           source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
           conda init bash &&
           conda activate test_env &&
+          cp $git_repo/Data/COR1/*.fits $git_repo/Output/fits_images &&
           git_repo=$(git rev-parse --show-toplevel) &&
           cd $git_repo/QRaFT &&
           (echo "ssw_path" &&

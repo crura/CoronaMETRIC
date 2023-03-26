@@ -263,11 +263,11 @@ PRO script3,  err_arr_MLSO,  err_arr_LOS_MLSO, err_arr_FORWARD,  err_arr_LOS_FOR
 
 End
 ;----------------------------------------
-PRO script4, input_directory,  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_COR1, L_FORWARD, manual=manual
+PRO script4, input_directory, output_directory,  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_COR1, L_FORWARD, manual=manual
 
  ;dirs = "c:\Users\vadim\Documents\SCIENCE PROJECTS\N Arge\PSI\COR1_PSI_FORWARD_coaligned\slices_1\" + ['1\','2\','3\','4\','5\','6\']
   dirs = input_directory;"/Users/crura/Desktop/Research/github/Test_Suite/Image-Coalignment/QRaFT/COR1_PSI_FORWARD_slices_1/"
-
+  out_dir = output_directory
 
   err_arr_COR1_ = [0.0]
   err_arr_LOS_COR1_ = [0.0]
@@ -291,7 +291,7 @@ PRO script4, input_directory,  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,
 
 	 date_str =  strmid(file_basename(f_pB),2,10)
 	 detector_str = strmid(file_basename(f_pB),14,19)
-     f_err_sav = file_dirname(f_pB) + '\'  + date_str+ '_' + detector_str +  '_errors.sav'
+     f_err_sav = out_dir + file_dirname(f_pB) + '\'  + date_str+ '_' + detector_str +  '_errors.sav'
 
       res_COR1 = compare_angles( f_COR1,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, data_source='COR1', thresh_k = 1.5, manual=manual)  ;hist_x=hist_x, hist_y=hist_y
       res_FORWARD = compare_angles( f_pB,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, data_source='COR1', thresh_k = 0.2, manual=manual)  ;hist_x=hist_x, hist_y=hist_y

@@ -291,7 +291,7 @@ PRO script4, input_directory, output_directory,  err_arr_COR1,  err_arr_LOS_COR1
 
 	 date_str =  strmid(file_basename(f_pB),2,10)
 	 detector_str = strmid(file_basename(f_pB),14,19)
-     f_err_sav = out_dir + file_dirname(f_pB) + '\'  + date_str+ '_' + detector_str +  '_errors.sav'
+     f_err_sav = out_dir + '\' + file_dirname(f_pB) + '\'  + date_str+ '_' + detector_str +  '_errors.sav'
 
       res_COR1 = compare_angles( f_COR1,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, data_source='COR1', thresh_k = 1.5, manual=manual)  ;hist_x=hist_x, hist_y=hist_y
       res_FORWARD = compare_angles( f_pB,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, data_source='COR1', thresh_k = 0.2, manual=manual)  ;hist_x=hist_x, hist_y=hist_y

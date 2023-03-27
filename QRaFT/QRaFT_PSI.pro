@@ -291,7 +291,7 @@ PRO script4, input_directory, output_directory,  err_arr_COR1,  err_arr_LOS_COR1
 
 	 date_str =  strmid(file_basename(f_pB),2,10)
 	 detector_str = strmid(file_basename(f_pB),14,19)
-     f_err_sav = out_dir + '\' + file_dirname(f_pB) + '\'  + date_str+ '_' + detector_str +  '_errors.sav'
+     f_err_sav = out_dir + repstr(file_basename(f_pb), '_pB.fits', '.sav'); + '/'  + date_str+ '_' + detector_str +  '_errors.sav'
 
       res_COR1 = compare_angles( f_COR1,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, data_source='COR1', thresh_k = 1.5, manual=manual)  ;hist_x=hist_x, hist_y=hist_y
       res_FORWARD = compare_angles( f_pB,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, data_source='COR1', thresh_k = 0.2, manual=manual)  ;hist_x=hist_x, hist_y=hist_y
@@ -314,8 +314,8 @@ PRO script4, input_directory, output_directory,  err_arr_COR1,  err_arr_LOS_COR1
 	  L_COR1 = res_COR1.L
 	  L_FORWARD = res_FORWARD.L
 
-      save, filename = f_err_sav, err_arr_COR1,  err_signed_arr_COR1, err_arr_LOS_COR1, err_signed_arr_LOS_COR1, err_arr_FORWARD,  err_signed_arr_FORWARD, $
-      			err_arr_LOS_FORWARD,  err_signed_arr_LOS_FORWARD,  err_arr_rnd,  err_signed_arr_rnd,  L_COR1, L_FORWARD
+      save, err_arr_COR1,  err_signed_arr_COR1, err_arr_LOS_COR1, err_signed_arr_LOS_COR1, err_arr_FORWARD,  err_signed_arr_FORWARD, $
+      			err_arr_LOS_FORWARD,  err_signed_arr_LOS_FORWARD,  err_arr_rnd,  err_signed_arr_rnd,  L_COR1, L_FORWARD, filename = f_err_sav
 
       err_arr_COR1_ = [err_arr_COR1_, err_arr_COR1]
       err_arr_LOS_COR1_ = [err_arr_LOS_COR1_,err_arr_LOS_COR1]

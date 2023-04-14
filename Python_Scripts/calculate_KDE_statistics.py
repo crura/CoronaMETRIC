@@ -38,7 +38,7 @@ repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
 data_dir = os.path.join(repo_path,'Data/QRaFT/errors.sav')
 
-datapath = join(repo_path, 'Data/QRaFT/COR-1_Errors_New')
+datapath = join(repo_path, 'Output/QRaFT_Results')
 datafiles = [join(datapath,f) for f in listdir(datapath) if isfile(join(datapath,f)) and f !='.DS_Store']
 
 err_cor1_central_new = np.array([]) # idl_save_new['ERR_ARR_COR1']

@@ -289,12 +289,13 @@ PRO script4, input_directory, output_directory,  err_arr_COR1,  err_arr_LOS_COR1
      f_By_LOS =  file_search(dirs[i]+'*COR1__PSI_By_LOS.fits')
      f_Bz_LOS =  file_search(dirs[i]+'*COR1__PSI_Bz_LOS.fits')
 
-	 date_str =  strmid(file_basename(f_pB),2,10)
-	 detector_str = strmid(file_basename(f_pB),14,19)
-     f_err_sav = out_dir + repstr(file_basename(f_pb), '_pB.fits', '.sav'); + '/'  + date_str+ '_' + detector_str +  '_errors.sav'
+	 for i=0, n_elements(f_pB)-1 do begin
+	 date_str =  strmid(file_basename(f_pB[i]),2,10)
+	 detector_str = strmid(file_basename(f_pB[i]),14,19)
+     f_err_sav = out_dir + repstr(file_basename(f_pb[i]), '_pB.fits', '.sav'); + '/'  + date_str+ '_' + detector_str +  '_errors.sav'
 
-      res_COR1 = compare_angles( f_COR1,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, data_source='COR1', thresh_k = 1.5, manual=manual)  ;hist_x=hist_x, hist_y=hist_y
-      res_FORWARD = compare_angles( f_pB,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, data_source='COR1', thresh_k = 0.2, manual=manual)  ;hist_x=hist_x, hist_y=hist_y
+      res_COR1 = compare_angles( f_COR1[i],  f_By[i], f_Bz[i], f_By_LOS[i], f_Bz_LOS[i], data_source='COR1', thresh_k = 1.5, manual=manual)  ;hist_x=hist_x, hist_y=hist_y
+      res_FORWARD = compare_angles( f_pB[i],  f_By[i], f_Bz[i], f_By_LOS[i], f_Bz_LOS[i], data_source='COR1', thresh_k = 0.2, manual=manual)  ;hist_x=hist_x, hist_y=hist_y
 
       err_arr_COR1 = res_COR1.err
       err_signed_arr_COR1 = res_COR1.err_signed
@@ -324,6 +325,7 @@ PRO script4, input_directory, output_directory,  err_arr_COR1,  err_arr_LOS_COR1
       err_arr_rnd_ = [err_arr_rnd_,  err_arr_rnd]
 	  L_COR1_ = [L_COR1_, L_COR1]
 	  L_FORWARD_ = [L_FORWARD_, L_FORWARD]
+	  endfor
 
   endfor
 

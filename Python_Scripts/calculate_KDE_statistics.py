@@ -38,7 +38,7 @@ repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
 data_dir = os.path.join(repo_path,'Data/QRaFT/errors.sav')
 
-datapath = join(repo_path, 'Output/QRaFT_Results')
+datapath = join(repo_path, 'Output/New_Test_QRaFT_Results')
 datafiles = [join(datapath,f) for f in listdir(datapath) if isfile(join(datapath,f)) and f !='.DS_Store']
 
 err_cor1_central_new = np.array([]) # idl_save_new['ERR_ARR_COR1']
@@ -54,22 +54,25 @@ err_random_centrak_masked = np.array([])
 date_dict = {}
 
 for i in datafiles:
-    date_str = i.rstrip('_errors.sav')[-10:]
-    sub_dict = {}
-    idl_save = readsav(i)
-    sub_dict['err_cor1_central'] = idl_save['ERR_SIGNED_ARR_COR1']
-    sub_dict['err_cor1_los'] = idl_save['ERR_SIGNED_ARR_LOS_COR1']
-    sub_dict['err_random'] = idl_save['ERR_SIGNED_ARR_RND']
-    sub_dict['err_psi_central'] = idl_save['ERR_SIGNED_ARR_FORWARD']
-    sub_dict['err_psi_los'] = idl_save['ERR_SIGNED_ARR_LOS_FORWARD']
-    sub_dict['L_cor1'] = idl_save['L_COR1']
-    sub_dict['L_forward'] = idl_save['L_FORWARD']
-    err_cor1_central_new = np.concatenate([err_cor1_central_new, idl_save['ERR_SIGNED_ARR_COR1']])
-    err_cor1_los_new = np.concatenate([err_cor1_los_new,idl_save['ERR_SIGNED_ARR_LOS_COR1']])
-    err_forward_cor1_central_new = np.concatenate([err_forward_cor1_central_new,idl_save['ERR_SIGNED_ARR_FORWARD']])
-    err_forward_cor1_los_new = np.concatenate([err_forward_cor1_los_new,idl_save['ERR_SIGNED_ARR_LOS_FORWARD']])
-    err_random_new = np.concatenate([err_random_new,idl_save['ERR_SIGNED_ARR_RND']])
-    date_dict[date_str] = sub_dict
+    if i.endswith('COR1__PSI.sav'):
+        date_str = i.rstrip('OR1__PSI.sav')[-11:].rstrip('__C')
+        sub_dict = {}
+        idl_save = readsav(i)
+        sub_dict['err_cor1_central'] = idl_save['ERR_SIGNED_ARR_COR1']
+        sub_dict['err_cor1_los'] = idl_save['ERR_SIGNED_ARR_LOS_COR1']
+        sub_dict['err_random'] = idl_save['ERR_SIGNED_ARR_RND']
+        sub_dict['err_psi_central'] = idl_save['ERR_SIGNED_ARR_FORWARD']
+        sub_dict['err_psi_los'] = idl_save['ERR_SIGNED_ARR_LOS_FORWARD']
+        sub_dict['L_cor1'] = idl_save['L_COR1']
+        sub_dict['L_forward'] = idl_save['L_FORWARD']
+        sub_dict['detector'] = 'COR-1'
+        detector = 'COR-1'
+        err_cor1_central_new = np.concatenate([err_cor1_central_new, idl_save['ERR_SIGNED_ARR_COR1']])
+        err_cor1_los_new = np.concatenate([err_cor1_los_new,idl_save['ERR_SIGNED_ARR_LOS_COR1']])
+        err_forward_cor1_central_new = np.concatenate([err_forward_cor1_central_new,idl_save['ERR_SIGNED_ARR_FORWARD']])
+        err_forward_cor1_los_new = np.concatenate([err_forward_cor1_los_new,idl_save['ERR_SIGNED_ARR_LOS_FORWARD']])
+        err_random_new = np.concatenate([err_random_new,idl_save['ERR_SIGNED_ARR_RND']])
+        date_dict[date_str] = sub_dict
 
 for i in date_dict.keys():
     results, data = create_results_dictionary(date_dict[i], i)
@@ -113,7 +116,7 @@ combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
 
 pd.set_option('display.float_format', '{:.3E}'.format)
 stats_df = pd.DataFrame(combined_dict)
-stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
+stats_df.columns = ['metric', '{} vs psi pB'.format(detector), '{} vs random'.format(detector), 'psi pB vs random']
 print(stats_df.to_latex(index=False))
 
 """
@@ -138,7 +141,7 @@ plt.close()
 
 fig = plt.figure(figsize=(10,10))
 ax = fig.subplots(1,1)
-sns.histplot(err_cor1_central_deg_new,kde=True,label='COR-1',bins=30,ax=ax,color='tab:blue')
+sns.histplot(err_cor1_central_deg_new,kde=True,label=detector,bins=30,ax=ax,color='tab:blue')
 sns.histplot(err_forward_cor1_central_deg_new,kde=True,label='PSI/FORWARD pB',bins=30,ax=ax,color='tab:orange')
 #sns.histplot(err_random_deg_new,kde=True, bins=30, label='Random',ax=ax, color='tab:green')
 #x_axis = np.linspace(-90, 90, len(KDE_cor1_central_deg_new))
@@ -151,7 +154,7 @@ norm_kde_cor1 = (KDE_cor1_central_deg_new/max(KDE_cor1_central_deg_new))*norm_ma
 #sns.kdeplot()
 ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
 ax.set_ylabel('Pixel Count',fontsize=14)
-ax.set_title('QRaFT Feature Tracing Performance Against Central POS $B$ Field',fontsize=15)
+ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
 ax.set_xlim(-95,95)
 #ax.set_ylim(0,0.07)
 ax.legend(fontsize=13)
@@ -159,7 +162,7 @@ ax.legend(fontsize=13)
 # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
-plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_COR1_vs_FORWARD_Feature_Tracing_Performance.png'))
+plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
 plt.show()
 #plt.close()
 
@@ -174,7 +177,7 @@ combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
 
 pd.set_option('display.float_format', '{:.3E}'.format)
 stats_df = pd.DataFrame(combined_dict)
-stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
+stats_df.columns = ['metric', '{} vs psi pB'.format(detector), '{} vs random'.format(detector), 'psi pB vs random']
 print(stats_df.to_latex(index=False))
 
 print("")
@@ -250,7 +253,7 @@ combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
 
 pd.set_option('display.float_format', '{:.3E}'.format)
 stats_df = pd.DataFrame(combined_dict)
-stats_df.columns = ['metric', 'cor1 vs psi pB (L > {})'.format(mask), 'cor1 vs random (L> {})'.format(mask), 'psi pB vs random (L > {})'.format(mask)]
+stats_df.columns = ['metric', '{} vs psi pB (L > {})'.format(detector,mask), '{} vs random (L> {})'.format(detector,mask), 'psi pB vs random (L > {})'.format(mask)]
 print(stats_df.to_latex(index=False))
 
 """
@@ -275,7 +278,7 @@ plt.close()
 
 fig = plt.figure(figsize=(10,10))
 ax = fig.subplots(1,1)
-sns.histplot(err_cor1_central_masked,kde=True,label='COR-1',bins=30,ax=ax,color='tab:blue')
+sns.histplot(err_cor1_central_masked,kde=True,label=detector,bins=30,ax=ax,color='tab:blue')
 sns.histplot(err_forward_central_masked,kde=True,label='PSI/FORWARD pB',bins=30,ax=ax,color='tab:orange')
 #sns.histplot(err_random_centrak_masked,kde=True, bins=30, label='Random',ax=ax, color='tab:green')
 #x_axis = np.linspace(-90, 90, len(KDE_cor1_central_deg_new))
@@ -288,7 +291,7 @@ norm_kde_cor1 = (KDE_cor1_central_deg_new/max(KDE_cor1_central_deg_new))*norm_ma
 #sns.kdeplot()
 ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
 ax.set_ylabel('Pixel Count',fontsize=14)
-ax.set_title('QRaFT Feature Tracing Performance Against Central POS $B$ Field (L > {})'.format(mask),fontsize=15)
+ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field (L > {})'.format(detector, mask),fontsize=15)
 ax.set_xlim(-95,95)
 #ax.set_ylim(0,0.07)
 ax.legend(fontsize=13)
@@ -296,7 +299,7 @@ ax.legend(fontsize=13)
 # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
-plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_COR1_vs_FORWARD_Feature_Tracing_Performance_masked_L{}.png'.format(mask)))
+plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_masked_L{}.png'.format(detector.replace('-',''), mask)))
 plt.show()
 
 

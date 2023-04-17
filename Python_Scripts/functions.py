@@ -66,6 +66,7 @@ def create_results_dictionary(input_dict, date, masked=False):
     err_random_new = input_dict['err_random']
     L_cor1 = input_dict['L_cor1']
     L_forward = input_dict['L_forward']
+    detector = input_dict['detector']
 
     err_cor1_central_deg_new = err_cor1_central_new[np.where(err_cor1_central_new != 0)]*180/np.pi
     err_forward_cor1_central_deg_new = err_forward_cor1_central_new[np.where(err_forward_cor1_central_new != 0)]*180/np.pi
@@ -99,7 +100,7 @@ def create_results_dictionary(input_dict, date, masked=False):
 
     pd.set_option('display.float_format', '{:.3E}'.format)
     stats_df = pd.DataFrame(combined_dict)
-    stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
+    stats_df.columns = ['metric', '{} vs psi pB'.format(detector), '{} vs random'.format(detector), 'psi pB vs random']
     print(stats_df.to_latex(index=False))
 
     what = sns.histplot(err_random_deg_new,kde=True, bins=30)
@@ -116,7 +117,7 @@ def create_results_dictionary(input_dict, date, masked=False):
 
     fig = plt.figure(figsize=(10,10))
     ax = fig.subplots(1,1)
-    sns.histplot(err_cor1_central_deg_new,kde=True,label='COR-1',bins=30,ax=ax,color='tab:blue')
+    sns.histplot(err_cor1_central_deg_new,kde=True,label=detector,bins=30,ax=ax,color='tab:blue')
     sns.histplot(err_forward_cor1_central_deg_new,kde=True,label='PSI/FORWARD pB',bins=30,ax=ax,color='tab:orange')
     #sns.histplot(err_random_deg_new,kde=True, bins=30, label='Random',ax=ax, color='tab:green')
     #x_axis = np.linspace(-90, 90, len(KDE_cor1_central_deg_new))
@@ -130,9 +131,9 @@ def create_results_dictionary(input_dict, date, masked=False):
     ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
     ax.set_ylabel('Pixel Count',fontsize=14)
     if masked:
-        ax.set_title('QRaFT Feature Tracing Performance Against Central POS $B$ Field {} (L > {})'.format(date, mask),fontsize=15)
+        ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field {} (L > {})'.format(detector, date, mask),fontsize=15)
     else:
-        ax.set_title('QRaFT Feature Tracing Performance Against Central POS $B$ Field {}'.format(date),fontsize=15)
+        ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field {}'.format(detector, date),fontsize=15)
     ax.set_xlim(-95,95)
     #ax.set_ylim(0,0.07)
     ax.legend(fontsize=13)
@@ -141,9 +142,9 @@ def create_results_dictionary(input_dict, date, masked=False):
     # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
     # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
     if masked:
-        plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_COR1_vs_FORWARD_Feature_Tracing_Performance_{}_L_gt_{}.png'.format(date, mask)))
+        plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_{}_L_gt_{}.png'.format(detector.replace('-',''), date, mask)))
     else:
-        plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_COR1_vs_FORWARD_Feature_Tracing_Performance_{}.png'.format(date)))
+        plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_{}.png'.format(detector.replace('-',''), date)))
     plt.show()
 
     if masked:
@@ -332,6 +333,6 @@ def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
     plt.savefig(outpath)
     # plt.show()
     plt.close()
-    
+
 
     return fig

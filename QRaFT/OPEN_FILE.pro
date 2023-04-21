@@ -69,6 +69,12 @@ FUNCTION OPEN_FILE, fname,  P, exten_no=exten_no, header=header
        img=float(remove_occult(img,P))
 
     end
+    'PSI_MLSO': begin
+      img = readfits(fname, header, exten_no=exten_no, /silent)
+      w = where((img lt 0) or ~finite(img)) & if w[0] ne -1 then img[w]=0.0
+      img=remove_occult(img,P)
+
+    end
 
     'ECL1': begin
        img = read_png(fname)

@@ -48,6 +48,15 @@ def JS_Div(p, q):
     m = (p + q) / 2
     return (KL_div(p, m) + KL_div(q, m)) / 2
 
+def remove_nans_infs(array):
+
+    # Find the indices of NaNs and Infs in the array
+    nan_indices = np.isnan(array)
+    inf_indices = np.isinf(array)
+
+    # Filter out NaNs and Infs from the array
+    return array[~nan_indices & ~inf_indices]
+
 def calculate_KDE_statistics(KDE_1, KDE_2):
 
     #compute JS Divergence
@@ -58,26 +67,45 @@ def calculate_KDE_statistics(KDE_1, KDE_2):
 
     return result_JSD, result_KLD
 
-def create_results_dictionary(input_dict, date, masked=False):
+def create_results_dictionary(input_dict, date, detector, masked=False):
     # convert arrays from radians to degrees
 
-    err_cor1_central_new = input_dict['err_cor1_central']
-    err_forward_cor1_central_new = input_dict['err_psi_central']
-    err_random_new = input_dict['err_random']
-    L_cor1 = input_dict['L_cor1']
-    L_forward = input_dict['L_forward']
-    detector = input_dict['detector']
+    if detector == 'COR-1':
+        err_cor1_central_new = input_dict['err_cor1_central']
+        err_forward_cor1_central_new = input_dict['err_psi_central']
+        err_random_new = input_dict['err_random']
+        L_cor1 = input_dict['L_cor1']
+        L_forward = input_dict['L_forward']
+        detector = input_dict['detector']
+    elif detector == 'K-COR':
+        err_cor1_central_new = input_dict['err_mlso_central']
+        err_forward_cor1_central_new = input_dict['err_psi_central']
+        err_random_new = input_dict['err_random']
+        L_cor1 = input_dict['L_mlso']
+        L_forward = input_dict['L_forward']
 
-    err_cor1_central_deg_new = err_cor1_central_new[np.where(err_cor1_central_new != 0)]*180/np.pi
-    err_forward_cor1_central_deg_new = err_forward_cor1_central_new[np.where(err_forward_cor1_central_new != 0)]*180/np.pi
-    err_random_deg_new = err_random_new[np.where(err_random_new != 0)]*180/np.pi
     L_cor1_new = L_cor1[np.where(err_cor1_central_new != 0)]
     L_forward_new = L_forward[np.where(err_forward_cor1_central_new != 0)]
+    err_cor1_central_deg_new = err_cor1_central_new[np.where(err_cor1_central_new != 0)]*180/np.pi
+    err_cor1_central_deg_new = remove_nans_infs(err_cor1_central_deg_new)
+    err_forward_cor1_central_deg_new = err_forward_cor1_central_new[np.where(err_forward_cor1_central_new != 0)]*180/np.pi
+    err_forward_cor1_central_deg_new = remove_nans_infs(err_forward_cor1_central_deg_new)
+    err_random_deg_new = err_random_new[np.where(err_random_new != 0)]*180/np.pi
+    err_random_deg_new = remove_nans_infs(err_random_deg_new)
+
+    L_cor1_new = remove_nans_infs(L_cor1_new)
+    L_forward_new = remove_nans_infs(L_forward_new)
 
     if masked:
-        mask = 50
+        if detector == 'COR-1':
+            mask = 50
+        elif detector == 'K-COR':
+            mask = 20
         err_cor1_central_deg_new = err_cor1_central_deg_new[np.where(L_cor1_new > mask)]
+        err_cor1_central_deg_new = remove_nans_infs(err_cor1_central_deg_new)
         err_forward_cor1_central_deg_new = err_forward_cor1_central_deg_new[np.where(L_forward_new > mask)]
+        err_forward_cor1_central_deg_new = remove_nans_infs(err_forward_cor1_central_deg_new)
+
 
 
     x_1_cor1_central_deg_new, KDE_cor1_central_deg_new = calculate_KDE(err_cor1_central_deg_new)
@@ -94,9 +122,14 @@ def create_results_dictionary(input_dict, date, masked=False):
                         psi_v_random=[KLDcor1_forward_central_random_new, JSD_COR1_Forward_Central_Random_new])
 
     data_dict = {}
-    data_dict['cor1_central'] = err_cor1_central_deg_new
-    data_dict['forward_central'] = err_forward_cor1_central_deg_new
-    data_dict['random'] = err_random_deg_new
+    if detector == 'COR-1':
+        data_dict['cor1_central'] = err_cor1_central_deg_new
+        data_dict['forward_central'] = err_forward_cor1_central_deg_new
+        data_dict['random'] = err_random_deg_new
+    elif detector == 'K-COR':
+        data_dict['mlso_central'] = err_cor1_central_deg_new
+        data_dict['forward_central'] = err_forward_cor1_central_deg_new
+        data_dict['random'] = err_random_deg_new
 
     pd.set_option('display.float_format', '{:.3E}'.format)
     stats_df = pd.DataFrame(combined_dict)

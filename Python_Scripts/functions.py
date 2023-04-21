@@ -23,6 +23,12 @@ import seaborn as sns
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
 
+
+def filter_nan_singular(array):
+    nan_indices = np.isnan(array)
+    inf_indices = np.isinf(array)
+    return array[~nan_indices & ~inf_indices]
+
 def calculate_KDE(err_array):
     # set minimum and maximum x values for gaussian kde calculation
     xmin = min(err_array)
@@ -99,7 +105,7 @@ def create_results_dictionary(input_dict, date, detector, masked=False):
     err_forward_cor1_central_deg_new = err_forward_cor1_central_new[np.where(err_forward_cor1_central_new != 0)]*180/np.pi
     err_forward_cor1_central_deg_new, L_forward_new = remove_nans_infs(err_forward_cor1_central_deg_new, L_forward_new)
     err_random_deg_new = err_random_new[np.where(err_random_new != 0)]*180/np.pi
-    #err_random_deg_new = remove_nans_infs(err_random_deg_new)
+    err_random_deg_new = filter_nan_singular(err_random_deg_new)
 
     #L_cor1_new = remove_nans_infs(L_cor1_new)
     #L_forward_new = remove_nans_infs(L_forward_new)
@@ -110,9 +116,9 @@ def create_results_dictionary(input_dict, date, detector, masked=False):
         elif detector == 'K-COR':
             mask = 25
         err_cor1_central_deg_new = err_cor1_central_deg_new[np.where(L_cor1_new > mask)]
-        #err_cor1_central_deg_new = remove_nans_infs(err_cor1_central_deg_new)
+        err_cor1_central_deg_new, L_cor1_new = remove_nans_infs(err_cor1_central_deg_new, L_cor1_new)
         err_forward_cor1_central_deg_new = err_forward_cor1_central_deg_new[np.where(L_forward_new > mask)]
-        #err_forward_cor1_central_deg_new = remove_nans_infs(err_forward_cor1_central_deg_new)
+        err_forward_cor1_central_deg_new, L_forward_new = remove_nans_infs(err_forward_cor1_central_deg_new, L_forward_new)
 
 
 

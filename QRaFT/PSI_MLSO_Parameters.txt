@@ -22,8 +22,8 @@
 # blob_detect_n_segments: number of segments in each interpolated feature used to compute orientaiton angles
 #
 data_source = PSI_MLSO
-Xcenter = 511
-Ycenter = 511
+Xcenter = 513
+Ycenter = 513
 Rot_angle = 0.0
 Rs = 205
 d_roi = 0

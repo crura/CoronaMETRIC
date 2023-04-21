@@ -37,6 +37,9 @@ jobs:
           source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
           conda init bash &&
           conda activate test_env &&
+          python3 -m venv env &&
+          source env/bin/activate &&
+          pip install -r requirements.txt &&
           git_repo=$(git rev-parse --show-toplevel) &&
           (echo "ssw_path" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/string/strjustify.pro'" &&
@@ -72,6 +75,8 @@ jobs:
           echo "run_code" &&
           cat) |
           /Users/crura/Documents/bin/ssw
+          deactivate &&
+          rm -rf env
 
 
       - uses: actions/upload-artifact@v3
@@ -87,6 +92,9 @@ jobs:
           source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
           conda init bash &&
           conda activate test_env &&
+          python3 -m venv env &&
+          source env/bin/activate &&
+          pip install -r requirements.txt &&
           git_repo=$(git rev-parse --show-toplevel) &&
           mkdir -p $git_repo/Output/QRaFT_Results &&
           cd $git_repo/QRaFT &&
@@ -127,6 +135,8 @@ jobs:
           echo "script3, '$git_repo/Output/fits_images/', '$git_repo/Output/QRaFT_Results/',  err_arr_MLSO,  err_arr_LOS_MLSO, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_MLSO, L_FORWARD, /manual" &&
           cat) |
           /Users/crura/Documents/bin/ssw
+          deactivate &&
+          rm -rf env
 
 
       - uses: actions/upload-artifact@v3

@@ -111,10 +111,32 @@ function compare_angles,  f_corona,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, isplot=ispl
   LOS_integrated_By_2D = readfits(f_By_LOS)
   LOS_integrated_Bz_2D = readfits(f_Bz_LOS)
 
-  By = congrid(By_2D,512,512)
-  Bz = congrid(Bz_2D,512,512)
-  By_LOS = congrid(LOS_integrated_By_2D,512,512)
-  Bz_LOS = congrid(LOS_integrated_Bz_2D,512,512)
+
+  if data_source eq 'MLSO2016' or data_source eq 'PSI_MLSO' then begin
+    By = congrid(By_2D,1024,1024)
+    Bz = congrid(Bz_2D,1024,1024)
+    By_LOS = congrid(LOS_integrated_By_2D,1024,1024)
+    Bz_LOS = congrid(LOS_integrated_Bz_2D,1024,1024)
+
+    By_rnd = randomu(seed1, 1024, 1024)
+    Bz_rnd = randomu(seed2, 1024, 1024)
+
+  endif else begin
+    By = congrid(By_2D,512,512)
+    Bz = congrid(Bz_2D,512,512)
+    By_LOS = congrid(LOS_integrated_By_2D,512,512)
+    Bz_LOS = congrid(LOS_integrated_Bz_2D,512,512)
+
+    By_rnd = randomu(seed1, 512, 512)
+    Bz_rnd = randomu(seed2, 512, 512)
+
+  endelse
+
+
+  ;By = congrid(By_2D,512,512)
+  ;Bz = congrid(Bz_2D,512,512)
+  ;By_LOS = congrid(LOS_integrated_By_2D,512,512)
+  ;Bz_LOS = congrid(LOS_integrated_Bz_2D,512,512)
 
   features = process_corona(f_corona,data_source, thresh_k=thresh_k, IMG_enh=IMG_enh, P=P, manual=manual)  ; using  'PSI' rescales MLSO image to match the B-field arrays
 
@@ -122,8 +144,8 @@ function compare_angles,  f_corona,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, isplot=ispl
  err_LOS = features_vs_B(features, By_LOS, Bz_LOS, angle_err_avr = err_avr_LOS, angle_err_sd = err_sd_LOS, angle_err_signed=err_signed_LOS)
 
  ; random test:
- By_rnd = randomu(seed1, 512, 512)
- Bz_rnd = randomu(seed2, 512, 512)
+ ;By_rnd = randomu(seed1, 512, 512)
+ ;Bz_rnd = randomu(seed2, 512, 512)
  err_rnd = features_vs_B(features, By_rnd, Bz_rnd, angle_err_avr = err_avr_rnd, angle_err_signed=err_signed_rnd)
 
  Lmin = 1 ; 30 ; can be adjusted
@@ -241,7 +263,7 @@ PRO script3, input_directory,  output_directory,  err_arr_MLSO,  err_arr_LOS_MLS
      f_err_sav = out_dir + repstr(file_basename(f_pb[i]), '_pB.fits', '.sav'); + '/'  + date_str+ '_' + detector_str +  '_errors.sav'
 
       res_MLSO = compare_angles( f_MLSO[i],  f_By[i], f_Bz[i], f_By_LOS[i], f_Bz_LOS[i], data_source='MLSO2016', manual=manual)  ;hist_x=hist_x, hist_y=hist_y
-      res_FORWARD = compare_angles( f_pB[i],  f_By[i], f_Bz[i], f_By_LOS[i], f_Bz_LOS[i], data_source='PSI', manual=manual)  ;hist_x=hist_x, hist_y=hist_y
+      res_FORWARD = compare_angles( f_pB[i],  f_By[i], f_Bz[i], f_By_LOS[i], f_Bz_LOS[i], data_source='PSI_MLSO', thresh_k = 0.2, manual=manual)  ;hist_x=hist_x, hist_y=hist_y
 
 
 

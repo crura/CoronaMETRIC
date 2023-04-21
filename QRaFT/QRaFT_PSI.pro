@@ -241,7 +241,7 @@ PRO script3, input_directory,  output_directory,  err_arr_MLSO,  err_arr_LOS_MLS
      f_err_sav = out_dir + repstr(file_basename(f_pb[i]), '_pB.fits', '.sav'); + '/'  + date_str+ '_' + detector_str +  '_errors.sav'
 
       res_MLSO = compare_angles( f_MLSO[i],  f_By[i], f_Bz[i], f_By_LOS[i], f_Bz_LOS[i], data_source='MLSO2016', manual=manual)  ;hist_x=hist_x, hist_y=hist_y
-      res_FORWARD = compare_angles( f_pB[i],  f_By[i], f_Bz[i], f_By_LOS[i], f_Bz_LOS[i], data_source='PSI' manual=manual)  ;hist_x=hist_x, hist_y=hist_y
+      res_FORWARD = compare_angles( f_pB[i],  f_By[i], f_Bz[i], f_By_LOS[i], f_Bz_LOS[i], data_source='PSI', manual=manual)  ;hist_x=hist_x, hist_y=hist_y
 
 
 

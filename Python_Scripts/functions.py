@@ -48,14 +48,22 @@ def JS_Div(p, q):
     m = (p + q) / 2
     return (KL_div(p, m) + KL_div(q, m)) / 2
 
-def remove_nans_infs(array):
+def remove_nans_infs(array, array2):
 
     # Find the indices of NaNs and Infs in the array
     nan_indices = np.isnan(array)
     inf_indices = np.isinf(array)
 
+    filtered_array = array[~nan_indices & ~inf_indices]
+    filtered_array2 = np.delete(array2, np.where(nan_indices | inf_indices))
+
+    if len(filtered_array) < len(array):
+        filtered = True
+    else:
+        filtered = False
+
     # Filter out NaNs and Infs from the array
-    return array[~nan_indices & ~inf_indices]
+    return filtered_array, filtered_array2
 
 def calculate_KDE_statistics(KDE_1, KDE_2):
 
@@ -87,24 +95,24 @@ def create_results_dictionary(input_dict, date, detector, masked=False):
     L_cor1_new = L_cor1[np.where(err_cor1_central_new != 0)]
     L_forward_new = L_forward[np.where(err_forward_cor1_central_new != 0)]
     err_cor1_central_deg_new = err_cor1_central_new[np.where(err_cor1_central_new != 0)]*180/np.pi
-    err_cor1_central_deg_new = remove_nans_infs(err_cor1_central_deg_new)
+    err_cor1_central_deg_new, L_cor1_new = remove_nans_infs(err_cor1_central_deg_new, L_cor1_new)
     err_forward_cor1_central_deg_new = err_forward_cor1_central_new[np.where(err_forward_cor1_central_new != 0)]*180/np.pi
-    err_forward_cor1_central_deg_new = remove_nans_infs(err_forward_cor1_central_deg_new)
+    err_forward_cor1_central_deg_new, L_forward_new = remove_nans_infs(err_forward_cor1_central_deg_new, L_forward_new)
     err_random_deg_new = err_random_new[np.where(err_random_new != 0)]*180/np.pi
-    err_random_deg_new = remove_nans_infs(err_random_deg_new)
+    #err_random_deg_new = remove_nans_infs(err_random_deg_new)
 
-    L_cor1_new = remove_nans_infs(L_cor1_new)
-    L_forward_new = remove_nans_infs(L_forward_new)
+    #L_cor1_new = remove_nans_infs(L_cor1_new)
+    #L_forward_new = remove_nans_infs(L_forward_new)
 
     if masked:
         if detector == 'COR-1':
             mask = 50
         elif detector == 'K-COR':
-            mask = 20
+            mask = 25
         err_cor1_central_deg_new = err_cor1_central_deg_new[np.where(L_cor1_new > mask)]
-        err_cor1_central_deg_new = remove_nans_infs(err_cor1_central_deg_new)
+        #err_cor1_central_deg_new = remove_nans_infs(err_cor1_central_deg_new)
         err_forward_cor1_central_deg_new = err_forward_cor1_central_deg_new[np.where(L_forward_new > mask)]
-        err_forward_cor1_central_deg_new = remove_nans_infs(err_forward_cor1_central_deg_new)
+        #err_forward_cor1_central_deg_new = remove_nans_infs(err_forward_cor1_central_deg_new)
 
 
 

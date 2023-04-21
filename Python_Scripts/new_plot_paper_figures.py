@@ -29,6 +29,7 @@ from functions import create_six_fig_plot
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
+"""
 data_dir = os.path.join(repo_path,'Data/QRaFT/errors.sav')
 
 idl_save_qraft = readsav(data_dir)
@@ -37,6 +38,7 @@ err_mlso_los = idl_save_qraft['ERR_ARR_LOS_MLSO']
 err_forward_central = idl_save_qraft['ERR_ARR_FORWARD']
 err_forward_los = idl_save_qraft['ERR_ARR_LOS_FORWARD']
 err_random = idl_save_qraft['ERR_ARR_RND']
+"""
 
 idl_save = readsav(os.path.join(repo_path,'Data/model_parameters.sav'))
 idl_save_outstring = readsav(os.path.join(repo_path,'Data/outstrings.sav'))
@@ -91,7 +93,7 @@ print(directory_list_1, outstring_list_1, directory_list_2, outstring_list_2)
 print(occlt_list_1, occlt_list_2)
 
 
-os.path.join(repo_path,'Data/QRaFT/errors.sav')
+# os.path.join(repo_path,'Data/QRaFT/errors.sav')
 
 
 def display_fits_images(fits_files, occlt_list, outpath):

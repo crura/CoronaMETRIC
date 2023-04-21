@@ -153,8 +153,7 @@ jobs:
           pip install -r requirements.txt &&
           python Python_Scripts/new_plot_paper_figures.py
           python Python_Scripts/calculate_KDE_statistics.py
-          deactivate &&
-          rm -rf env
+          deactivate 
 
       - uses: actions/upload-artifact@v3
         with:

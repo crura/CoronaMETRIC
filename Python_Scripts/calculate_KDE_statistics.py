@@ -39,6 +39,8 @@ repo_path = repo.working_tree_dir
 
 datapath = join(repo_path, 'Output/QRaFT_Results')
 datafiles = [join(datapath,f) for f in listdir(datapath) if isfile(join(datapath,f)) and f !='.DS_Store']
+file_path = join(repo_path, 'Output/Plots/results.txt')
+file = open(file_path, 'w')
 
 #def run_calculations(datafiles, detector):
 
@@ -66,7 +68,7 @@ detector = 'COR-1'
 for i in datafiles:
     if detector == 'COR-1':
         if i.endswith('COR1__PSI.sav'):
-            date_str = i.rstrip('OR1__PSI.sav')[-11:].rstrip('__C')
+            date_str = i.rstrip('OR1__PSI.sav')[-13:].rstrip('__C')
             sub_dict = {}
             idl_save = readsav(i)
             sub_dict['err_cor1_central'] = idl_save['ERR_SIGNED_ARR_COR1']
@@ -85,7 +87,8 @@ for i in datafiles:
             date_dict[date_str] = sub_dict
     elif detector == 'K-COR':
         if i.endswith('KCor__PSI.sav'):
-            date_str = i.rstrip('Cor__PSI.sav')[-10:].rstrip('__K')
+            date_str_full = i
+            date_str = i.rstrip('__KCor__PSI.sav')[-13:]
             sub_dict = {}
             idl_save = readsav(i)
             sub_dict['err_mlso_central'] = idl_save['ERR_SIGNED_ARR_MLSO']
@@ -105,8 +108,8 @@ for i in datafiles:
 
 
 for i in date_dict.keys():
-    results, data = create_results_dictionary(date_dict[i], i, detector)
-    results_masked, data_masked, mask = create_results_dictionary(date_dict[i], i, detector, True)
+    results, data = create_results_dictionary(date_dict[i], i, detector, file)
+    results_masked, data_masked, mask = create_results_dictionary(date_dict[i], i, detector, file, True)
     print(i)
     if detector == 'COR-1':
         err_cor1_central_masked = np.concatenate([err_cor1_central_masked, data_masked['cor1_central']])
@@ -153,7 +156,8 @@ combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
 pd.set_option('display.float_format', '{:.3E}'.format)
 stats_df = pd.DataFrame(combined_dict)
 stats_df.columns = ['metric', '{} vs psi pB'.format(detector), '{} vs random'.format(detector), 'psi pB vs random']
-print(stats_df.to_latex(index=False))
+#print(stats_df.to_latex(index=False))
+#file.write(stats_df.to_latex(index=False))
 
 """
 xmin_random = min(err_random_deg_new)
@@ -214,7 +218,10 @@ combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
 pd.set_option('display.float_format', '{:.3E}'.format)
 stats_df = pd.DataFrame(combined_dict)
 stats_df.columns = ['metric', '{} vs psi pB'.format(detector), '{} vs random'.format(detector), 'psi pB vs random']
+print('\n Combined Results: \n')
 print(stats_df.to_latex(index=False))
+file.write('\n Combined Results: \n')
+file.write(stats_df.to_latex(index=False))
 
 print("")
 
@@ -235,7 +242,9 @@ combined_dict = dict(metric=['average discrepancy', 'median discrepancy'],
 pd.set_option('display.float_format', '{:.3f}'.format)
 stats_df = pd.DataFrame(combined_dict)
 #stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
+
 print(stats_df.to_latex(index=False))
+file.write(stats_df.to_latex(index=False))
 """
 # Generate figure for combined plot of COR-1 and MLSO K-COR datasets
 fig, ax = plt.subplots(1,2,figsize=(24,9))
@@ -290,7 +299,12 @@ combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
 pd.set_option('display.float_format', '{:.3E}'.format)
 stats_df = pd.DataFrame(combined_dict)
 stats_df.columns = ['metric', '{} vs psi pB (L > {})'.format(detector,mask), '{} vs random (L> {})'.format(detector,mask), 'psi pB vs random (L > {})'.format(mask)]
+
+print('\n Combined results (L > {}):\n'.format(mask))
 print(stats_df.to_latex(index=False))
+file.write('\n Combined results (L > {}):\n'.format(mask))
+file.write(stats_df.to_latex(index=False))
+#file.write(stats_df.to_latex(index=False))
 
 """
 xmin_random = min(err_random_centrak_masked)
@@ -357,6 +371,7 @@ pd.set_option('display.float_format', '{:.3f}'.format)
 stats_df = pd.DataFrame(combined_dict)
 #stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
 print(stats_df.to_latex(index=False))
+file.write(stats_df.to_latex(index=False))
 
 
 
@@ -405,7 +420,7 @@ for i in datafiles:
             date_dict[date_str] = sub_dict
     elif detector == 'K-COR':
         if i.endswith('KCor__PSI.sav'):
-            date_str = i.rstrip('Cor__PSI.sav')[-10:].rstrip('__K')
+            date_str = i.rstrip('KCor__PSI.sav')[-10:]
             sub_dict = {}
             idl_save = readsav(i)
             sub_dict['err_mlso_central'] = idl_save['ERR_SIGNED_ARR_MLSO']
@@ -425,8 +440,8 @@ for i in datafiles:
 
 
 for i in date_dict.keys():
-    results, data = create_results_dictionary(date_dict[i], i, detector)
-    results_masked, data_masked, mask = create_results_dictionary(date_dict[i], i, detector, True)
+    results, data = create_results_dictionary(date_dict[i], i, detector, file)
+    results_masked, data_masked, mask = create_results_dictionary(date_dict[i], i, detector, file, True)
     print(i)
     if detector == 'COR-1':
         err_cor1_central_masked = np.concatenate([err_cor1_central_masked, data_masked['cor1_central']])
@@ -473,7 +488,10 @@ combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
 pd.set_option('display.float_format', '{:.3E}'.format)
 stats_df = pd.DataFrame(combined_dict)
 stats_df.columns = ['metric', '{} vs psi pB'.format(detector), '{} vs random'.format(detector), 'psi pB vs random']
+print('\n Combined Results: \n')
 print(stats_df.to_latex(index=False))
+file.write('\n Combined Results: \n')
+file.write(stats_df.to_latex(index=False))
 
 """
 xmin_random = min(err_random_deg_new)
@@ -534,7 +552,8 @@ combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
 pd.set_option('display.float_format', '{:.3E}'.format)
 stats_df = pd.DataFrame(combined_dict)
 stats_df.columns = ['metric', '{} vs psi pB'.format(detector), '{} vs random'.format(detector), 'psi pB vs random']
-print(stats_df.to_latex(index=False))
+#print(stats_df.to_latex(index=False))
+#file.write(stats_df.to_latex(index=False))
 
 print("")
 
@@ -556,6 +575,7 @@ pd.set_option('display.float_format', '{:.3f}'.format)
 stats_df = pd.DataFrame(combined_dict)
 #stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
 print(stats_df.to_latex(index=False))
+file.write(stats_df.to_latex(index=False))
 """
 # Generate figure for combined plot of COR-1 and MLSO K-COR datasets
 fig, ax = plt.subplots(1,2,figsize=(24,9))
@@ -610,7 +630,10 @@ combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
 pd.set_option('display.float_format', '{:.3E}'.format)
 stats_df = pd.DataFrame(combined_dict)
 stats_df.columns = ['metric', '{} vs psi pB (L > {})'.format(detector,mask), '{} vs random (L> {})'.format(detector,mask), 'psi pB vs random (L > {})'.format(mask)]
+print('\n Combined results (L > {}):\n'.format(mask))
 print(stats_df.to_latex(index=False))
+file.write('\n Combined results (L > {}):\n'.format(mask))
+file.write(stats_df.to_latex(index=False))
 
 """
 xmin_random = min(err_random_centrak_masked)
@@ -677,6 +700,9 @@ pd.set_option('display.float_format', '{:.3f}'.format)
 stats_df = pd.DataFrame(combined_dict)
 #stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
 print(stats_df.to_latex(index=False))
+file.write(stats_df.to_latex(index=False))
 
 #run_calculations(datafiles, 'COR-1')
 #run_calculations(datafiles, 'K-COR')
+
+file.close()

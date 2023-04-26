@@ -81,7 +81,7 @@ def calculate_KDE_statistics(KDE_1, KDE_2):
 
     return result_JSD, result_KLD
 
-def create_results_dictionary(input_dict, date, detector, masked=False):
+def create_results_dictionary(input_dict, date, detector, file, masked=False):
     # convert arrays from radians to degrees
 
     if detector == 'COR-1':
@@ -115,10 +115,15 @@ def create_results_dictionary(input_dict, date, detector, masked=False):
             mask = 50
         elif detector == 'K-COR':
             mask = 25
+        print('\n Results for {} (L > {}): \n'.format(date, mask))
+        file.write('\n Results for {} (L > {}): \n'.format(date, mask))
         err_cor1_central_deg_new = err_cor1_central_deg_new[np.where(L_cor1_new > mask)]
         err_cor1_central_deg_new, L_cor1_new = remove_nans_infs(err_cor1_central_deg_new, L_cor1_new)
         err_forward_cor1_central_deg_new = err_forward_cor1_central_deg_new[np.where(L_forward_new > mask)]
         err_forward_cor1_central_deg_new, L_forward_new = remove_nans_infs(err_forward_cor1_central_deg_new, L_forward_new)
+    else:
+        print('\n Results for {}: \n'.format(date))
+        file.write('\n Results for {}: \n'.format(date))
 
 
 
@@ -145,10 +150,34 @@ def create_results_dictionary(input_dict, date, detector, masked=False):
         data_dict['forward_central'] = err_forward_cor1_central_deg_new
         data_dict['random'] = err_random_deg_new
 
+    cor1_avg = np.round(np.average(abs(err_cor1_central_deg_new)),5)
+    forward_avg = np.round(np.average(abs(err_forward_cor1_central_deg_new)),5)
+    random_avg = np.round(np.average(abs(err_random_deg_new)),5)
+
+    cor1_med = np.round(np.median(abs(err_cor1_central_deg_new)),5)
+    forward_med = np.round(np.median(abs(err_forward_cor1_central_deg_new)),5)
+    random_med = np.round(np.median(abs(err_random_deg_new)),5)
+
+
+    combined_dict = dict(metric=['average discrepancy', 'median discrepancy'],
+                        cor1=[cor1_avg, cor1_med],
+                       psi=[forward_avg, forward_med],
+                        random=[random_avg, random_med])
+
+
+    pd.set_option('display.float_format', '{:.3f}'.format)
+    accuracy_stats_df = pd.DataFrame(combined_dict)
+    accuracy_stats_df.columns = ['metric', '{}'.format(detector), 'psi'.format(detector), 'random']
+    #stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
+    print(accuracy_stats_df.to_latex(index=False))
+    file.write(accuracy_stats_df.to_latex(index=False))
+
+
     pd.set_option('display.float_format', '{:.3E}'.format)
     stats_df = pd.DataFrame(combined_dict)
     stats_df.columns = ['metric', '{} vs psi pB'.format(detector), '{} vs random'.format(detector), 'psi pB vs random']
     print(stats_df.to_latex(index=False))
+    file.write(stats_df.to_latex(index=False))
 
     what = sns.histplot(err_random_deg_new,kde=True, bins=30)
     norm_max_random = max(what.get_lines()[0].get_data()[1])

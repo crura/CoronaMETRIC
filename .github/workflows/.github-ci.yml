@@ -153,12 +153,13 @@ jobs:
           pip install -r requirements.txt &&
           python Python_Scripts/new_plot_paper_figures.py
           python Python_Scripts/calculate_KDE_statistics.py
-          deactivate 
+          deactivate
 
       - uses: actions/upload-artifact@v3
         with:
           name: output-plots
           path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output/Plots
+          retention-days: 30
 
   #
   # Python-build:

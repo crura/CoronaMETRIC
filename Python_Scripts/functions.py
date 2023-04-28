@@ -221,7 +221,7 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
         plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_{}_L_gt_{}.png'.format(detector.replace('-',''), date, mask)))
     else:
         plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_{}.png'.format(detector.replace('-',''), date)))
-    plt.show()
+    #plt.show()
 
     if masked:
         return combined_dict, data_dict, mask

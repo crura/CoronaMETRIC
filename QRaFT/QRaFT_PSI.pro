@@ -137,7 +137,13 @@ function compare_angles,  f_corona,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, isplot=ispl
   ;By_LOS = congrid(LOS_integrated_By_2D,512,512)
   ;Bz_LOS = congrid(LOS_integrated_Bz_2D,512,512)
 
-  features = process_corona(f_corona,data_source, thresh_k=thresh_k, IMG_enh=IMG_enh, P=P, /old, /silent)  ; using  'PSI' rescales MLSO image to match the B-field arrays
+  if keyword_set(manual) then begin
+    features = process_corona(f_corona,data_source, thresh_k=thresh_k, IMG_enh=IMG_enh, P=P, /old, manual=manual)  ; using  'PSI' rescales MLSO image to match the B-field arrays
+  endif else begin
+    features = process_corona(f_corona,data_source, thresh_k=thresh_k, IMG_enh=IMG_enh, P=P, /old)  ; using  'PSI' rescales MLSO image to match the B-field arrays
+  endelse
+
+  ;features = process_corona(f_corona,data_source, thresh_k=thresh_k, IMG_enh=IMG_enh, P=P, /old, /silent)  ; using  'PSI' rescales MLSO image to match the B-field arrays
 
  err = features_vs_B(features, By, Bz, angle_err_avr = err_avr, angle_err_sd = err_sd, angle_err_signed=err_signed)
  err_LOS = features_vs_B(features, By_LOS, Bz_LOS, angle_err_avr = err_avr_LOS, angle_err_sd = err_sd_LOS, angle_err_signed=err_signed_LOS)

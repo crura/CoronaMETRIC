@@ -43,14 +43,18 @@ import seaborn as sns
 
 
 #def run_calculations(datafiles, detector):
+repo = git.Repo('.', search_parent_directories=True)
+repo_path = repo.working_tree_dir
 
+optimization_array = []
+x_list = []
 
 def filter_nan(array):
     nan_indices = np.isnan(array)
     inf_indices = np.isinf(array)
     return array[~nan_indices & ~inf_indices]
 
-def optimize_for_avg(detector):
+def optimize_for_avg(detector, optimization_array):
     
     repo = git.Repo('.', search_parent_directories=True)
     repo_path = repo.working_tree_dir
@@ -357,6 +361,7 @@ def optimize_for_avg(detector):
     # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
     plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_masked_L{}.png'.format(detector.replace('-',''), mask)))
     #plt.show()
+    plt.close()
     
     
     cor1_avg = np.round(np.average(abs(err_cor1_central_masked)),5)
@@ -380,6 +385,8 @@ def optimize_for_avg(detector):
     print(stats_df.to_latex(index=False))
     file.write(stats_df.to_latex(index=False))
     
+    optimization_array.append(cor1_avg)
+    
     #run_calculations(datafiles, 'COR-1')
     #run_calculations(datafiles, 'K-COR')
     
@@ -389,6 +396,7 @@ def optimize_for_avg(detector):
 from scipy.optimize import minimize_scalar
 import subprocess
 
+
 def objective(x):
     
     cmd = ['./execute_qraft.sh', str(x)]
@@ -397,18 +405,58 @@ def objective(x):
 
     # Print the output of the script
     print(result.stdout.decode('utf-8'))
+    x_list.append(x)
     
     
 
 
-    hi = optimize_for_avg('K-COR')
+    hi = optimize_for_avg('K-COR', optimization_array)
     return hi
 
 # define the bounds
-bounds = (0, 10)
+bounds = (0, 3)
 
 # perform constrained optimization
 result = minimize_scalar(lambda x: objective(x), bounds=bounds, method='bounded')
 
 # print the result
 print(f"The minimum value of y is {result.fun:.4f} at x={result.x:.4f}")
+
+
+# initialize lists to store x and y values
+#x_vals = []
+#y_vals = []
+
+# perform constrained optimization
+#result = minimize_scalar(lambda x: objective(x), bounds=bounds, method='bounded', callback=lambda xk: (x_vals.append(xk), y_vals.append(objective(xk))))
+
+# plot the values of y as x is minimized
+fig = plt.figure()
+plt.plot(x_list, optimization_array)
+plt.xlabel('Iteration')
+plt.ylabel('Value of y')
+plt.title('Minimization of y')
+#plt.show()
+detector = 'K-COR'
+mask = 25
+plt.savefig(os.path.join(repo_path,'Output/Plots/{}_vs_FORWARD_masked_L{}_Optimization.png'.format(detector.replace('-',''), mask)))
+plt.close()
+
+fig = plt.figure()
+plt.plot(np.arange(0, len(optimization_array),1), optimization_array)
+plt.xlabel('Iteration')
+plt.ylabel('Value of y')
+plt.title('Minimization of y')
+#plt.show()
+detector = 'K-COR'
+mask = 25
+plt.savefig(os.path.join(repo_path,'Output/Plots/{}_vs_FORWARD_masked_L{}_Optimization_Indicies.png'.format(detector.replace('-',''), mask)))
+plt.close()
+
+# print the result
+print(f"The minimum value of y is {result.fun:.4f} at x={result.x:.4f}")
+
+
+
+
+

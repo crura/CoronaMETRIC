@@ -129,9 +129,9 @@ results_cor1_masked_combined, data_all = create_results_dictionary([combined_mak
 """
 
 # convert arrays from radians to degrees
-err_cor1_central_deg_new = err_cor1_central_new[np.where(err_cor1_central_new != 0)]*180/np.pi
-err_forward_cor1_central_deg_new = err_forward_cor1_central_new[np.where(err_forward_cor1_central_new != 0)]*180/np.pi
-err_random_deg_new = err_random_new[np.where(err_random_new != 0)]*180/np.pi
+err_cor1_central_deg_new = filter_nan(err_cor1_central_new[np.where(err_cor1_central_new != 0)]*180/np.pi)
+err_forward_cor1_central_deg_new = filter_nan(err_forward_cor1_central_new[np.where(err_forward_cor1_central_new != 0)]*180/np.pi)
+err_random_deg_new = filter_nan(err_random_new[np.where(err_random_new != 0)]*180/np.pi)
 
 
 err_cor1_central_deg_new_combined = err_cor1_central_deg_new.copy()
@@ -558,8 +558,11 @@ stats_df.columns = ['metric', '{} vs psi pB'.format(detector), '{} vs random'.fo
 print("")
 
 cor1_avg = np.round(np.average(abs(err_cor1_central_deg_new)),5)
+cor1_std = np.round(np.std(abs(err_cor1_central_deg_new)),5)
 forward_avg = np.round(np.average(abs(err_forward_cor1_central_deg_new)),5)
+forward_std = np.round(np.std(abs(err_forward_cor1_central_deg_new)),5)
 random_avg = np.round(np.average(abs(err_random_deg_new)),5)
+random_std = np.round(np.std(abs(err_random_deg_new)),5)
 
 cor1_med = np.round(np.median(abs(err_cor1_central_deg_new)),5)
 forward_med = np.round(np.median(abs(err_forward_cor1_central_deg_new)),5)

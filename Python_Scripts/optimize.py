@@ -40,11 +40,15 @@ from scipy.stats import gaussian_kde
 #mpl.use('TkAgg')
 from functions import KL_div, JS_Div, calculate_KDE, calculate_KDE_statistics, create_results_dictionary
 import seaborn as sns
+from scipy.optimize import minimize_scalar
+import subprocess
 
 
 #def run_calculations(datafiles, detector):
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
+
+os.chdir(repo_path)
 
 optimization_array = []
 x_list = []
@@ -119,6 +123,8 @@ def optimize_for_avg(detector, optimization_array):
                 date_dict[date_str] = sub_dict
     
     
+    length_dict = {}
+    
     for i in date_dict.keys():
         results, data = create_results_dictionary(date_dict[i], i, detector, file)
         results_masked, data_masked, mask = create_results_dictionary(date_dict[i], i, detector, file, True)
@@ -127,10 +133,12 @@ def optimize_for_avg(detector, optimization_array):
             err_cor1_central_masked = np.concatenate([err_cor1_central_masked, data_masked['cor1_central']])
             err_forward_central_masked = np.concatenate([err_forward_central_masked, data_masked['forward_central']])
             err_random_centrak_masked = np.concatenate([err_random_centrak_masked, data_masked['random']])
+            length_dict[i] = np.average(date_dict[i]['L_cor1'])
         elif detector == 'K-COR':
             err_cor1_central_masked = np.concatenate([err_cor1_central_masked, data_masked['mlso_central']])
             err_forward_central_masked = np.concatenate([err_forward_central_masked, data_masked['forward_central']])
             err_random_centrak_masked = np.concatenate([err_random_centrak_masked, data_masked['random']])
+            length_dict[i] = np.average(date_dict[i]['L_mlso'])
         #print(results)
     
     """
@@ -391,15 +399,13 @@ def optimize_for_avg(detector, optimization_array):
     #run_calculations(datafiles, 'K-COR')
     
     file.close()
-    return cor1_avg
+    return cor1_avg, length_dict
 
-from scipy.optimize import minimize_scalar
-import subprocess
 
 
 def objective(x):
     
-    cmd = ['./execute_qraft.sh', str(x)]
+    cmd = ['./execute_qraft_optimize.sh', str(x)]
     # Run the command and capture the output
     result = subprocess.run(cmd, stdout=subprocess.PIPE)
 
@@ -410,18 +416,32 @@ def objective(x):
     
 
 
-    hi = optimize_for_avg('K-COR', optimization_array)
-    return hi
+    hi, length_dict = optimize_for_avg('K-COR', optimization_array)
+    return hi, length_dict
 
 # define the bounds
-bounds = (0, 3)
+bounds = (0, 5)
 
 # perform constrained optimization
-result = minimize_scalar(lambda x: objective(x), bounds=bounds, method='bounded')
+#result = minimize_scalar(lambda x: objective(x), bounds=bounds, method='bounded')
 
 # print the result
-print(f"The minimum value of y is {result.fun:.4f} at x={result.x:.4f}")
+#print(f"The minimum value of y is {result.fun:.4f} at x={result.x:.4f}")
 
+test_values = np.arange(bounds[0],bounds[1], 0.1)
+test_values_dict = {}
+for i in test_values:
+    result, length_dict = objective(i)
+    test_values_dict[i] = length_dict
+
+
+#value_list = [1,2,3]
+#value_dict = {}
+#for i in value_list:
+#    length_dict = {}
+#    for j in date_dict.keys():
+#        length_dict[j] = np.average(date_dict[j]['L_mlso'])
+#    value_dict[i] = length_dict
 
 # initialize lists to store x and y values
 #x_vals = []
@@ -454,7 +474,7 @@ plt.savefig(os.path.join(repo_path,'Output/Plots/{}_vs_FORWARD_masked_L{}_Optimi
 plt.close()
 
 # print the result
-print(f"The minimum value of y is {result.fun:.4f} at x={result.x:.4f}")
+#print(f"The minimum value of y is {result.fun:.4f} at x={result.x:.4f}")
 
 
 

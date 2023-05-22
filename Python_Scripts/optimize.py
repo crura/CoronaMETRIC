@@ -434,7 +434,8 @@ for i in test_values:
     result, length_dict = objective(i)
     test_values_dict[i] = length_dict
 
-
+test_values_df = pd.DataFrame(test_values_dict)
+transposed_length_df = test_values_df.transpose()
 #value_list = [1,2,3]
 #value_dict = {}
 #for i in value_list:
@@ -476,6 +477,21 @@ plt.close()
 # print the result
 #print(f"The minimum value of y is {result.fun:.4f} at x={result.x:.4f}")
 
+
+# Generate a single plot with six line plots
+plt.figure(figsize=(10, 6))
+
+# Iterate over each column
+for column in transposed_length_df.columns:
+    # Plot the values against the row index
+    plt.plot(transposed_length_df.index, transposed_length_df[column], label=column)
+
+plt.title('Comparison QRaFT Feature Lengths MLSO K-COR')
+plt.xlabel('trend_k parameter')
+plt.ylabel('Average Feature Length')
+plt.legend()  # Show a legend with column names
+plt.savefig(os.path.join(repo_path,'Output/Plots/{}_Average_Feature_Length_Comparison.png'.format(detector)))
+plt.show()
 
 
 

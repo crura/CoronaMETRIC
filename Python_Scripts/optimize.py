@@ -124,6 +124,7 @@ def optimize_for_avg(detector, optimization_array):
     
     
     length_dict = {}
+    num_features_dict = {}
     
     for i in date_dict.keys():
         results, data = create_results_dictionary(date_dict[i], i, detector, file)
@@ -133,12 +134,16 @@ def optimize_for_avg(detector, optimization_array):
             err_cor1_central_masked = np.concatenate([err_cor1_central_masked, data_masked['cor1_central']])
             err_forward_central_masked = np.concatenate([err_forward_central_masked, data_masked['forward_central']])
             err_random_centrak_masked = np.concatenate([err_random_centrak_masked, data_masked['random']])
-            length_dict[i] = np.average(date_dict[i]['L_cor1'])
+            # find average feature length based on every unique length, indicating different feature
+            length_dict[i] = np.average(np.unique(date_dict[i]['L_cor1']))
+            num_features_dict[i] = len(np.unique(date_dict[i]['L_cor1']))
         elif detector == 'K-COR':
             err_cor1_central_masked = np.concatenate([err_cor1_central_masked, data_masked['mlso_central']])
             err_forward_central_masked = np.concatenate([err_forward_central_masked, data_masked['forward_central']])
             err_random_centrak_masked = np.concatenate([err_random_centrak_masked, data_masked['random']])
-            length_dict[i] = np.average(date_dict[i]['L_mlso'])
+            # find average feature length based on every unique length, indicating different feature
+            length_dict[i] = np.average(np.unique(date_dict[i]['L_mlso']))
+            num_features_dict[i] = len(np.unique(date_dict[i]['L_mlso']))
         #print(results)
     
     """
@@ -399,7 +404,7 @@ def optimize_for_avg(detector, optimization_array):
     #run_calculations(datafiles, 'K-COR')
     
     file.close()
-    return cor1_avg, length_dict
+    return cor1_avg, length_dict, num_features_dict
 
 
 
@@ -416,8 +421,8 @@ def objective(x):
     
 
 
-    hi, length_dict = optimize_for_avg('K-COR', optimization_array)
-    return hi, length_dict
+    hi, length_dict, num_features_dict = optimize_for_avg('K-COR', optimization_array)
+    return hi, length_dict, num_features_dict
 
 # define the bounds
 bounds = (0, 5)
@@ -430,12 +435,17 @@ bounds = (0, 5)
 
 test_values = np.arange(bounds[0],bounds[1], 0.1)
 test_values_dict = {}
+test_num_features_dict = {}
 for i in test_values:
-    result, length_dict = objective(i)
+    result, length_dict, num_features_dict = objective(i)
     test_values_dict[i] = length_dict
+    test_num_features_dict[i] = num_features_dict
 
 test_values_df = pd.DataFrame(test_values_dict)
 transposed_length_df = test_values_df.transpose()
+
+test_num_features_df = pd.DataFrame(test_num_features_dict)
+transposed_num_length_df = test_num_features_df.transpose()
 #value_list = [1,2,3]
 #value_dict = {}
 #for i in value_list:

@@ -114,7 +114,7 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
         if detector == 'COR-1':
             mask = 50
         elif detector == 'K-COR':
-            mask = 25
+            mask = np.min(L_cor1_new)
         print('\n Results for {} (L > {}): \n'.format(date, mask))
         file.write('\n Results for {} (L > {}): \n'.format(date, mask))
         err_cor1_central_deg_new = err_cor1_central_deg_new[np.where(L_cor1_new > mask)]
@@ -135,7 +135,7 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
     JSD_cor1_central_random_new, KLD_cor1_central_random_new = calculate_KDE_statistics(KDE_cor1_central_deg_new, KDE_random_deg_new)
     JSD_COR1_Forward_Central_Random_new, KLDcor1_forward_central_random_new = calculate_KDE_statistics(KDE_forward_cor1_central_deg_new, KDE_random_deg_new)
 
-    combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
+    combined_stats_dict = dict(metric=['KL Divergence', 'JS Divergence'],
                         cor1_v_psi=[KLD_cor1_forward_central_new, JSD_cor1_forward_central_new],
                        cor1_v_random=[KLD_cor1_central_random_new, JSD_cor1_central_random_new],
                         psi_v_random=[KLDcor1_forward_central_random_new, JSD_COR1_Forward_Central_Random_new])
@@ -158,11 +158,29 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
     forward_med = np.round(np.median(abs(err_forward_cor1_central_deg_new)),5)
     random_med = np.round(np.median(abs(err_random_deg_new)),5)
 
+    cor1_std = np.round(np.std(abs(err_cor1_central_deg_new)),5)
+    forward_std = np.round(np.std(abs(err_forward_cor1_central_deg_new)),5)
+    random_std = np.round(np.std(abs(err_random_deg_new)),5)
+
+    cor1_confidence_interval = 1.96 * (cor1_std / np.sqrt(len(err_cor1_central_deg_new)))
+    forward_confidence_interval = 1.96 * (forward_std / np.sqrt(len(err_forward_cor1_central_deg_new)))
+    random_confidence_interval = 1.96 * (random_std / np.sqrt(len(err_random_deg_new)))
+
+    cor1_confidence_interval_rounded = np.round(cor1_confidence_interval, 3)
+    forward_confidence_interval_rounded = np.round(forward_confidence_interval, 3)
+    random_confidence_interval_rounded = np.round(random_confidence_interval, 3)
+
+    cor1_avg_rounded = np.round(cor1_avg, 3)
+    forward_avg_rounded = np.round(forward_avg, 3)
+    random_avg_rounded = np.round(random_avg, 3)
+    #assert type(cor1_avg_rounded) == np.float64
+
+
 
     combined_dict = dict(metric=['average discrepancy', 'median discrepancy'],
-                        cor1=[cor1_avg, cor1_med],
-                       psi=[forward_avg, forward_med],
-                        random=[random_avg, random_med])
+                        cor1=['{} +- {}'.format(str(cor1_avg_rounded), str(cor1_confidence_interval_rounded)), cor1_med],
+                       psi=['{} +- {}'.format(str(forward_avg_rounded), str(forward_confidence_interval_rounded)), forward_med],
+                       random=['{} +- {}'.format(str(random_avg_rounded), str(random_confidence_interval_rounded)), random_med])
 
 
     pd.set_option('display.float_format', '{:.3f}'.format)
@@ -174,7 +192,7 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
 
 
     pd.set_option('display.float_format', '{:.3E}'.format)
-    stats_df = pd.DataFrame(combined_dict)
+    stats_df = pd.DataFrame(combined_stats_dict)
     stats_df.columns = ['metric', '{} vs psi pB'.format(detector), '{} vs random'.format(detector), 'psi pB vs random']
     print(stats_df.to_latex(index=False))
     file.write(stats_df.to_latex(index=False))

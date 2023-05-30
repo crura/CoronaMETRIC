@@ -254,6 +254,12 @@ def optimize_for_avg(detector, optimization_array):
     forward_avg = np.round(np.average(abs(err_forward_cor1_central_deg_new)),5)
     random_avg = np.round(np.average(abs(err_random_deg_new)),5)
     
+    cor1_std = np.round(np.std(abs(err_cor1_central_deg_new)),5)
+    forward_avg = np.round(np.average(abs(err_forward_cor1_central_deg_new)),5)
+    forward_std = np.round(np.std(abs(err_forward_cor1_central_deg_new)),5)
+    
+    cor1_confidence_interval = 1.96 * (cor1_std / np.sqrt(len(err_cor1_central_deg_new)))
+    
     cor1_med = np.round(np.median(abs(err_cor1_central_deg_new)),5)
     forward_med = np.round(np.median(abs(err_forward_cor1_central_deg_new)),5)
     random_med = np.round(np.median(abs(err_random_deg_new)),5)
@@ -503,6 +509,21 @@ plt.legend()  # Show a legend with column names
 plt.savefig(os.path.join(repo_path,'Output/Plots/{}_Average_Feature_Length_Comparison.png'.format(detector)))
 plt.show()
 
+
+# Generate a single plot with six line plots
+plt.figure(figsize=(10, 6))
+
+# Iterate over each column
+for column in transposed_num_length_df.columns:
+    # Plot the values against the row index
+    plt.plot(transposed_num_length_df.index, transposed_num_length_df[column], label=column)
+
+plt.title('Comparison QRaFT Number of Features MLSO K-COR')
+plt.xlabel('trend_k parameter')
+plt.ylabel('Number of Features Detected')
+plt.legend()  # Show a legend with column names
+plt.savefig(os.path.join(repo_path,'Output/Plots/{}_Number_of_Features_Comparison.png'.format(detector)))
+plt.show()
 
 
 

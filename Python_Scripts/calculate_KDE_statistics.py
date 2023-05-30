@@ -369,8 +369,23 @@ plt.show()
 
 
 cor1_avg = np.round(np.average(abs(err_cor1_central_masked)),5)
+cor1_std = np.round(np.std(abs(err_cor1_central_masked)),5)
 forward_avg = np.round(np.average(abs(err_forward_central_masked)),5)
+forward_std = np.round(np.std(abs(err_forward_central_masked)),5)
 random_avg = np.round(np.average(abs(err_random_centrak_masked)),5)
+random_std = np.round(np.std(abs(err_random_centrak_masked)),5)
+
+cor1_confidence_interval = 1.96 * (cor1_std / np.sqrt(len(err_cor1_central_masked)))
+forward_confidence_interval = 1.96 * (forward_std / np.sqrt(len(err_forward_central_masked)))
+random_confidence_interval = 1.96 * (random_std / np.sqrt(len(err_random_centrak_masked)))
+
+cor1_confidence_interval_rounded = np.round(cor1_confidence_interval, 3)
+forward_confidence_interval_rounded = np.round(forward_confidence_interval, 3)
+random_confidence_interval_rounded = np.round(random_confidence_interval, 3)
+
+cor1_avg_rounded = np.round(cor1_avg, 3)
+forward_avg_rounded = np.round(forward_avg, 3)
+random_avg_rounded = np.round(random_avg, 3)
 
 cor1_med = np.round(np.median(abs(err_cor1_central_masked)),5)
 forward_med = np.round(np.median(abs(err_forward_central_masked)),5)
@@ -378,9 +393,9 @@ random_med = np.round(np.median(abs(err_random_centrak_masked)),5)
 
 
 combined_dict = dict(metric=['average discrepancy (L>{})'.format(mask), 'median discrepancy (L>{})'.format(mask)],
-                    cor1=[cor1_avg, cor1_med],
-                   psi=[forward_avg, forward_med],
-                    random=[random_avg, random_med])
+                    cor1=['{} +- {}'.format(str(cor1_avg_rounded), str(cor1_confidence_interval_rounded)), cor1_med],
+                    psi=['{} +- {}'.format(str(forward_avg_rounded), str(forward_confidence_interval_rounded)), forward_med],
+                    random=['{} +- {}'.format(str(random_avg_rounded), str(random_confidence_interval_rounded)), random_med])
 
 pd.set_option('display.float_format', '{:.3f}'.format)
 stats_df = pd.DataFrame(combined_dict)
@@ -714,18 +729,33 @@ plt.show()
 
 
 cor1_avg = np.round(np.average(abs(err_cor1_central_masked)),5)
+cor1_std = np.round(np.std(abs(err_cor1_central_masked)),5)
 forward_avg = np.round(np.average(abs(err_forward_central_masked)),5)
+forward_std = np.round(np.std(abs(err_forward_central_masked)),5)
 random_avg = np.round(np.average(abs(err_random_centrak_masked)),5)
+random_std = np.round(np.std(abs(err_random_centrak_masked)),5)
+
+cor1_confidence_interval = 1.96 * (cor1_std / np.sqrt(len(err_cor1_central_masked)))
+forward_confidence_interval = 1.96 * (forward_std / np.sqrt(len(err_forward_central_masked)))
+random_confidence_interval = 1.96 * (random_std / np.sqrt(len(err_random_centrak_masked)))
+
+cor1_confidence_interval_rounded = np.round(cor1_confidence_interval, 3)
+forward_confidence_interval_rounded = np.round(forward_confidence_interval, 3)
+random_confidence_interval_rounded = np.round(random_confidence_interval, 3)
+
+cor1_avg_rounded = np.round(cor1_avg, 3)
+forward_avg_rounded = np.round(forward_avg, 3)
+random_avg_rounded = np.round(random_avg, 3)
 
 cor1_med = np.round(np.median(abs(err_cor1_central_masked)),5)
 forward_med = np.round(np.median(abs(err_forward_central_masked)),5)
 random_med = np.round(np.median(abs(err_random_centrak_masked)),5)
 
 
-combined_dict = dict(metric=['average discrepancy (L>{})'.format(mask), 'median discrepancy (L>{})'.format(mask)],
-                    kcor=[cor1_avg, cor1_med],
-                   psi=[forward_avg, forward_med],
-                    random=[random_avg, random_med])
+combined_dict = dict(metric=['average discrepancy (L>{})'.format(str(mask)), 'median discrepancy (L>{})'.format(str(mask))],
+                    kcor=['{} +- {}'.format(str(cor1_avg_rounded), str(cor1_confidence_interval_rounded)), cor1_med],
+                    psi=['{} +- {}'.format(str(forward_avg_rounded), str(forward_confidence_interval_rounded)), forward_med],
+                    random=['{} +- {}'.format(str(random_avg_rounded), str(random_confidence_interval_rounded)), random_med])
 
 pd.set_option('display.float_format', '{:.3f}'.format)
 stats_df = pd.DataFrame(combined_dict)

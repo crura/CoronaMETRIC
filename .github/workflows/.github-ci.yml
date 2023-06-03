@@ -78,10 +78,10 @@ jobs:
           deactivate
 
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: output-fits-images
-          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output/fits_images
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: output-fits-images
+      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output/fits_images
 
       # Runs a set of commands using the runners shell
       - name: Run QRaFT

@@ -112,7 +112,7 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
 
     if masked:
         if detector == 'COR-1':
-            mask = 50
+            mask = np.min(L_cor1_new)
         elif detector == 'K-COR':
             mask = np.min(L_cor1_new)
         print('\n Results for {} (L > {}): \n'.format(date, mask))

@@ -138,9 +138,9 @@ function compare_angles,  f_corona,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, isplot=ispl
   ;Bz_LOS = congrid(LOS_integrated_Bz_2D,512,512)
 
   if keyword_set(manual) then begin
-    features = process_corona(f_corona,data_source, thresh_k=thresh_k, IMG_enh=IMG_enh, P=P, manual=manual)  ; using  'PSI' rescales MLSO image to match the B-field arrays
+    features = process_corona(f_corona,data_source, thresh_k=thresh_k, IMG_enh=IMG_enh, P=P, manual=manual,/save)  ; using  'PSI' rescales MLSO image to match the B-field arrays
   endif else begin
-    features = process_corona(f_corona,data_source, thresh_k=thresh_k, IMG_enh=IMG_enh, P=P)  ; using  'PSI' rescales MLSO image to match the B-field arrays
+    features = process_corona(f_corona,data_source, thresh_k=thresh_k, IMG_enh=IMG_enh, P=P,/save)  ; using  'PSI' rescales MLSO image to match the B-field arrays
   endelse
 
   ;features = process_corona(f_corona,data_source, thresh_k=thresh_k, IMG_enh=IMG_enh, P=P, /old, /silent)  ; using  'PSI' rescales MLSO image to match the B-field arrays

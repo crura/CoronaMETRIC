@@ -42,9 +42,11 @@ echo ".compile -v '$git_repo/generate_forward_model.pro'" &&
 echo ".compile -v '$git_repo/run_code.pro'" &&
 echo ".compile -v '$git_repo/QRaFT/open_PSI.pro'" &&
 echo ".compile -v '$git_repo/QRaFT/QRaFT_PSI.pro'" &&
-# echo "script4, '$git_repo/Output/fits_images/', '$git_repo/Output/QRaFT_Results/',  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_COR1, L_FORWARD, /manual" &&
+echo "script4, '$git_repo/Output/fits_images/', '$git_repo/Output/QRaFT_Results/',  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_COR1, L_FORWARD, /manual" &&
 echo "script3, '$git_repo/Output/fits_images/', '$git_repo/Output/QRaFT_Results/',  err_arr_MLSO,  err_arr_LOS_MLSO, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_MLSO, L_FORWARD, /manual" || true &&
 # Simulate CTRL-D to exit the cat command
 echo -e "\n" | cat) |
 /Users/crura/Documents/bin/ssw
+mv $git_repo/Output/fits_images/*.sav $git_repo/Output/QRaFT_Results
+mv $git_repo/Output/fits_images/*.png $git_repo/Output/QRaFT_Results
 deactivate

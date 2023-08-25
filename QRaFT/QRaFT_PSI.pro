@@ -271,7 +271,6 @@ PRO script3, input_directory,  output_directory,  err_arr_MLSO,  err_arr_LOS_MLS
       res_FORWARD = compare_angles( f_pB[i],  f_By[i], f_Bz[i], f_By_LOS[i], f_Bz_LOS[i], data_source='PSI_MLSO', thresh_k = 1.1647)  ;hist_x=hist_x, hist_y=hist_y
 
 
-
       ;err_arr_MLSO = [err_arr_MLSO, res_MLSO.err]
       ;err_arr_LOS_MLSO = [err_arr_LOS_MLSO, res_MLSO.err_LOS]
       ;err_arr_FORWARD = [err_arr_FORWARD, res_FORWARD.err]

@@ -174,6 +174,110 @@ def display_fits_images(fits_files, qraft_files, outpath):
     plt.close()
 
 
+
+def display_fits_image(fits_file, qraft_file, outpath):
+    # fig, axes = plt.subplots(nrows=int(n/2), ncols=2, figsize=(10, 10))
+    fig = plt.figure(figsize=(10, 10))
+
+
+    filename = fits_file.split('/')[-1]
+
+    data = fits.getdata(fits_file)
+    head = fits.getheader(fits_file)
+
+    idl_save_path = qraft_file
+
+    map = sunpy.map.Map(data, head)
+
+    telescope = head['telescop']
+    instrument = head['instrume']
+    print(telescope)
+    # print(head)
+    if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
+      head['detector'] = ('KCor')
+
+    if head['detector'] == 'COR1':
+        map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
+        # rsun = (head['rsun'] / head['cdelt1']) * occlt_list # number of pixels in radius of sun
+    # else:
+        # rsun = (head['rsun'] / head['cdelt1']) * occlt_list # number of pixels in radius of sun
+    axes = fig.add_subplot(1,1,1, projection=map)
+    if head['detector'] == 'PSI-MAS Forward Model' or head['telescop'] == 'PSI-MAS Forward Model':
+        map.plot(axes=axes,title=False,norm=matplotlib.colors.LogNorm())
+    elif head['detector'] == 'COR1':
+        map.plot(axes=axes,title=False,clip_interval=(1, 99.99)*u.percent)
+    else:
+        map.plot(axes=axes,title=False)
+    # axes.add_patch(Circle((int(data.shape[0]/2),int(data.shape[1]/2)), rsun, color='black',zorder=100))
+
+    idl_save = readsav(idl_save_path)
+    IMG = idl_save['img_orig']
+    FEATURES = idl_save['features']
+    P = idl_save['P']
+    colors = plt.cm.jet(np.linspace(0, 1, len(FEATURES)))
+    for i, feature in enumerate(FEATURES):
+        axes.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
+
+    if 'KCor' in filename:
+        detector = 'KCor'
+        keyword_By = 'KCor__PSI_By.fits'
+        keyword_Bz = 'KCor__PSI_Bz.fits'
+        file1_y = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_By)
+        file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_Bz)
+    elif 'COR1' in filename:
+        detector = 'COR1'
+        keyword_By = 'COR1__PSI_By.fits'
+        keyword_Bz = 'COR1__PSI_Bz.fits'
+        file1_y = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_By)
+        file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_Bz)
+
+
+
+
+
+    fits_dir_bz_los_coaligned = file1_z
+    data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+    head_bz_los_coaligned['detector'] = (detector)
+    # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+    bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+
+    wcs = WCS(head_bz_los_coaligned)
+
+    fits_dir_by_los_coaligned = file1_y
+    data_by_los_coaligned = fits.getdata(fits_dir_by_los_coaligned)
+    head_by_los_coaligned = fits.getheader(fits_dir_by_los_coaligned)
+    head_by_los_coaligned['Observatory'] = ('PSI-MAS')
+    head_by_los_coaligned['detector'] = (detector)
+    # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+    by_los_coaligned_map = sunpy.map.Map(data_by_los_coaligned, head_by_los_coaligned)
+
+    ny, nz = data_bz_los_coaligned.shape[0],data_bz_los_coaligned.shape[1]
+    dy = np.linspace(0, int(ny), ny)
+    dz = np.linspace(0, int(nz), nz)
+    # R_SUN = rsun
+    # rsun = (head['rsun'] / head['cdelt1']) * occlt_list[i]
+    widths = np.linspace(0,1024,by_los_coaligned_map.data.size)
+    skip_val = int(by_los_coaligned_map.data.shape[0]/73.14285714285714)
+    skip = (slice(None, None, skip_val), slice(None, None, skip_val))
+    skip1 = slice(None, None, skip_val)
+    axes.quiver(dy[skip1],dz[skip1],by_los_coaligned_map.data[skip],bz_los_coaligned_map.data[skip],linewidths=widths)
+
+
+
+    # plot_features(idl_save_path, map=axes)
+    # axes[i].imshow(data, cmap='gray')
+    # axes[i].set_title(fits_file)
+
+    plt.subplots_adjust(bottom=0.05, top=0.95)
+    # plt.savefig(outpath)
+    plt.show()
+    plt.close()
+
+
+display_fits_image(outstring_list_1[0], outstring_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'))
+
 display_fits_images(outstring_list_1, outstring_list_1_qraft,os.path.join(repo_path,'Output/Plots/COR1_PSI_Plots.png'))
 display_fits_images(directory_list_1, directory_list_1_qraft ,os.path.join(repo_path,'Output/Plots/COR1_Plots.png'))
 display_fits_images(outstring_list_2, outstring_list_2_qraft ,os.path.join(repo_path,'Output/Plots/MLSO_PSI_Plots.png'))

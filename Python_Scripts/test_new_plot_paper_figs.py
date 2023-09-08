@@ -175,7 +175,7 @@ def display_fits_images(fits_files, qraft_files, outpath):
 
 
 
-def display_fits_image(fits_file, qraft_file, outpath):
+def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath, PSI=True):
     # fig, axes = plt.subplots(nrows=int(n/2), ncols=2, figsize=(10, 10))
     fig = plt.figure(figsize=(10, 10))
 
@@ -218,18 +218,39 @@ def display_fits_image(fits_file, qraft_file, outpath):
     for i, feature in enumerate(FEATURES):
         axes.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
 
-    if 'KCor' in filename:
-        detector = 'KCor'
-        keyword_By = 'KCor__PSI_By.fits'
-        keyword_Bz = 'KCor__PSI_Bz.fits'
-        file1_y = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_By)
-        file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_Bz)
-    elif 'COR1' in filename:
-        detector = 'COR1'
-        keyword_By = 'COR1__PSI_By.fits'
-        keyword_Bz = 'COR1__PSI_Bz.fits'
-        file1_y = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_By)
-        file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_Bz)
+    detector = head['detector']
+    if PSI:
+        if detector == 'KCor':
+            if 'KCor' in filename:
+                keyword_By = 'KCor__PSI_By.fits'
+                keyword_Bz = 'KCor__PSI_Bz.fits'
+                file1_y = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_By)
+                file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_Bz)
+
+        elif detector == 'COR1':
+            if 'COR1' in filename:
+                keyword_By = 'COR1__PSI_By.fits'
+                keyword_Bz = 'COR1__PSI_Bz.fits'
+                file1_y = os.path.join(repo_path, 'Output/fits_images/' + filename.split('COR1')[0] + keyword_By)
+                file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('COR1')[0] + keyword_Bz)
+    else:
+        if detector == 'KCor':
+            for i in outstring_list_1:
+                if head['date-obs'].replace('-','_').split('T')[0] in i:
+                    file1_y = i.replace('pB','By')
+                    file1_z = i.replace('pB', 'Bz')
+
+        elif detector == 'COR1':
+            for i in outstring_list_2:
+                if head['date-obs'].replace('-','_').split('T')[0] in i:
+                    print('input file: {}'.format(fits_file))
+                    print('qraft file: {}'.format(qraft_file))
+                    # print('corresponding B field file: {}'.format(i))
+                    file1_y = i.replace('pB','By')
+                    file1_z = i.replace('pB', 'Bz')
+                    print('By file: {}'.format(file1_y))
+                    print('Bz file: {}'.format(file1_z))
+
 
 
 
@@ -276,7 +297,10 @@ def display_fits_image(fits_file, qraft_file, outpath):
     plt.close()
 
 
-display_fits_image(outstring_list_1[0], outstring_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'))
+display_fits_image_with_features_and_B_field(outstring_list_1[0], outstring_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=True)
+display_fits_image_with_features_and_B_field(directory_list_1[0], directory_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=False)
+display_fits_image_with_features_and_B_field(outstring_list_2[0], outstring_list_2_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=True)
+display_fits_image_with_features_and_B_field(directory_list_2[0], directory_list_2_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=False)
 
 display_fits_images(outstring_list_1, outstring_list_1_qraft,os.path.join(repo_path,'Output/Plots/COR1_PSI_Plots.png'))
 display_fits_images(directory_list_1, directory_list_1_qraft ,os.path.join(repo_path,'Output/Plots/COR1_Plots.png'))

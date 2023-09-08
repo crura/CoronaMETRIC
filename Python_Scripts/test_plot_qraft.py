@@ -92,7 +92,14 @@ plt.close()
 
 
 
-def plot_features(IMG, FEATURES, P, range=None, old_win=False, title=''):
+def plot_features(datapath, range=None, old_win=False, title='', save=False, **kwargs):
+    
+    idl_save = readsav(datapath)
+    IMG = idl_save['img_orig']
+    FEATURES = idl_save['features']
+    P = idl_save['P']
+    spath=datapath+'.png'
+    
     if not old_win:
         plt.figure(figsize=(7, 7))
         plt.title(title)
@@ -124,9 +131,15 @@ def plot_features(IMG, FEATURES, P, range=None, old_win=False, title=''):
         colors = plt.cm.jet(np.linspace(0, 1, len(FEATURES)))
         for i, feature in enumerate(FEATURES):
             plt.plot(feature['xx_p'][:feature['n_nodes']], feature['yy_p'][:feature['n_nodes']] / P['Rs'], color=colors[i], linewidth=2)
+            if map:
+                map.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
 
     plt.colorbar()
+    if save:
+        plt.savefig(spath)
     plt.show()
-
+    plt.close()
+    
+#plot_features(idl_save['img_orig'], features, idl_save['P'],save=True)
 # Example usage:
 # plot_features(IMG_enh, FEATURES, P, range=[-0.025, 0.025], title='Detected coronal features')

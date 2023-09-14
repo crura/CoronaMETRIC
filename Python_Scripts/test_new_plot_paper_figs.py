@@ -118,6 +118,16 @@ print(directory_list_1, outstring_list_1, directory_list_2, outstring_list_2)
 # print(occlt_list_1, occlt_list_2)
 
 
+# match up all file paths by alphabetical order to match up time of observations
+outstring_list_1 = sorted(outstring_list_1)
+outstring_list_1_qraft = sorted(outstring_list_1_qraft)
+outstring_list_2 = sorted(outstring_list_2)
+outstring_list_2_qraft = sorted(outstring_list_2_qraft)
+directory_list_1 = sorted(directory_list_1)
+directory_list_1_qraft = sorted(directory_list_1_qraft)
+directory_list_2 = sorted(directory_list_2)
+directory_list_2_qraft = sorted(directory_list_2_qraft)
+
 # os.path.join(repo_path,'Data/QRaFT/errors.sav')
 
 

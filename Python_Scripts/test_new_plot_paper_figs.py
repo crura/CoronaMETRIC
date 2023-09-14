@@ -5,7 +5,8 @@ Created on Fri Sep  1 11:16:38 2023
 
 @author: crura
 """
-
+# import subprocess
+# subprocess.run(['source', ' ', 'env/bin/activate'])
 import os
 from scipy.io import readsav
 import matplotlib as mpl
@@ -35,7 +36,6 @@ mpl.rcParams.update(mpl.rcParamsDefault)
 from functions import create_six_fig_plot
 from test_plot_qraft import plot_features
 
-
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
 """
@@ -60,8 +60,8 @@ date_obs =idl_save['DATE_OBS']
 # shape = idl_save['shape']
 # detector = idl_save['detector']
 outstring_list = idl_save_outstring['outstring_list']
-directory_list_1 = idl_save_outstring['directory_list']
-directory_list_2 = idl_save_outstring['directory_list_2']
+directory_list_2 = idl_save_outstring['directory_list']
+directory_list_1 = idl_save_outstring['directory_list_2']
 occlt_list = idl_save_outstring['occlt_list']
 
 for i in range(len(directory_list_1)):
@@ -280,10 +280,10 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
     # R_SUN = rsun
     # rsun = (head['rsun'] / head['cdelt1']) * occlt_list[i]
     widths = np.linspace(0,1024,by_los_coaligned_map.data.size)
-    skip_val = int(by_los_coaligned_map.data.shape[0]/73.14285714285714)
+    skip_val = int(by_los_coaligned_map.data.shape[0]/163.14285714285714) #73.14285714285714
     skip = (slice(None, None, skip_val), slice(None, None, skip_val))
     skip1 = slice(None, None, skip_val)
-    axes.quiver(dy[skip1],dz[skip1],by_los_coaligned_map.data[skip],bz_los_coaligned_map.data[skip],linewidths=widths)
+    axes.quiver(dy[skip1],dz[skip1],by_los_coaligned_map.data[skip],bz_los_coaligned_map.data[skip],linewidths=widths, scale_units='inches',color='r')
 
 
 
@@ -297,18 +297,105 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
     plt.close()
 
 
-display_fits_image_with_features_and_B_field(outstring_list_1[0], outstring_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=True)
-display_fits_image_with_features_and_B_field(directory_list_1[0], directory_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=False)
-display_fits_image_with_features_and_B_field(outstring_list_2[0], outstring_list_2_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=True)
-display_fits_image_with_features_and_B_field(directory_list_2[0], directory_list_2_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=False)
 
-display_fits_images(outstring_list_1, outstring_list_1_qraft,os.path.join(repo_path,'Output/Plots/COR1_PSI_Plots.png'))
-display_fits_images(directory_list_1, directory_list_1_qraft ,os.path.join(repo_path,'Output/Plots/COR1_Plots.png'))
-display_fits_images(outstring_list_2, outstring_list_2_qraft ,os.path.join(repo_path,'Output/Plots/MLSO_PSI_Plots.png'))
-display_fits_images(directory_list_2, directory_list_2_qraft ,os.path.join(repo_path,'Output/Plots/MLSO_Plots.png'))
+def plot_model_data_comparison_with_features(data_fits_file, data_qraft_file, model_fits_file, model_qraft_file, outpath, PSI=True):
+
+    filename = data_fits_file.split('/')[-1]
+
+    data = fits.getdata(data_fits_file)
+    head = fits.getheader(data_fits_file)
+
+    date_obs = head['date-obs']
+
+    telescope = head['telescop']
+    instrument = head['instrume']
+    if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
+      head['detector'] = ('KCor')
+
+    detector = head['detector']
+
+    str_strip = date_obs.split('T',1)[0]
+
+    idl_save_path = data_qraft_file
+
+    idl_save = readsav(idl_save_path)
+    IMG = idl_save['img_orig']
+    FEATURES = idl_save['features']
+    P = idl_save['P']
+    colors = plt.cm.jet(np.linspace(0, 1, len(FEATURES)))
+
+    datamap = sunpy.map.Map(data, head)
+
+    fits_dir_psi = model_fits_file
+    data1 = fits.getdata(fits_dir_psi)
+    head1 = fits.getheader(fits_dir_psi)
+
+    idl_save_path_model = model_qraft_file
+
+    idl_save_model = readsav(idl_save_path_model)
+    IMG_model = idl_save_model['img_orig']
+    FEATURES_model = idl_save_model['features']
+    P_model = idl_save_model['P']
+    colors_model = plt.cm.jet(np.linspace(0, 1, len(FEATURES_model)))
+
+    # head1['detector'] = ('Cor-1')
+    psimap = sunpy.map.Map(data1, head1)
+    psimap.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
+
+    fig1 = plt.figure(figsize=(15, 8))
+    ax1 = fig1.add_subplot(1, 2, 1, projection=datamap)
+    datamap.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
+    datamap.plot(axes=ax1,title=False)
+    for i, feature in enumerate(FEATURES):
+        ax1.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
+
+    # R_SUN = occlt * (head2['rsun'] / head2['cdelt1'])
+    # ax1.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
 
 
 
+    ax2 = fig1.add_subplot(1, 2, 2, projection=datamap)
+    psimap.plot_settings['norm'] = plt.Normalize(datamap.min(), datamap.max())
+
+    psimap.plot(axes=ax2,title=False,norm=matplotlib.colors.LogNorm())
+    for i, feature in enumerate(FEATURES_model):
+        ax2.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors_model[i], linewidth=3)
+    # R_SUN = occlt * (head1['rsun'] / head1['cdelt1'])
+    # ax2.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
+    # ax1.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
+    ax1.set_xlabel('Helioprojective Longitude (Solar-X)',fontsize=18)
+    ax2.set_xlabel('Helioprojective Longitude (Solar-X)',fontsize=18)
+    ax1.set_ylabel('Helioprojective Latitude (Solar-Y)',fontsize=18)
+    ax2.set_ylabel('Helioprojective Latitude (Solar-Y)',fontsize=18)
+    ax1.set_title('{} Observation {}'.format(detector, str_strip), fontsize=18)
+    ax2.set_title('Corresponding PSI/FORWARD pB Eclipse Model', fontsize=18)
+
+    # string_print = str(date_obs,'utf-8').split('T')[0].replace('-','_') + 'cor1'
+
+    # plt.savefig(os.path.join(repo_path,'Output/Plots/Model_Comparison_{}_{}.png'.format(string_print, detector)))
+    plt.show()
+    plt.close()
+
+
+
+
+# display_fits_image_with_features_and_B_field(outstring_list_1[0], outstring_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=True)
+# display_fits_image_with_features_and_B_field(directory_list_1[0], directory_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=False)
+
+# plot_model_data_comparison_with_features(directory_list_1[0], directory_list_1_qraft[0], outstring_list_1[0], outstring_list_1_qraft[0], os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'))
+# display_fits_image_with_features_and_B_field(outstring_list_2[0], outstring_list_2_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=True)
+# display_fits_image_with_features_and_B_field(directory_list_2[0], directory_list_2_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=False)
+
+# display_fits_images(outstring_list_1, outstring_list_1_qraft,os.path.join(repo_path,'Output/Plots/COR1_PSI_Plots.png'))
+# display_fits_images(directory_list_1, directory_list_1_qraft ,os.path.join(repo_path,'Output/Plots/COR1_Plots.png'))
+# display_fits_images(outstring_list_2, outstring_list_2_qraft ,os.path.join(repo_path,'Output/Plots/MLSO_PSI_Plots.png'))
+# display_fits_images(directory_list_2, directory_list_2_qraft ,os.path.join(repo_path,'Output/Plots/MLSO_Plots.png'))
+
+for i in range(len(directory_list_1)):
+    plot_model_data_comparison_with_features(directory_list_1[i], directory_list_1_qraft[i], outstring_list_1[i], outstring_list_1_qraft[i], os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'))
+
+for i in range(len(directory_list_1)):
+    plot_model_data_comparison_with_features(directory_list_2[i], directory_list_2_qraft[i], outstring_list_2[i], outstring_list_2_qraft[i], os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'))
 
 
 # carrington lat/lon in degrees

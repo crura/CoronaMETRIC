@@ -35,6 +35,8 @@ mpl.use('TkAgg')
 mpl.rcParams.update(mpl.rcParamsDefault)
 from functions import create_six_fig_plot
 from test_plot_qraft import plot_features
+import math
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -273,6 +275,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
     head_bz_los_coaligned['detector'] = (detector)
     # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
     bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+    Bz = data_bz_los_coaligned
 
     wcs = WCS(head_bz_los_coaligned)
 
@@ -283,17 +286,27 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
     head_by_los_coaligned['detector'] = (detector)
     # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
     by_los_coaligned_map = sunpy.map.Map(data_by_los_coaligned, head_by_los_coaligned)
+    By = data_by_los_coaligned
+
 
     ny, nz = data_bz_los_coaligned.shape[0],data_bz_los_coaligned.shape[1]
     dy = np.linspace(0, int(ny), ny)
     dz = np.linspace(0, int(nz), nz)
+    X, Y = np.meshgrid(np.linspace(0, 2 * np.pi, ny), np.linspace(0, 2 * np.pi, nz))
     # R_SUN = rsun
     # rsun = (head['rsun'] / head['cdelt1']) * occlt_list[i]
     widths = np.linspace(0,1024,by_los_coaligned_map.data.size)
-    skip_val = int(by_los_coaligned_map.data.shape[0]/163.14285714285714) #73.14285714285714
+    skip_val = int(by_los_coaligned_map.data.shape[0]/233.14285714285714) #73.14285714285714
     skip = (slice(None, None, skip_val), slice(None, None, skip_val))
     skip1 = slice(None, None, skip_val)
-    axes.quiver(dy[skip1],dz[skip1],by_los_coaligned_map.data[skip],bz_los_coaligned_map.data[skip],linewidths=widths, scale_units='inches',color='r')
+    by = by_los_coaligned_map.data
+    bz = bz_los_coaligned_map.data
+    by_normalized = (by / np.sqrt(by**2 + bz**2))
+    bz_normalized = (bz / np.sqrt(by**2 + bz**2))
+    r = np.power(np.add(np.power(by,2), np.power(bz,2)),0.5) * 50000
+    axes.quiver(dy[skip1],dz[skip1],by[skip],bz[skip],units='width',color='r')
+    # qk = plt.quiverkey(Q, 0.9, 0.9, 2, r'$2 \frac{m}{s}$', labelpos='E',
+    #                coordinates='figure')
 
 
 
@@ -303,6 +316,159 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
 
     plt.subplots_adjust(bottom=0.05, top=0.95)
     # plt.savefig(outpath)
+    plt.show()
+    plt.close()
+
+
+
+
+    features = FEATURES
+    N = len(features)
+    N_nodes_max = len(features[0]['angles_xx_r'])
+    angle_err = np.zeros((N, N_nodes_max), dtype=float)
+    angle_err_signed = np.zeros((N, N_nodes_max), dtype=float)
+    angle_err_signed_test = np.zeros((N, N_nodes_max), dtype=float)
+
+    angles = []
+    angles_signed = []
+    angles_signed_test = []
+    angles_xx_positions = []
+    angles_yy_positions = []
+
+    for i in range(N):
+        # this needs to be [:features[i]['n_nodes'] -1]
+        xx = features[i]['angles_xx_r'][:features[i]['n_nodes']]
+        yy = features[i]['angles_yy_r'][:features[i]['n_nodes']]
+        for k in range(features[i]['n_nodes'] - 1):
+            v1 = [features[i]['xx_r'][k+1] - features[i]['xx_r'][k], features[i]['yy_r'][k+1] - features[i]['yy_r'][k]]
+            # Because IDL indexes backwards we index by y then x
+            v2 = [By[int(yy[k]), int(xx[k])], Bz[int(yy[k]), int(xx[k])]]
+
+            v1_mag = np.sqrt(np.sum(np.array(v1) ** 2))
+            v2_mag = np.sqrt(np.sum(np.array(v2) ** 2))
+
+            d_angle = np.arccos(np.sum(np.array(v1)*np.array(v2)) / (v1_mag * v2_mag) )
+            if d_angle > math.pi/2:
+                d_angle = math.pi - d_angle
+            angle_err[i, k] = d_angle
+            angles.append(d_angle)
+            angles_xx_positions.append(int(xx[k]))
+            angles_yy_positions.append(int(yy[k]))
+
+            d_angle_signed = np.arcsin((v1[0] * v2[1] - v1[1] * v2[0]) / (v1_mag * v2_mag))
+            d_angle_signed_test = np.arctan2(v1[0] * v2[1] - v1[1] * v2[0], v1[0] * v2[0] + v1[1] * v2[1])
+            angles_signed.append(d_angle_signed)
+            angles_signed_test.append(d_angle_signed_test)
+
+
+    fig = plt.figure(figsize=(10, 10))
+    map = sunpy.map.Map(data, head)
+
+    telescope = head['telescop']
+    instrument = head['instrume']
+
+    if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
+      head['detector'] = ('KCor')
+
+    if head['detector'] == 'COR1':
+        map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
+        # rsun = (head['rsun'] / head['cdelt1']) * occlt_list # number of pixels in radius of sun
+    # else:
+        # rsun = (head['rsun'] / head['cdelt1']) * occlt_list # number of pixels in radius of sun
+    axes = fig.add_subplot(1,1,1, projection=map)
+    if head['detector'] == 'PSI-MAS Forward Model' or head['telescop'] == 'PSI-MAS Forward Model':
+        map.plot(axes=axes,title=False,norm=matplotlib.colors.LogNorm())
+    elif head['detector'] == 'COR1':
+        map.plot(axes=axes,title=False,clip_interval=(1, 99.99)*u.percent)
+    else:
+        map.plot(axes=axes,title=False)
+    # axes.add_patch(Circle((int(data.shape[0]/2),int(data.shape[1]/2)), rsun, color='black',zorder=100))
+
+    idl_save = readsav(idl_save_path)
+    IMG = idl_save['img_orig']
+    FEATURES = idl_save['features']
+    P = idl_save['P']
+    colors = plt.cm.jet(np.linspace(0, 1, len(FEATURES)))
+    # for i, feature in enumerate(FEATURES):
+        # axes.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
+    # Scatter plot for angle errors
+    sc = axes.scatter(angles_xx_positions, angles_yy_positions, c=np.degrees(angles), cmap='viridis', label=False)
+    divider = make_axes_locatable(axes)
+    cax = divider.append_axes('right', size='5%', pad=0.6)
+    # Add colorbar manually
+    # cb = mpl.colorbar.ColorbarBase(cax,orientation='vertical')
+
+    cax.yaxis.set_ticks_position('right')
+    cax.yaxis.set_label_position('right')
+    cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical')
+    # cax.set_xlabel(' ')
+    # cax.grid(axis='y')
+    lat = cax.coords[0]
+    # lat.set_ticks([20,20]*u.arcsec)
+    lat.set_ticks_visible(False)
+    lat.set_ticklabel_visible(False)
+    lat.set_axislabel('')
+    plt.show()
+    plt.close()
+
+
+
+
+
+
+
+
+
+
+
+
+    fig = plt.figure(figsize=(10, 10))
+    map = sunpy.map.Map(data, head)
+
+    telescope = head['telescop']
+    instrument = head['instrume']
+
+    if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
+      head['detector'] = ('KCor')
+
+    if head['detector'] == 'COR1':
+        map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
+        # rsun = (head['rsun'] / head['cdelt1']) * occlt_list # number of pixels in radius of sun
+    # else:
+        # rsun = (head['rsun'] / head['cdelt1']) * occlt_list # number of pixels in radius of sun
+    axes = fig.add_subplot(1,1,1, projection=map)
+    if head['detector'] == 'PSI-MAS Forward Model' or head['telescop'] == 'PSI-MAS Forward Model':
+        map.plot(axes=axes,title=False,norm=matplotlib.colors.LogNorm())
+    elif head['detector'] == 'COR1':
+        map.plot(axes=axes,title=False,clip_interval=(1, 99.99)*u.percent)
+    else:
+        map.plot(axes=axes,title=False)
+    # axes.add_patch(Circle((int(data.shape[0]/2),int(data.shape[1]/2)), rsun, color='black',zorder=100))
+
+    idl_save = readsav(idl_save_path)
+    IMG = idl_save['img_orig']
+    FEATURES = idl_save['features']
+    P = idl_save['P']
+    colors = plt.cm.jet(np.linspace(0, 1, len(FEATURES)))
+    # for i, feature in enumerate(FEATURES):
+        # axes.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
+    # Scatter plot for angle errors
+    sc = axes.scatter(angles_xx_positions, angles_yy_positions, c=np.degrees(angles_signed), cmap='coolwarm', label=False)
+    divider = make_axes_locatable(axes)
+    cax = divider.append_axes('right', size='5%', pad=0.6)
+    # Add colorbar manually
+    # cb = mpl.colorbar.ColorbarBase(cax,orientation='vertical')
+
+    cax.yaxis.set_ticks_position('right')
+    cax.yaxis.set_label_position('right')
+    cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical')
+    # cax.set_xlabel(' ')
+    # cax.grid(axis='y')
+    lat = cax.coords[0]
+    # lat.set_ticks([20,20]*u.arcsec)
+    lat.set_ticks_visible(False)
+    lat.set_ticklabel_visible(False)
+    lat.set_axislabel('')
     plt.show()
     plt.close()
 
@@ -380,21 +546,21 @@ def plot_model_data_comparison_with_features(data_fits_file, data_qraft_file, mo
     ax1.set_title('{} Observation {}'.format(detector, str_strip), fontsize=18)
     ax2.set_title('Corresponding PSI/FORWARD pB Eclipse Model', fontsize=18)
 
-    # string_print = str(date_obs,'utf-8').split('T')[0].replace('-','_') + 'cor1'
+    string_print = date_obs.split('T')[0].replace('-','_')
 
-    # plt.savefig(os.path.join(repo_path,'Output/Plots/Model_Comparison_{}_{}.png'.format(string_print, detector)))
-    plt.show()
+    plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Model_Comparison_{}_{}.png'.format(string_print, detector)))
+    # plt.show()
     plt.close()
 
 
 
 
-# display_fits_image_with_features_and_B_field(outstring_list_1[0], outstring_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=True)
-# display_fits_image_with_features_and_B_field(directory_list_1[0], directory_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=False)
+display_fits_image_with_features_and_B_field(outstring_list_1[0], outstring_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=True)
+display_fits_image_with_features_and_B_field(directory_list_1[0], directory_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=False)
 
 # plot_model_data_comparison_with_features(directory_list_1[0], directory_list_1_qraft[0], outstring_list_1[0], outstring_list_1_qraft[0], os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'))
-# display_fits_image_with_features_and_B_field(outstring_list_2[0], outstring_list_2_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=True)
-# display_fits_image_with_features_and_B_field(directory_list_2[0], directory_list_2_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=False)
+display_fits_image_with_features_and_B_field(outstring_list_2[0], outstring_list_2_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=True)
+display_fits_image_with_features_and_B_field(directory_list_2[0], directory_list_2_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=False)
 
 # display_fits_images(outstring_list_1, outstring_list_1_qraft,os.path.join(repo_path,'Output/Plots/COR1_PSI_Plots.png'))
 # display_fits_images(directory_list_1, directory_list_1_qraft ,os.path.join(repo_path,'Output/Plots/COR1_Plots.png'))

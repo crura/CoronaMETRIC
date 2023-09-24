@@ -38,6 +38,7 @@ from test_plot_qraft import plot_features
 import math
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
 """
@@ -585,7 +586,14 @@ z_radius = []
 for i in files:
     path = os.path.join(repo_path, i)
     head = fits.getheader(path)
-    time = datetime.strptime(head['DATE-OBS'],'%Y-%m-%dT%H:%M:%S')
+    def has_seconds(a_string):
+        return "." in a_string.split(":")[2]
+
+    if has_seconds(head['DATE-OBS']):
+        time = datetime.strptime(head['DATE-OBS'], "%Y-%m-%dT%H:%M:%S.%f")
+    else:
+        time = datetime.strptime(head['DATE-OBS'], "%Y-%m-%dT%H:%M:%S")
+    # time = datetime.strptime(head['DATE-OBS'],'%Y-%m-%dT%H:%M:%S')
     latitudes.append(head['CRLT_OBS'])
     longitudes.append(head['CRLN_OBS'])
     d_sun_obs = (constants.radius.to_value() * small_angle_const) / head['RSUN']
@@ -602,7 +610,11 @@ z2_radius = []
 for i in files2:
     path2 = os.path.join(repo_path, i)
     head2 = fits.getheader(path2)
-    time2 = datetime.strptime(head['DATE-OBS'],'%Y-%m-%dT%H:%M:%S')
+    # time2 = datetime.strptime(head2['DATE-OBS'],'%Y-%m-%dT%H:%M:%S')
+    if has_seconds(head2['DATE-OBS']):
+        time2 = datetime.strptime(head2['DATE-OBS'], "%Y-%m-%dT%H:%M:%S.%f")
+    else:
+        tim2e = datetime.strptime(head2['DATE-OBS'], "%Y-%m-%dT%H:%M:%S")
     latitudes2.append(head2['CRLT_OBS'])
     longitudes2.append(head2['CRLN_OBS'])
     x2_radius.append(head2['DSUN_OBS'])

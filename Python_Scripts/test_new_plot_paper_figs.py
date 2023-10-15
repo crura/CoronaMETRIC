@@ -154,6 +154,8 @@ def display_fits_images(fits_files, qraft_files, outpath):
         # print(head)
         if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
           head['detector'] = ('KCor')
+          norm = map.plot_settings['norm']
+          norm.vmin, norm.vmax = np.percentile(map.data, [1, 99.9])
 
         if head['detector'] == 'COR1':
             map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
@@ -208,6 +210,8 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
     # print(head)
     if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
       head['detector'] = ('KCor')
+      norm = map.plot_settings['norm']
+      norm.vmin, norm.vmax = np.percentile(map.data, [1, 99.9])
 
     if head['detector'] == 'COR1':
         map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
@@ -333,6 +337,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
     angles = []
     angles_signed = []
     angles_signed_test = []
+    angles_signed_test_2 = []
     angles_xx_positions = []
     angles_yy_positions = []
 
@@ -357,9 +362,11 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
             angles_yy_positions.append(int(yy[k]))
 
             d_angle_signed = np.arcsin((v1[0] * v2[1] - v1[1] * v2[0]) / (v1_mag * v2_mag))
-            d_angle_signed_test = np.arctan2(v1[0] * v2[1] - v1[1] * v2[0], v1[0] * v2[0] + v1[1] * v2[1])
+            d_angle_signed_test = np.arctan2((v1[0] * v2[1] - v1[1] * v2[0]),  (v1[0] * v2[0] + v1[1] * v2[1]))
+            d_angle_signed_test_2 = np.arctan((v1[0] * v2[1] - v1[1] * v2[0]) / (v1[0] * v2[0] + v1[1] * v2[1]))
             angles_signed.append(d_angle_signed)
             angles_signed_test.append(d_angle_signed_test)
+            angles_signed_test_2.append(d_angle_signed_test_2)
 
 
     fig = plt.figure(figsize=(10, 10))
@@ -370,6 +377,8 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
 
     if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
       head['detector'] = ('KCor')
+      norm = map.plot_settings['norm']
+      norm.vmin, norm.vmax = np.percentile(map.data, [1, 99.9])
 
     if head['detector'] == 'COR1':
         map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
@@ -431,6 +440,8 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
 
     if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
       head['detector'] = ('KCor')
+      norm = map.plot_settings['norm']
+      norm.vmin, norm.vmax = np.percentile(map.data, [1, 99.9])
 
     if head['detector'] == 'COR1':
         map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
@@ -454,7 +465,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
     # for i, feature in enumerate(FEATURES):
         # axes.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
     # Scatter plot for angle errors
-    sc = axes.scatter(angles_xx_positions, angles_yy_positions, c=np.degrees(angles_signed), cmap='coolwarm', label=False)
+    sc = axes.scatter(angles_xx_positions, angles_yy_positions, c=np.degrees(angles_signed_test_2), cmap='coolwarm', label=False)
     divider = make_axes_locatable(axes)
     cax = divider.append_axes('right', size='5%', pad=0.6)
     # Add colorbar manually
@@ -502,6 +513,10 @@ def plot_model_data_comparison_with_features(data_fits_file, data_qraft_file, mo
     colors = plt.cm.jet(np.linspace(0, 1, len(FEATURES)))
 
     datamap = sunpy.map.Map(data, head)
+
+    if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
+      norm = datamap.plot_settings['norm']
+      norm.vmin, norm.vmax = np.percentile(datamap.data, [1, 99.9])
 
     fits_dir_psi = model_fits_file
     data1 = fits.getdata(fits_dir_psi)
@@ -576,7 +591,7 @@ for i in range(len(directory_list_1)):
 
 
 # carrington lat/lon in degrees
-files = directory_list_2
+files = directory_list_1
 longitudes = []
 latitudes = []
 small_angle_const = (3600 * 360)/(2 * np.pi)
@@ -601,7 +616,7 @@ for i in files:
     y_radius.append(d_sun_obs)
     z_radius.append(d_sun_obs)
 
-files2 = directory_list_1
+files2 = directory_list_2
 longitudes2 = []
 latitudes2 = []
 x2_radius = []

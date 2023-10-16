@@ -375,6 +375,9 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
     telescope = head['telescop']
     instrument = head['instrume']
 
+    date_obs = head['date-obs']
+    string_print = date_obs.split('T')[0].replace('-','_')
+
     if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
       head['detector'] = ('KCor')
       norm = map.plot_settings['norm']
@@ -418,6 +421,10 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
     lat.set_ticks_visible(False)
     lat.set_ticklabel_visible(False)
     lat.set_axislabel('')
+    if PSI:
+        plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.png'.format(string_print, detector)))
+    else:
+        plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)))
     plt.show()
     plt.close()
 
@@ -481,6 +488,10 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
     lat.set_ticks_visible(False)
     lat.set_ticklabel_visible(False)
     lat.set_axislabel('')
+    if PSI:
+        plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_Signed_{}_{}_PSI.png'.format(string_print, detector)))
+    else:
+        plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_Signed_{}_{}.png'.format(string_print, detector)))
     plt.show()
     plt.close()
 

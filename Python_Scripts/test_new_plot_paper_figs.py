@@ -190,7 +190,7 @@ def display_fits_images(fits_files, qraft_files, outpath):
 
 
 
-def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath, PSI=True):
+def display_fits_image_with_features_and_B_field(fits_file, qraft_file, PSI=True):
     # fig, axes = plt.subplots(nrows=int(n/2), ncols=2, figsize=(10, 10))
     fig = plt.figure(figsize=(10, 10))
 
@@ -321,7 +321,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
 
     plt.subplots_adjust(bottom=0.05, top=0.95)
     # plt.savefig(outpath)
-    plt.show()
+    # plt.show()
     plt.close()
 
 
@@ -333,7 +333,6 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
     angle_err = np.zeros((N, N_nodes_max), dtype=float)
     angle_err_signed = np.zeros((N, N_nodes_max), dtype=float)
     angle_err_signed_test = np.zeros((N, N_nodes_max), dtype=float)
-
     angles = []
     angles_signed = []
     angles_signed_test = []
@@ -405,7 +404,8 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
     # for i, feature in enumerate(FEATURES):
         # axes.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
     # Scatter plot for angle errors
-    sc = axes.scatter(angles_xx_positions, angles_yy_positions, c=np.degrees(angles), cmap='viridis', label=False)
+    norm = mpl.colors.Normalize(vmin=0, vmax=90)
+    sc = axes.scatter(angles_xx_positions, angles_yy_positions, c=np.degrees(angles), cmap='viridis', label=False, norm=norm)
     divider = make_axes_locatable(axes)
     cax = divider.append_axes('right', size='5%', pad=0.6)
     # Add colorbar manually
@@ -413,7 +413,8 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
 
     cax.yaxis.set_ticks_position('right')
     cax.yaxis.set_label_position('right')
-    cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical')
+    norm = mpl.colors.Normalize(vmin=0, vmax=90)
+    cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical', norm=norm)
     # cax.set_xlabel(' ')
     # cax.grid(axis='y')
     lat = cax.coords[0]
@@ -425,7 +426,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
         plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.png'.format(string_print, detector)))
     else:
         plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)))
-    plt.show()
+    # plt.show()
     plt.close()
 
 
@@ -472,7 +473,8 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
     # for i, feature in enumerate(FEATURES):
         # axes.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
     # Scatter plot for angle errors
-    sc = axes.scatter(angles_xx_positions, angles_yy_positions, c=np.degrees(angles_signed_test_2), cmap='coolwarm', label=False)
+    norm = mpl.colors.Normalize(vmin=-90, vmax=90)
+    sc = axes.scatter(angles_xx_positions, angles_yy_positions, c=np.degrees(angles_signed_test_2), cmap='coolwarm', label=False, norm=norm)
     divider = make_axes_locatable(axes)
     cax = divider.append_axes('right', size='5%', pad=0.6)
     # Add colorbar manually
@@ -480,7 +482,8 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
 
     cax.yaxis.set_ticks_position('right')
     cax.yaxis.set_label_position('right')
-    cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical')
+    norm = mpl.colors.Normalize(vmin=-90, vmax=90)
+    cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical', norm=norm)
     # cax.set_xlabel(' ')
     # cax.grid(axis='y')
     lat = cax.coords[0]
@@ -492,7 +495,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, outpath,
         plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_Signed_{}_{}_PSI.png'.format(string_print, detector)))
     else:
         plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_Signed_{}_{}.png'.format(string_print, detector)))
-    plt.show()
+    # plt.show()
     plt.close()
 
 
@@ -582,12 +585,12 @@ def plot_model_data_comparison_with_features(data_fits_file, data_qraft_file, mo
 
 
 
-display_fits_image_with_features_and_B_field(outstring_list_1[0], outstring_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=True)
-display_fits_image_with_features_and_B_field(directory_list_1[0], directory_list_1_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=False)
+# display_fits_image_with_features_and_B_field(outstring_list_1[0], outstring_list_1_qraft[0], PSI=True)
+# display_fits_image_with_features_and_B_field(directory_list_1[0], directory_list_1_qraft[0], PSI=False)
 
 # plot_model_data_comparison_with_features(directory_list_1[0], directory_list_1_qraft[0], outstring_list_1[0], outstring_list_1_qraft[0], os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'))
-display_fits_image_with_features_and_B_field(outstring_list_2[0], outstring_list_2_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=True)
-display_fits_image_with_features_and_B_field(directory_list_2[0], directory_list_2_qraft[0],os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'), PSI=False)
+# display_fits_image_with_features_and_B_field(outstring_list_2[0], outstring_list_2_qraft[0], PSI=True)
+# display_fits_image_with_features_and_B_field(directory_list_2[0], directory_list_2_qraft[0], PSI=False)
 
 # display_fits_images(outstring_list_1, outstring_list_1_qraft,os.path.join(repo_path,'Output/Plots/COR1_PSI_Plots.png'))
 # display_fits_images(directory_list_1, directory_list_1_qraft ,os.path.join(repo_path,'Output/Plots/COR1_Plots.png'))
@@ -596,9 +599,13 @@ display_fits_image_with_features_and_B_field(directory_list_2[0], directory_list
 
 for i in range(len(directory_list_1)):
     plot_model_data_comparison_with_features(directory_list_1[i], directory_list_1_qraft[i], outstring_list_1[i], outstring_list_1_qraft[i], os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'))
+    display_fits_image_with_features_and_B_field(outstring_list_1[i], outstring_list_1_qraft[i], PSI=True)
+    display_fits_image_with_features_and_B_field(directory_list_1[i], directory_list_1_qraft[i], PSI=False)
 
 for i in range(len(directory_list_1)):
     plot_model_data_comparison_with_features(directory_list_2[i], directory_list_2_qraft[i], outstring_list_2[i], outstring_list_2_qraft[i], os.path.join(repo_path,'Output/Plots/COR1_PSI_Plot_test.png'))
+    display_fits_image_with_features_and_B_field(outstring_list_2[i], outstring_list_2_qraft[i], PSI=True)
+    display_fits_image_with_features_and_B_field(directory_list_2[i], directory_list_2_qraft[i], PSI=False)
 
 
 # carrington lat/lon in degrees

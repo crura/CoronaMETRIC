@@ -375,6 +375,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, PSI=True
     instrument = head['instrume']
 
     date_obs = head['date-obs']
+    str_strip = date_obs.split('T',1)[0]
     string_print = date_obs.split('T')[0].replace('-','_')
 
     if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
@@ -423,8 +424,10 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, PSI=True
     lat.set_ticklabel_visible(False)
     lat.set_axislabel('')
     if PSI:
+        axes.set_title('Corresponding PSI/FORWARD pB Eclipse Model')
         plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.png'.format(string_print, detector)))
     else:
+        axes.set_title('{} Observation {}'.format(detector, str_strip))
         plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)))
     # plt.show()
     plt.close()
@@ -445,6 +448,8 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, PSI=True
 
     telescope = head['telescop']
     instrument = head['instrume']
+    date_obs = head['date-obs']
+    str_strip = date_obs.split('T',1)[0]
 
     if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
       head['detector'] = ('KCor')
@@ -492,8 +497,10 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, PSI=True
     lat.set_ticklabel_visible(False)
     lat.set_axislabel('')
     if PSI:
+        axes.set_title('Corresponding PSI/FORWARD pB Eclipse Model')
         plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_Signed_{}_{}_PSI.png'.format(string_print, detector)))
     else:
+        axes.set_title('{} Observation {}'.format(detector, str_strip))
         plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_Signed_{}_{}.png'.format(string_print, detector)))
     # plt.show()
     plt.close()

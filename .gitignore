@@ -21,3 +21,7 @@ Data/Forward_PB_data.csv
 Data/*.sav
 Python_Scripts/__pycache__
 Output
+env
+.project
+*.png
+*.jpg

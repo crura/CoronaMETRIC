@@ -19,6 +19,8 @@ from scipy.interpolate import interp1d
 import matplotlib
 from scipy.stats import gaussian_kde
 import seaborn as sns
+import math
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -430,3 +432,294 @@ def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
 
 
     return fig
+
+
+
+# import os
+# from scipy.io import readsav
+# import matplotlib as mpl
+# import matplotlib.pyplot as plt
+# import git
+# from matplotlib.patches import Circle
+# from astropy.wcs import WCS
+# from astropy.io import fits
+# import sunpy
+# import sunpy.map
+# import matplotlib
+# import numpy as np
+# import scipy as sci
+# from tqdm import tqdm_notebook
+# import pandas as pd
+# import unittest
+# from pathlib import Path
+# from scipy.interpolate import interp1d
+# import matplotlib
+# from datetime import datetime, timedelta
+# from sunpy.sun import constants
+# import astropy.constants
+# import astropy.units as u
+# matplotlib.use('TkAgg')
+# mpl.use('TkAgg')
+# mpl.rcParams.update(mpl.rcParamsDefault)
+# from functions import create_six_fig_plot
+# from test_plot_qraft import plot_features
+
+
+# repo = git.Repo('.', search_parent_directories=True)
+# repo_path = repo.working_tree_dir
+
+def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, PSI=True, enhanced=False):
+    # fig, axes = plt.subplots(nrows=int(n/2), ncols=2, figsize=(10, 10))
+    fig = plt.figure(figsize=(10, 10))
+
+
+    filename = fits_file.split('/')[-1]
+
+    data = fits.getdata(fits_file)
+    head = fits.getheader(fits_file)
+
+    idl_save_path = qraft_file
+
+    map = sunpy.map.Map(data, head)
+
+    telescope = head['telescop']
+    instrument = head['instrume']
+    print(telescope)
+    # print(head)
+    if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
+      head['detector'] = ('KCor')
+      norm = map.plot_settings['norm']
+      norm.vmin, norm.vmax = np.percentile(map.data, [1, 99.9])
+
+    if head['detector'] == 'COR1':
+        map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
+        # rsun = (head['rsun'] / head['cdelt1']) * occlt_list # number of pixels in radius of sun
+    # else:
+        # rsun = (head['rsun'] / head['cdelt1']) * occlt_list # number of pixels in radius of sun
+    axes = fig.add_subplot(1,1,1, projection=map)
+    if head['detector'] == 'PSI-MAS Forward Model' or head['telescop'] == 'PSI-MAS Forward Model':
+        map.plot(axes=axes,title=False,norm=matplotlib.colors.LogNorm())
+    elif head['detector'] == 'COR1':
+        map.plot(axes=axes,title=False,clip_interval=(1, 99.99)*u.percent)
+    else:
+        map.plot(axes=axes,title=False)
+    # axes.add_patch(Circle((int(data.shape[0]/2),int(data.shape[1]/2)), rsun, color='black',zorder=100))
+
+    idl_save = readsav(idl_save_path)
+    IMG = idl_save['img_d2_phi_r']
+    # img_enh = idl_save['img_enh']
+    FEATURES = idl_save['features']
+    # P = idl_save['P']
+    colors = plt.cm.jet(np.linspace(0, 1, len(FEATURES)))
+    for i, feature in enumerate(FEATURES):
+        axes.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
+
+    detector = head['detector']
+    if PSI:
+        if detector == 'KCor':
+            if 'KCor' in filename:
+                keyword_By = 'KCor__PSI_By.fits'
+                keyword_Bz = 'KCor__PSI_Bz.fits'
+                file1_y = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_By)
+                file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_Bz)
+
+        elif detector == 'COR1':
+            if 'COR1' in filename:
+                keyword_By = 'COR1__PSI_By.fits'
+                keyword_Bz = 'COR1__PSI_Bz.fits'
+                file1_y = os.path.join(repo_path, 'Output/fits_images/' + filename.split('COR1')[0] + keyword_By)
+                file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('COR1')[0] + keyword_Bz)
+    else:
+        if detector == 'KCor':
+            for i in outstring_list_1:
+                if head['date-obs'].replace('-','_').split('T')[0] in i:
+                    file1_y = i.replace('pB','By')
+                    file1_z = i.replace('pB', 'Bz')
+
+        elif detector == 'COR1':
+            for i in outstring_list_2:
+                if head['date-obs'].replace('-','_').split('T')[0] in i:
+                    print('input file: {}'.format(fits_file))
+                    print('qraft file: {}'.format(qraft_file))
+                    # print('corresponding B field file: {}'.format(i))
+                    file1_y = i.replace('pB','By')
+                    file1_z = i.replace('pB', 'Bz')
+                    print('By file: {}'.format(file1_y))
+                    print('Bz file: {}'.format(file1_z))
+
+
+
+
+
+
+    fits_dir_bz_los_coaligned = file1_z
+    data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
+    head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+    head_bz_los_coaligned['detector'] = (detector)
+    # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+    bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
+    Bz = data_bz_los_coaligned
+
+    wcs = WCS(head_bz_los_coaligned)
+
+    fits_dir_by_los_coaligned = file1_y
+    data_by_los_coaligned = fits.getdata(fits_dir_by_los_coaligned)
+    head_by_los_coaligned = fits.getheader(fits_dir_by_los_coaligned)
+    head_by_los_coaligned['Observatory'] = ('PSI-MAS')
+    head_by_los_coaligned['detector'] = (detector)
+    # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
+    by_los_coaligned_map = sunpy.map.Map(data_by_los_coaligned, head_by_los_coaligned)
+    By = data_by_los_coaligned
+
+
+    ny, nz = data_bz_los_coaligned.shape[0],data_bz_los_coaligned.shape[1]
+    dy = np.linspace(0, int(ny), ny)
+    dz = np.linspace(0, int(nz), nz)
+    X, Y = np.meshgrid(np.linspace(0, 2 * np.pi, ny), np.linspace(0, 2 * np.pi, nz))
+    # R_SUN = rsun
+    # rsun = (head['rsun'] / head['cdelt1']) * occlt_list[i]
+    widths = np.linspace(0,1024,by_los_coaligned_map.data.size)
+    skip_val = int(by_los_coaligned_map.data.shape[0]/233.14285714285714) #73.14285714285714
+    skip = (slice(None, None, skip_val), slice(None, None, skip_val))
+    skip1 = slice(None, None, skip_val)
+    by = by_los_coaligned_map.data
+    bz = bz_los_coaligned_map.data
+    by_normalized = (by / np.sqrt(by**2 + bz**2))
+    bz_normalized = (bz / np.sqrt(by**2 + bz**2))
+    r = np.power(np.add(np.power(by,2), np.power(bz,2)),0.5) * 50000
+    axes.quiver(dy[skip1],dz[skip1],by[skip],bz[skip],units='width',color='r')
+    # qk = plt.quiverkey(Q, 0.9, 0.9, 2, r'$2 \frac{m}{s}$', labelpos='E',
+    #                coordinates='figure')
+
+
+
+    # plot_features(idl_save_path, map=axes)
+    # axes[i].imshow(data, cmap='gray')
+    # axes[i].set_title(fits_file)
+
+    plt.subplots_adjust(bottom=0.05, top=0.95)
+    # plt.savefig(outpath)
+    # plt.show()
+    plt.close()
+
+
+
+
+    features = FEATURES
+    N = len(features)
+    N_nodes_max = len(features[0]['angles_xx_r'])
+    angle_err = np.zeros((N, N_nodes_max), dtype=float)
+    angle_err_signed = np.zeros((N, N_nodes_max), dtype=float)
+    angle_err_signed_test = np.zeros((N, N_nodes_max), dtype=float)
+    angles = []
+    angles_signed = []
+    angles_signed_test = []
+    angles_signed_test_2 = []
+    angles_xx_positions = []
+    angles_yy_positions = []
+
+    for i in range(N):
+        # this needs to be [:features[i]['n_nodes'] -1]
+        xx = features[i]['angles_xx_r'][:features[i]['n_nodes']]
+        yy = features[i]['angles_yy_r'][:features[i]['n_nodes']]
+        for k in range(features[i]['n_nodes'] - 1):
+            v1 = [features[i]['xx_r'][k+1] - features[i]['xx_r'][k], features[i]['yy_r'][k+1] - features[i]['yy_r'][k]]
+            # Because IDL indexes backwards we index by y then x
+            v2 = [By[int(yy[k]), int(xx[k])], Bz[int(yy[k]), int(xx[k])]]
+
+            v1_mag = np.sqrt(np.sum(np.array(v1) ** 2))
+            v2_mag = np.sqrt(np.sum(np.array(v2) ** 2))
+
+            d_angle = np.arccos(np.sum(np.array(v1)*np.array(v2)) / (v1_mag * v2_mag) )
+            if d_angle > math.pi/2:
+                d_angle = math.pi - d_angle
+            angle_err[i, k] = d_angle
+            angles.append(d_angle)
+            angles_xx_positions.append(int(xx[k]))
+            angles_yy_positions.append(int(yy[k]))
+
+            d_angle_signed = np.arcsin((v1[0] * v2[1] - v1[1] * v2[0]) / (v1_mag * v2_mag))
+            d_angle_signed_test = np.arctan2((v1[0] * v2[1] - v1[1] * v2[0]),  (v1[0] * v2[0] + v1[1] * v2[1]))
+            d_angle_signed_test_2 = np.arctan((v1[0] * v2[1] - v1[1] * v2[0]) / (v1[0] * v2[0] + v1[1] * v2[1]))
+            angles_signed.append(d_angle_signed)
+            angles_signed_test.append(d_angle_signed_test)
+            angles_signed_test_2.append(d_angle_signed_test_2)
+
+
+    angles_arr = np.array(angles)
+    angles_arr_finite = angles_arr[~np.isnan(angles_arr)]*180/np.pi
+    angles_arr_mean = np.round(np.mean(angles_arr[~np.isnan(angles_arr)])*180/np.pi,5)
+    angles_arr_median = np.round(np.median(angles_arr[~np.isnan(angles_arr)])*180/np.pi,5)
+    std = np.round(np.std(abs(angles_arr_finite)),5)
+    confidence_interval = np.round(1.96 * (std / np.sqrt(len(angles_arr_finite))),5)
+    n = len(angles_arr_finite)
+
+    fig = plt.figure(figsize=(10, 10))
+    map = sunpy.map.Map(data, head)
+
+    telescope = head['telescop']
+    instrument = head['instrume']
+
+    date_obs = head['date-obs']
+    str_strip = date_obs.split('T',1)[0]
+    string_print = date_obs.split('T')[0].replace('-','_')
+
+    if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
+      head['detector'] = ('KCor')
+      norm = map.plot_settings['norm']
+      norm.vmin, norm.vmax = np.percentile(map.data, [1, 99.9])
+
+    if head['detector'] == 'COR1':
+        map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
+        # rsun = (head['rsun'] / head['cdelt1']) * occlt_list # number of pixels in radius of sun
+    # else:
+        # rsun = (head['rsun'] / head['cdelt1']) * occlt_list # number of pixels in radius of sun
+    axes = fig.add_subplot(1,1,1, projection=map)
+    if head['detector'] == 'PSI-MAS Forward Model' or head['telescop'] == 'PSI-MAS Forward Model':
+        map.plot(axes=axes,title=False,norm=matplotlib.colors.LogNorm())
+    elif head['detector'] == 'COR1':
+        map.plot(axes=axes,title=False,clip_interval=(1, 99.99)*u.percent)
+    else:
+        map.plot(axes=axes,title=False)
+    # axes.add_patch(Circle((int(data.shape[0]/2),int(data.shape[1]/2)), rsun, color='black',zorder=100))
+
+    idl_save = readsav(idl_save_path)
+    IMG = idl_save['img_d2_phi_r']
+    # FEATURES = idl_save['features']
+    # P = idl_save['P']
+    colors = plt.cm.jet(np.linspace(0, 1, len(FEATURES)))
+    # for i, feature in enumerate(FEATURES):
+        # axes.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
+    # Scatter plot for angle errors
+    norm = mpl.colors.Normalize(vmin=0, vmax=90)
+    sc = axes.scatter(angles_xx_positions, angles_yy_positions, c=np.degrees(angles), cmap='viridis', label=False, norm=norm)
+    divider = make_axes_locatable(axes)
+    cax = divider.append_axes('right', size='5%', pad=0.6)
+    # Add colorbar manually
+    # cb = mpl.colorbar.ColorbarBase(cax,orientation='vertical')
+
+    cax.yaxis.set_ticks_position('right')
+    cax.yaxis.set_label_position('right')
+    norm = mpl.colors.Normalize(vmin=0, vmax=90)
+    cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical', norm=norm)
+    # cax.set_xlabel(' ')
+    # cax.grid(axis='y')
+    lat = cax.coords[0]
+    # lat.set_ticks([20,20]*u.arcsec)
+    lat.set_ticks_visible(False)
+    lat.set_ticklabel_visible(False)
+    lat.set_axislabel('')
+    if PSI:
+        axes.set_title('Corresponding PSI/FORWARD pB Eclipse Model')
+        # plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.png'.format(string_print, detector)))
+    else:
+        axes.set_title('{} Observation {}'.format(detector, str_strip))
+        # plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)))
+    plt.show()
+    plt.close()
+
+
+    return angles_arr_finite, angles_arr_mean, angles_arr_median, confidence_interval, n
+
+

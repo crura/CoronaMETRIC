@@ -246,3 +246,52 @@ data_stats_2_combined.append((data_type_ne_LOS_combined, data_source, date_combi
 
 cur.executemany("INSERT INTO stats3_new VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
+
+
+query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM stats3_new WHERE date!='combined' ORDER BY mean ASC;"
+cur.execute(query)
+rows = cur.fetchall()
+
+# Close the cursor and the connection
+cur.close()
+con.close()
+
+# Process the data for plotting
+data_by_date = {}  # Dictionary to store data by date
+
+for row in rows:
+    mean, median, date, data_type, data_source, n, confidence = row
+    if date not in data_by_date:
+        data_by_date[date] = {'mean': [], 'confidence': [], 'data_type': []}
+    data_by_date[date]['mean'].append(mean)
+    data_by_date[date]['confidence'].append(confidence)
+    data_by_date[date]['data_type'].append(data_type)
+
+# Plot the scatter plot with error bars by date
+dates = sorted(list(data_by_date.keys()))
+data_types = list(set(data_by_date[dates[0]]['data_type']))  # Assuming data types are consistent across dates
+
+# Create a scatter plot for each date
+for i, date in enumerate(dates):
+    data_to_plot = [data_by_date[date]['mean'][j] for j in range(len(data_by_date[date]['data_type']))]
+    confidence_to_plot = [data_by_date[date]['confidence'][j] for j in range(len(data_by_date[date]['data_type']))]
+    data_type_to_plot = [data_by_date[date]['data_type'][j] for j in range(len(data_by_date[date]['data_type']))]
+    for j in range(len(data_to_plot)):
+        if data_type_to_plot[j] == data_types[0]:
+            plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C0' ,label=data_type_to_plot[j] if i == 0 else "")
+        elif data_type_to_plot[j] == data_types[1]:
+            plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C1' ,label=data_type_to_plot[j] if i == 0 else "")
+        elif data_type_to_plot[j] == data_types[2]:
+            plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C2' ,label=data_type_to_plot[j] if i == 0 else "")
+
+# Customize the plot
+plt.xlabel('Date of Corresponding Observation')
+plt.ylabel('Mean Value (Degrees)')
+plt.title('PSI COR-1 Projection Angle Discrepancy by Date')
+plt.legend()
+plt.ylim(0,20)
+
+# Set x-axis ticks and labels
+plt.xticks(range(len(dates)), dates)
+
+plt.show()

@@ -45,9 +45,9 @@ cur = con.cursor()
 
 # cur.execute("CREATE TABLE stats2_new(data_type, data_source, date, mean, median, confidence interval, n)")
 
-cur.execute("DROP TABLE IF EXISTS stats3_new")
+cur.execute("DROP TABLE IF EXISTS stats3_copy")
 
-cur.execute("CREATE TABLE IF NOT EXISTS stats3_new(data_type, data_source, date, mean, median, confidence interval, n)")
+cur.execute("CREATE TABLE IF NOT EXISTS stats3_copy(data_type, data_source, date, mean, median, confidence interval, n)")
 
 
 repo = git.Repo('.', search_parent_directories=True)
@@ -109,7 +109,7 @@ combined_pB = []
 combined_ne = []
 combined_ne_LOS = []
 
-for i in range(len(fits_files_pB)-1):
+for i in range(len(fits_files_pB)):
     data_stats_2 = []
 
     file_pB = fits_files_pB[i]
@@ -127,7 +127,7 @@ for i in range(len(fits_files_pB)-1):
     angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav')
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS))
 
-    cur.executemany("INSERT INTO stats3_new VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT INTO stats3_copy VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
 
     # retrieve probability density data from seaborne distplots
@@ -244,17 +244,17 @@ data_stats_2_combined.append((data_type_ne_LOS_combined, data_source, date_combi
 
 
 
-cur.executemany("INSERT INTO stats3_new VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT INTO stats3_copy VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
-query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM stats3_new WHERE date!='combined' ORDER BY mean ASC;"
+query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM stats3_copy WHERE date!='combined' ORDER BY mean ASC;"
 cur.execute(query)
 rows = cur.fetchall()
 
 # Close the cursor and the connection
 cur.close()
-con.close()
+connection.close()
 
 # Process the data for plotting
 data_by_date = {}  # Dictionary to store data by date

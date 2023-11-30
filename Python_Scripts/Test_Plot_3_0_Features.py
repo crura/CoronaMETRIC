@@ -49,6 +49,10 @@ cur.execute("DROP TABLE IF EXISTS central_tendency_stats_cor1")
 
 cur.execute("CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1(data_type, data_source, date, mean, median, confidence interval, n)")
 
+cur.execute("DROP TABLE IF EXISTS central_tendency_stats_kcor")
+
+cur.execute("CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor(data_type, data_source, date, mean, median, confidence interval, n)")
+
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -99,6 +103,8 @@ def determine_paths(fits_file, PSI=True):
     data_source = keyword
 
     return data_source, date, data_type
+
+
 
 fits_path = os.path.join(repo_path, 'QRaFT/3.0_PSI_Tests')
 fits_files_pB = get_files_from_pattern(fits_path, 'COR1__PSI_pB.fits')
@@ -249,13 +255,44 @@ cur.executemany("INSERT INTO central_tendency_stats_cor1 VALUES(?, ?, ?, ?, ?, ?
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
+
+what = sns.histplot(combined_ne_ravel_arr,kde=True, bins=30)
+norm_max_ne = max(what.get_lines()[0].get_data()[1])
+plt.close()
+
+what2 = sns.histplot(combined_pB_ravel,kde=True, bins=30)
+norm_max_pB = max(what2.get_lines()[0].get_data()[1])
+plt.close()
+
+what3 = sns.histplot(combined_ne_LOS_ravel,kde=True, bins=30)
+norm_max_ne_los = max(what3.get_lines()[0].get_data()[1])
+plt.close()
+
+fig = plt.figure(figsize=(10,10))
+ax = fig.subplots(1,1)
+sns.histplot(combined_ne_ravel_arr,kde=True,label='ne',bins=30,ax=ax,color='tab:blue')
+sns.histplot(combined_pB_ravel,kde=True,label='pB',bins=30,ax=ax,color='tab:orange')
+sns.histplot(combined_ne_LOS_ravel,kde=True, bins=30, label='ne_LOS',ax=ax, color='tab:green')
+
+#sns.kdeplot()
+ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
+ax.set_ylabel('Pixel Count',fontsize=14)
+detector = 'COR1_PSI'
+ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
+ax.set_xlim(-95,95)
+#ax.set_ylim(0,0.07)
+ax.legend(fontsize=13)
+
+plt.show()
+plt.close()
+
 query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM central_tendency_stats_cor1 WHERE date!='combined' ORDER BY mean ASC;"
 cur.execute(query)
 rows = cur.fetchall()
 
 # Close the cursor and the connection
 cur.close()
-connection.close()
+con.close()
 
 # Process the data for plotting
 data_by_date = {}  # Dictionary to store data by date

@@ -468,7 +468,7 @@ def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
 # repo = git.Repo('.', search_parent_directories=True)
 # repo_path = repo.working_tree_dir
 
-def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, PSI=True, enhanced=False):
+def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data_type=None, PSI=True, enhanced=False):
     # fig, axes = plt.subplots(nrows=int(n/2), ncols=2, figsize=(10, 10))
     fig = plt.figure(figsize=(10, 10))
 
@@ -712,11 +712,17 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, PSI=
     lat.set_axislabel('')
     if PSI:
         axes.set_title('Corresponding PSI/FORWARD pB Eclipse Model')
-        # plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.png'.format(string_print, detector)))
+        if data_type:
+            plt.savefig(os.path.join(repo_path,'QRaFT/3.0_PSI_Tests/Plots/Features_Angle_Error_{}_{}_{}_PSI.png'.format(string_print, detector, data_type)))
+        else:
+            plt.savefig(os.path.join(repo_path,'QRaFT/3.0_PSI_Tests/Plots/Features_Angle_Error_{}_{}_PSI.png'.format(string_print, detector)))
     else:
         axes.set_title('{} Observation {}'.format(detector, str_strip))
-        # plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)))
-    plt.show()
+        if data_type:
+            plt.savefig(os.path.join(repo_path,'QRaFT/3.0_PSI_Tests/Plots/Features_Angle_Error_{}_{}_{}.png'.format(string_print, detector, data_type)))
+        else:
+            plt.savefig(os.path.join(repo_path,'QRaFT/3.0_PSI_Tests/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)))
+    # plt.show()
     plt.close()
 
 

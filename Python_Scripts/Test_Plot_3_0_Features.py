@@ -45,9 +45,9 @@ cur = con.cursor()
 
 # cur.execute("CREATE TABLE stats2_new(data_type, data_source, date, mean, median, confidence interval, n)")
 
-cur.execute("DROP TABLE IF EXISTS stats3_copy")
+cur.execute("DROP TABLE IF EXISTS central_tendency_stats_cor1")
 
-cur.execute("CREATE TABLE IF NOT EXISTS stats3_copy(data_type, data_source, date, mean, median, confidence interval, n)")
+cur.execute("CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1(data_type, data_source, date, mean, median, confidence interval, n)")
 
 
 repo = git.Repo('.', search_parent_directories=True)
@@ -114,20 +114,20 @@ for i in range(len(fits_files_pB)):
 
     file_pB = fits_files_pB[i]
     data_source, date, data_type = determine_paths(file_pB)
-    angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav')
+    angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB))
 
     file_ne = fits_files_ne[i]
     data_source, date, data_type = determine_paths(file_ne)
-    angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav')
+    angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne))
 
     file_ne_LOS = fits_files_ne_LOS[i]
     data_source, date, data_type = determine_paths(file_ne_LOS)
-    angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav')
+    angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS))
 
-    cur.executemany("INSERT INTO stats3_copy VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT INTO central_tendency_stats_cor1 VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
 
     # retrieve probability density data from seaborne distplots
@@ -169,7 +169,8 @@ for i in range(len(fits_files_pB)):
     plt.plot(x_1_ne, kde0_x_ne, color='b', label='ne KDE')
     plt.plot(x_1_pB, kde0_x_pB, color='r', label='pB KDE')
     plt.legend()
-    plt.show()
+    # plt.show()
+    plt.close()
 
 
     #compute JS Divergence
@@ -244,11 +245,11 @@ data_stats_2_combined.append((data_type_ne_LOS_combined, data_source, date_combi
 
 
 
-cur.executemany("INSERT INTO stats3_copy VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT INTO central_tendency_stats_cor1 VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
-query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM stats3_copy WHERE date!='combined' ORDER BY mean ASC;"
+query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM central_tendency_stats_cor1 WHERE date!='combined' ORDER BY mean ASC;"
 cur.execute(query)
 rows = cur.fetchall()
 
@@ -271,6 +272,7 @@ for row in rows:
 dates = sorted(list(data_by_date.keys()))
 data_types = list(set(data_by_date[dates[0]]['data_type']))  # Assuming data types are consistent across dates
 
+fig = plt.figure(figsize=(8, 8))
 # Create a scatter plot for each date
 for i, date in enumerate(dates):
     data_to_plot = [data_by_date[date]['mean'][j] for j in range(len(data_by_date[date]['data_type']))]
@@ -293,5 +295,5 @@ plt.ylim(0,20)
 
 # Set x-axis ticks and labels
 plt.xticks(range(len(dates)), dates)
-
+plt.savefig(os.path.join(repo_path, 'QRaFT/3.0_PSI_Tests/Plots', '{}_Angle_Discrepancy_By_Date.png'.format(data_type)))
 plt.show()

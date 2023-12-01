@@ -655,6 +655,8 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data
     std = np.round(np.std(abs(angles_arr_finite)),5)
     confidence_interval = np.round(1.96 * (std / np.sqrt(len(angles_arr_finite))),5)
     n = len(angles_arr_finite)
+    angles_signed_arr = np.array(angles_signed)
+    angles_signed_arr_finite = angles_signed_arr[~np.isnan(angles_signed_arr)]*180/np.pi
 
     fig = plt.figure(figsize=(10, 10))
     map = sunpy.map.Map(data, head)
@@ -727,7 +729,7 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data
     plt.close()
 
 
-    return angles_arr_finite, angles_arr_mean, angles_arr_median, confidence_interval, n
+    return angles_signed_arr_finite, angles_arr_finite, angles_arr_mean, angles_arr_median, confidence_interval, n
 
 
 

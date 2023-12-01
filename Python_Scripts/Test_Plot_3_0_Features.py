@@ -70,59 +70,63 @@ combined_pB = []
 combined_ne = []
 combined_ne_LOS = []
 
+combined_pB_signed = []
+combined_ne_signed = []
+combined_ne_signed_LOS = []
+
 for i in range(len(fits_files_pB)):
     data_stats_2 = []
 
     file_pB = fits_files_pB[i]
     data_source, date, data_type = determine_paths(file_pB)
-    angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type)
+    angles_signed_arr_finite_pB, angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB))
 
     file_ne = fits_files_ne[i]
     data_source, date, data_type = determine_paths(file_ne)
-    angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type)
+    angles_signed_arr_finite_ne, angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne))
 
     file_ne_LOS = fits_files_ne_LOS[i]
     data_source, date, data_type = determine_paths(file_ne_LOS)
-    angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type)
+    angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS))
 
     cur.executemany("INSERT INTO central_tendency_stats_cor1 VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
 
     # retrieve probability density data from seaborne distplots
-    x_dist_values_pB = sns.distplot(angles_arr_finite_pB).get_lines()[0].get_data()[0]
+    x_dist_values_pB = sns.distplot(angles_signed_arr_finite_pB).get_lines()[0].get_data()[0]
     xmin_pB = x_dist_values_pB.min()
     xmax_pB = x_dist_values_pB.max()
     # plt.show()
     plt.close()
 
-    kde0_pB = gaussian_kde(angles_arr_finite_pB)
+    kde0_pB = gaussian_kde(angles_signed_arr_finite_pB)
     x_1_pB = np.linspace(xmin_pB, xmax_pB, 200)
     kde0_x_pB = kde0_pB(x_1_pB)
 
     # retrieve probability density data from seaborne distplots
-    x_dist_values_ne = sns.distplot(angles_arr_finite_ne).get_lines()[0].get_data()[0]
+    x_dist_values_ne = sns.distplot(angles_signed_arr_finite_ne).get_lines()[0].get_data()[0]
     xmin_ne = x_dist_values_ne.min()
     xmax_ne = x_dist_values_ne.max()
     # plt.show()
     plt.close()
 
-    kde0_ne = gaussian_kde(angles_arr_finite_ne)
+    kde0_ne = gaussian_kde(angles_signed_arr_finite_ne)
     x_1_ne = np.linspace(xmin_ne, xmax_ne, 200)
     kde0_x_ne = kde0_ne(x_1_ne)
 
 
 
     # retrieve probability density data from seaborne distplots
-    x_dist_values_ne_LOS = sns.distplot(angles_arr_finite_ne_LOS).get_lines()[0].get_data()[0]
+    x_dist_values_ne_LOS = sns.distplot(angles_signed_arr_finite_ne_LOS).get_lines()[0].get_data()[0]
     xmin_ne_LOS = x_dist_values_ne_LOS.min()
     xmax_ne_LOS = x_dist_values_ne_LOS.max()
     # plt.show()
     plt.close()
 
-    kde0_ne_LOS = gaussian_kde(angles_arr_finite_ne_LOS)
+    kde0_ne_LOS = gaussian_kde(angles_signed_arr_finite_ne_LOS)
     x_1_ne_LOS = np.linspace(xmin_ne_LOS, xmax_ne_LOS, 200)
     kde0_x_ne_LOS = kde0_ne_LOS(x_1_ne_LOS)
 
@@ -168,6 +172,11 @@ for i in range(len(fits_files_pB)):
     combined_ne.append(angles_arr_finite_ne)
     combined_ne_LOS.append(angles_arr_finite_ne_LOS)
 
+
+    combined_pB_signed.append(angles_signed_arr_finite_pB)
+    combined_ne_signed.append(angles_signed_arr_finite_ne)
+    combined_ne_signed_LOS.append(angles_signed_arr_finite_ne_LOS)
+
 data_stats_2_combined = []
 
 combined_pB_ravel = [item for sublist in combined_pB for item in sublist]
@@ -210,24 +219,31 @@ cur.executemany("INSERT INTO central_tendency_stats_cor1 VALUES(?, ?, ?, ?, ?, ?
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
+combined_pB_signed_ravel = [item for sublist in combined_pB_signed for item in sublist]
+combined_ne_signed_ravel = [item for sublist in combined_ne_signed for item in sublist]
+combined_ne_signed_LOS_ravel = [item for sublist in combined_ne_signed_LOS for item in sublist]
 
-what = sns.histplot(combined_ne_ravel_arr,kde=True, bins=30)
+combined_pB_signed_ravel_arr = np.array(combined_pB_signed_ravel)
+combined_ne_signed_ravel_arr = np.array(combined_ne_signed_ravel)
+combined_ne_signed_LOS_ravel_arr = np.array(combined_ne_signed_LOS_ravel)
+
+what = sns.histplot(combined_ne_signed_ravel_arr,kde=True, bins=30)
 norm_max_ne = max(what.get_lines()[0].get_data()[1])
 plt.close()
 
-what2 = sns.histplot(combined_pB_ravel,kde=True, bins=30)
+what2 = sns.histplot(combined_pB_signed_ravel,kde=True, bins=30)
 norm_max_pB = max(what2.get_lines()[0].get_data()[1])
 plt.close()
 
-what3 = sns.histplot(combined_ne_LOS_ravel,kde=True, bins=30)
+what3 = sns.histplot(combined_ne_signed_LOS_ravel,kde=True, bins=30)
 norm_max_ne_los = max(what3.get_lines()[0].get_data()[1])
 plt.close()
 
 fig = plt.figure(figsize=(10,10))
 ax = fig.subplots(1,1)
-sns.histplot(combined_ne_ravel_arr,kde=True,label='ne',bins=30,ax=ax,color='tab:blue')
-sns.histplot(combined_pB_ravel,kde=True,label='pB',bins=30,ax=ax,color='tab:orange')
-sns.histplot(combined_ne_LOS_ravel,kde=True, bins=30, label='ne_LOS',ax=ax, color='tab:green')
+sns.histplot(combined_ne_signed_ravel_arr,kde=True,label='ne',bins=30,ax=ax,color='tab:blue')
+sns.histplot(combined_pB_signed_ravel,kde=True,label='pB',bins=30,ax=ax,color='tab:orange')
+sns.histplot(combined_ne_signed_LOS_ravel,kde=True, bins=30, label='ne_LOS',ax=ax, color='tab:green')
 
 #sns.kdeplot()
 ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)

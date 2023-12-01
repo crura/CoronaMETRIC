@@ -21,6 +21,7 @@ from scipy.stats import gaussian_kde
 import seaborn as sns
 import math
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import glob
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -727,5 +728,54 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data
 
 
     return angles_arr_finite, angles_arr_mean, angles_arr_median, confidence_interval, n
+
+
+
+def get_files_from_pattern(directory, pattern):
+    # Use glob to get all files with the '.fits' extension in the specified directory
+    fits_files = glob.glob(f"{directory}/*{pattern}")
+    return sorted(fits_files)
+
+
+def determine_paths(fits_file, PSI=True):
+
+    filename = fits_file.split('/')[-1]
+
+    data = fits.getdata(fits_file)
+    head = fits.getheader(fits_file)
+
+    telescope = head['telescop']
+    instrument = head['instrume']
+
+    if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
+        head['detector'] = ('KCor')
+
+    detector = head['detector']
+    if PSI:
+        if detector == 'KCor':
+            if 'KCor' in filename:
+                keyword = 'KCor__PSI'
+                keyword_By = 'KCor__PSI_By.fits'
+                keyword_Bz = 'KCor__PSI_Bz.fits'
+                file1_y = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_By)
+                file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_Bz)
+
+        elif detector == 'COR1':
+            if 'COR1' in filename:
+                keyword = 'COR1__PSI'
+                keyword_By = 'COR1__PSI_By.fits'
+                keyword_Bz = 'COR1__PSI_Bz.fits'
+                file1_y = os.path.join(repo_path, 'Output/fits_images/' + filename.split('COR1')[0] + keyword_By)
+                file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('COR1')[0] + keyword_Bz)
+    
+    date_obs = head['date-obs']
+    date = date_obs.split('T',1)[0]
+    string_print = date_obs.split('T')[0].replace('-','_')
+    data_type = filename.split('_')[-1].strip('.fits')
+    if data_type == 'LOS':
+        data_type = 'ne_LOS'
+    data_source = keyword
+
+    return data_source, date, data_type
 
 

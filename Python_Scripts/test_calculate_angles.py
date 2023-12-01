@@ -51,7 +51,7 @@ def get_detector(fitsfilepath):
     instrument = head['instrume']
     if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
       head['detector'] = ('KCor')
-      
+
     return head['detector']
 
 
@@ -171,7 +171,7 @@ if PSI:
             keyword_Bz = 'KCor__PSI_Bz.fits'
             file1_y = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_By)
             file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('KCor')[0] + keyword_Bz)
-    
+
     elif detector == 'COR1':
         if 'COR1' in filename:
             keyword_By = 'COR1__PSI_By.fits'
@@ -225,6 +225,8 @@ By = data_by_los_coaligned
 
 # d_angle = acos(total(v1*v2)/(v1_mag*v2_mag))
 angles = []
+angles_signed = []
+angles_signed_test = []
 angles_xx_positions = []
 angles_yy_positions = []
 for i in range(N):
@@ -235,10 +237,10 @@ for i in range(N):
         v1 = [features[i]['xx_r'][k+1] - features[i]['xx_r'][k], features[i]['yy_r'][k+1] - features[i]['yy_r'][k]]
         # Because IDL indexes backwards we index by y then x
         v2 = [By[int(yy[k]), int(xx[k])], Bz[int(yy[k]), int(xx[k])]]
-        
+
         v1_mag = np.sqrt(np.sum(np.array(v1) ** 2))
         v2_mag = np.sqrt(np.sum(np.array(v2) ** 2))
-        
+
         d_angle = np.arccos(np.sum(np.array(v1)*np.array(v2)) / (v1_mag * v2_mag) )
         if d_angle > math.pi/2:
             d_angle = math.pi - d_angle
@@ -246,8 +248,13 @@ for i in range(N):
         angles.append(d_angle)
         angles_xx_positions.append(int(xx[k]))
         angles_yy_positions.append(int(yy[k]))
-        
-        
+
+        d_angle_signed = np.arcsin((v1[0] * v2[1] - v1[1] * v2[0]) / (v1_mag * v2_mag))
+        d_angle_signed_test = np.arctan2(v1[0] * v2[1] - v1[1] * v2[0], v1[0] * v2[0] + v1[1] * v2[1])
+        angles_signed.append(d_angle_signed)
+        angles_signed_test.append(d_angle_signed_test)
+
+
 fig = plt.figure(figsize=(10, 10))
 map = sunpy.map.Map(data, head)
 
@@ -287,7 +294,7 @@ cax = divider.append_axes('right', size='5%', pad=0.6)
 
 cax.yaxis.set_ticks_position('right')
 cax.yaxis.set_label_position('right')
-cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degree)', orientation='vertical')
+cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical')
 # cax.set_xlabel(' ')
 # cax.grid(axis='y')
 lat = cax.coords[0]
@@ -297,6 +304,69 @@ lat.set_ticklabel_visible(False)
 lat.set_axislabel('')
 plt.show()
 plt.close()
+
+
+
+
+
+
+
+
+
+
+
+
+fig = plt.figure(figsize=(10, 10))
+map = sunpy.map.Map(data, head)
+
+telescope = head['telescop']
+instrument = head['instrume']
+
+if telescope == 'COSMO K-Coronagraph' or instrument == 'COSMO K-Coronagraph':
+  head['detector'] = ('KCor')
+
+if head['detector'] == 'COR1':
+    map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
+    # rsun = (head['rsun'] / head['cdelt1']) * occlt_list # number of pixels in radius of sun
+# else:
+    # rsun = (head['rsun'] / head['cdelt1']) * occlt_list # number of pixels in radius of sun
+axes = fig.add_subplot(1,1,1, projection=map)
+if head['detector'] == 'PSI-MAS Forward Model' or head['telescop'] == 'PSI-MAS Forward Model':
+    map.plot(axes=axes,title=False,norm=matplotlib.colors.LogNorm())
+elif head['detector'] == 'COR1':
+    map.plot(axes=axes,title=False,clip_interval=(1, 99.99)*u.percent)
+else:
+    map.plot(axes=axes,title=False)
+# axes.add_patch(Circle((int(data.shape[0]/2),int(data.shape[1]/2)), rsun, color='black',zorder=100))
+
+idl_save = readsav(idl_save_path)
+IMG = idl_save['img_orig']
+FEATURES = idl_save['features']
+P = idl_save['P']
+colors = plt.cm.jet(np.linspace(0, 1, len(FEATURES)))
+# for i, feature in enumerate(FEATURES):
+    # axes.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
+# Scatter plot for angle errors
+sc = axes.scatter(angles_xx_positions, angles_yy_positions, c=np.degrees(angles_signed), cmap='Spectral', label=False)
+divider = make_axes_locatable(axes)
+cax = divider.append_axes('right', size='5%', pad=0.6)
+# Add colorbar manually
+# cb = mpl.colorbar.ColorbarBase(cax,orientation='vertical')
+
+cax.yaxis.set_ticks_position('right')
+cax.yaxis.set_label_position('right')
+cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical')
+# cax.set_xlabel(' ')
+# cax.grid(axis='y')
+lat = cax.coords[0]
+# lat.set_ticks([20,20]*u.arcsec)
+lat.set_ticks_visible(False)
+lat.set_ticklabel_visible(False)
+lat.set_axislabel('')
+plt.show()
+plt.close()
+
+
 
 
 
@@ -314,10 +384,3 @@ plt.close()
 # fig.colorbar(np.degrees(angles), cax, label='Angle Error (degrees)')
 # plt.show()
 # plt.close()
-
-    
-    
-    
-
-    
-    

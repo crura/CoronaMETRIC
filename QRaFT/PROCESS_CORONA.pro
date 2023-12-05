@@ -261,17 +261,12 @@
        PLOT_FEATURES, IMG_p_enh, FEATURES, P, range=minmax(P.blob_detect_thresholds)/2.0, title=file_basename(fname), /polar, $
        				  position=[0.02,0.0,0.95, 0.5]+dpos, /old
 
-
-
  	   !P.noerase=0
  	   !P.charsize=1.00
 
 
    if keyword_set(save) then $
-     image_array = TVRD(True=1)
-     filename = fname + '.png'
-     WRITE_PNG, filename, image_array
-     save, filename=fname +'.sav', FEATURES, IMG_orig, IMG_enh, IMG_p_enh, image_array, P, header, fname
+     save, filename=fname +'.sav', FEATURES, IMG_orig, IMG_enh, IMG_p_enh, P, header, fname
 
 
     !quiet = 0 & !except =1

@@ -36,6 +36,9 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 from functions import calculate_KDE_statistics, determine_paths, get_files_from_pattern
 import sqlite3
+from scipy.stats import f_oneway
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+from scipy.stats import tukey_hsd
 
 
 con = sqlite3.connect("tutorial.db")
@@ -46,13 +49,13 @@ cur = con.cursor()
 
 # cur.execute("CREATE TABLE stats2_new(data_type, data_source, date, mean, median, confidence interval, n)")
 
-cur.execute("DROP TABLE IF EXISTS central_tendency_stats_cor1")
+cur.execute("DROP TABLE IF EXISTS central_tendency_stats_cor1_new")
 
-cur.execute("CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1(data_type, data_source, date, mean, median, confidence interval, n)")
+cur.execute("CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_new(data_type, data_source, date, mean, median, confidence interval, n)")
 
-cur.execute("DROP TABLE IF EXISTS central_tendency_stats_kcor")
+cur.execute("DROP TABLE IF EXISTS central_tendency_stats_kcor_new")
 
-cur.execute("CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor(data_type, data_source, date, mean, median, confidence interval, n)")
+cur.execute("CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_new(data_type, data_source, date, mean, median, confidence interval, n)")
 
 
 repo = git.Repo('.', search_parent_directories=True)
@@ -92,7 +95,7 @@ for i in range(len(fits_files_pB)):
     angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS))
 
-    cur.executemany("INSERT INTO central_tendency_stats_cor1 VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
 
     # retrieve probability density data from seaborne distplots
@@ -215,7 +218,7 @@ data_stats_2_combined.append((data_type_ne_LOS_combined, data_source, date_combi
 
 
 
-cur.executemany("INSERT INTO central_tendency_stats_cor1 VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
@@ -267,11 +270,11 @@ ax.legend(fontsize=13)
 # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
-plt.savefig(os.path.join(repo_path,'QRaFT/3.0_PSI_Tests/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
+plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
 # plt.show()
 #plt.close()
 
-query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM central_tendency_stats_cor1 WHERE date!='combined' ORDER BY mean ASC;"
+query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM central_tendency_stats_cor1_new WHERE date!='combined' ORDER BY mean ASC;"
 cur.execute(query)
 rows = cur.fetchall()
 
@@ -317,17 +320,70 @@ plt.ylim(0,20)
 
 # Set x-axis ticks and labels
 plt.xticks(range(len(dates)), dates)
-plt.savefig(os.path.join(repo_path, 'QRaFT/3.0_PSI_Tests/Plots', '{}_Angle_Discrepancy_By_Date.png'.format(data_type)))
+plt.savefig(os.path.join(repo_path, 'Output/Plots', '{}_Angle_Discrepancy_By_Date.png'.format(data_type)))
 plt.show()
 
+# Combine data into a single array
+all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr])
+
+# Create labels for the data types
+labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr)
+
+# Perform Tukey's HSD post-hoc test
+tukey_result = pairwise_tukeyhsd(all_data, labels)
+print(tukey_result)
 
 
+f_statistic, p_value = f_oneway(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr)
+# Check for statistical significance
+if p_value < 0.05:
+    print("There are significant differences between at least two data types.")
+else:
+    print("No significant differences detected between data types.")
 
 
+res = tukey_hsd(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr)
+print(res)
 
 
+# Combine data into a single array
+all_data = np.concatenate([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr])
+
+# Create labels for the data types
+labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr)
+
+# Perform Tukey's HSD post-hoc test
+tukey_result = pairwise_tukeyhsd(all_data, labels)
+print(tukey_result)
+fig, ax = plt.subplots(1, 1)
+# ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr], showfliers=False)
+# ax.set_xticklabels(["ne", "ne_LOS", "pB"]) 
+ax.set_xlabel("Mean (Degrees)") 
+ax.set_ylabel("Data Type") 
+ax.set_title('HSD Comparison of Data Types for PSI_COR1 Combined Results')
+tukey_result.plot_simultaneous(xlabel='Mean (Degrees)', ax=ax)
+plt.savefig(os.path.join(repo_path,'Output/Plots/testfig1.png'))
+plt.show()
+
+f_statistic, p_value = f_oneway(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr)
+# Check for statistical significance
+if p_value < 0.05:
+    print("There are significant differences between at least two data types.")
+else:
+    print("No significant differences detected between data types.")
 
 
+fig, ax = plt.subplots(1, 1)
+ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr], showfliers=False)
+ax.set_xticklabels(["ne", "ne_LOS", "pB"]) 
+ax.set_ylabel("Mean (Degrees)") 
+ax.set_xlabel("Data Type") 
+ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
+plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.png'))
+plt.show()
+
+res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr)
+print(res)
 
 
 fits_path = os.path.join(repo_path, 'QRaFT/3.0_PSI_Tests')
@@ -361,7 +417,7 @@ for i in range(len(fits_files_pB)):
     angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS))
 
-    cur.executemany("INSERT INTO central_tendency_stats_kcor VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
 
     # retrieve probability density data from seaborne distplots
@@ -484,7 +540,7 @@ data_stats_2_combined.append((data_type_ne_LOS_combined, data_source, date_combi
 
 
 
-cur.executemany("INSERT INTO central_tendency_stats_kcor VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
@@ -536,11 +592,11 @@ ax.legend(fontsize=13)
 # plt.text(20,0.045,"kcor average discrepancy: " + str(np.round(np.average(err_kcor_central_deg),5)))
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_kcor_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
-plt.savefig(os.path.join(repo_path,'QRaFT/3.0_PSI_Tests/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
+plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
 # plt.show()
 #plt.close()
 
-query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM central_tendency_stats_kcor WHERE date!='combined' ORDER BY mean ASC;"
+query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM central_tendency_stats_kcor_new WHERE date!='combined' ORDER BY mean ASC;"
 cur.execute(query)
 rows = cur.fetchall()
 
@@ -586,5 +642,68 @@ plt.ylim(0,20)
 
 # Set x-axis ticks and labels
 plt.xticks(range(len(dates)), dates)
-plt.savefig(os.path.join(repo_path, 'QRaFT/3.0_PSI_Tests/Plots', '{}_Angle_Discrepancy_By_Date.png'.format(data_type)))
+plt.savefig(os.path.join(repo_path, 'Output/Plots', '{}_Angle_Discrepancy_By_Date.png'.format(data_type)))
 plt.show()
+
+
+# Combine data into a single array
+all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr])
+
+# Create labels for the data types
+labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr)
+
+# Perform Tukey's HSD post-hoc test
+tukey_result = pairwise_tukeyhsd(all_data, labels)
+print(tukey_result)
+
+
+f_statistic, p_value = f_oneway(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr)
+# Check for statistical significance
+if p_value < 0.05:
+    print("There are significant differences between at least two data types.")
+else:
+    print("No significant differences detected between data types.")
+
+
+res = tukey_hsd(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr)
+print(res)
+
+
+# Combine data into a single array
+all_data = np.concatenate([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr])
+
+# Create labels for the data types
+labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr)
+
+# Perform Tukey's HSD post-hoc test
+tukey_result = pairwise_tukeyhsd(all_data, labels)
+print(tukey_result)
+fig, ax = plt.subplots(1, 1)
+# ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr], showfliers=False)
+# ax.set_xticklabels(["ne", "ne_LOS", "pB"]) 
+ax.set_xlabel("Mean (Degrees)") 
+ax.set_ylabel("Data Type") 
+ax.set_title('HSD Comparison of Data Types for PSI_KCor Combined Results')
+tukey_result.plot_simultaneous(xlabel='Mean (Degrees)', ax=ax)
+plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig1_kcor.png'))
+plt.show()
+
+f_statistic, p_value = f_oneway(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr)
+# Check for statistical significance
+if p_value < 0.05:
+    print("There are significant differences between at least two data types.")
+else:
+    print("No significant differences detected between data types.")
+
+
+fig, ax = plt.subplots(1, 1)
+ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr], showfliers=False)
+ax.set_xticklabels(["ne", "ne_LOS", "pB"]) 
+ax.set_ylabel("Mean (Degrees)") 
+ax.set_xlabel("Data Type") 
+ax.set_title('Box Plot Comparison of Data Types for PSI_KCor Combined Results')
+plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2_kcor.png'))
+plt.show()
+
+res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr)
+print(res)

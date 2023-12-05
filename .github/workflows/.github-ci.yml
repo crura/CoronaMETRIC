@@ -125,12 +125,21 @@ jobs:
           echo ".compile -v '$git_repo/run_code.pro'" &&
           echo ".compile -v '$git_repo/QRaFT/open_PSI.pro'" &&
           echo ".compile -v '$git_repo/QRaFT/QRaFT_PSI.pro'" &&
-          echo "script4, '$git_repo/Output/fits_images/', '$git_repo/Output/QRaFT_Results/',  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_COR1, L_FORWARD, /manual" &&
-          echo "script3, '$git_repo/Output/fits_images/', '$git_repo/Output/QRaFT_Results/',  err_arr_MLSO,  err_arr_LOS_MLSO, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_MLSO, L_FORWARD, /manual" &&
+          echo ".compile -v '$git_repo/QRaFT/blob_tests.pro'" &&
+          echo ".compile -v '$git_repo/QRaFT/blob_tests.pro'" &&
+          echo ".compile -v '$git_repo/QRaFT/a_graph_utils.pro'" &&
+          echo ".compile -v '$git_repo/QRaFT/qraft_test.pro'" &&
+          echo ".compile -v '$git_repo/QRaFT/run_qraft_test.pro'" &&
+          echo "device, dec=0" &&
+          # echo "flipcolors" &&
+          echo "SetColors" &&
+          echo "run_qraft_test" 
+          # echo "script4, '$git_repo/Output/fits_images/', '$git_repo/Output/QRaFT_Results/',  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_COR1, L_FORWARD, /manual" &&
+          # echo "script3, '$git_repo/Output/fits_images/', '$git_repo/Output/QRaFT_Results/',  err_arr_MLSO,  err_arr_LOS_MLSO, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_MLSO, L_FORWARD, /manual" &&
           cat) |
           /Users/crura/Documents/bin/ssw
-          mv $git_repo/Output/fits_images/*.sav $git_repo/Output/QRaFT_Results
-          mv $git_repo/Output/fits_images/*.png $git_repo/Output/QRaFT_Results
+          # mv $git_repo/Output/fits_images/*.sav $git_repo/Output/QRaFT_Results
+          # mv $git_repo/Output/fits_images/*.png $git_repo/Output/QRaFT_Results
           deactivate
 
       # - uses: actions/upload-artifact@v3
@@ -152,9 +161,7 @@ jobs:
           python3 -m venv env &&
           source env/bin/activate &&
           pip install -r requirements.txt &&
-          python Python_Scripts/new_plot_paper_figures.py
-          python Python_Scripts/test_new_plot_paper_figs.py
-          python Python_Scripts/calculate_KDE_statistics.py
+          Python_Scripts/Test_Plot_3_0_Features.py
           deactivate
 
       - uses: actions/upload-artifact@v3

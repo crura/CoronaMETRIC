@@ -233,7 +233,16 @@ combined_pB_signed_ravel_arr = np.array(combined_pB_signed_ravel)
 combined_ne_signed_ravel_arr = np.array(combined_ne_signed_ravel)
 combined_ne_signed_LOS_ravel_arr = np.array(combined_ne_signed_LOS_ravel)
 
+print(combined_ne_signed_ravel_arr)
+
+query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM central_tendency_stats_cor1_new WHERE date!='combined' ORDER BY mean ASC;"
+cur.execute(query)
+rows = cur.fetchall()
+print(rows)
+
 what = sns.histplot(combined_ne_signed_ravel_arr,kde=True, bins=30)
+print(what.get_lines()[0].get_data()[0])
+print(what.get_lines()[0].get_data()[1])
 norm_max_ne = max(what.get_lines()[0].get_data()[1])
 plt.close()
 

@@ -27,7 +27,7 @@ mpl.use('TkAgg')
 mpl.rcParams.update(mpl.rcParamsDefault)
 from functions import create_six_fig_plot
 from scipy.stats import gaussian_kde
-from test_plot_qraft import plot_features
+# from test_plot_qraft import plot_features
 import math
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from functions import display_fits_image_with_3_0_features_and_B_field

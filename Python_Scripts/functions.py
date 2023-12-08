@@ -716,15 +716,15 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data
     if PSI:
         axes.set_title('Corresponding PSI/FORWARD pB Eclipse Model')
         if data_type:
-            plt.savefig(os.path.join(repo_path,'QRaFT/3.0_PSI_Tests/Plots/Features_Angle_Error_{}_{}_{}_PSI.png'.format(string_print, detector, data_type)))
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}_PSI.png'.format(string_print, detector, data_type)))
         else:
-            plt.savefig(os.path.join(repo_path,'QRaFT/3.0_PSI_Tests/Plots/Features_Angle_Error_{}_{}_PSI.png'.format(string_print, detector)))
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.png'.format(string_print, detector)))
     else:
         axes.set_title('{} Observation {}'.format(detector, str_strip))
         if data_type:
-            plt.savefig(os.path.join(repo_path,'QRaFT/3.0_PSI_Tests/Plots/Features_Angle_Error_{}_{}_{}.png'.format(string_print, detector, data_type)))
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}.png'.format(string_print, detector, data_type)))
         else:
-            plt.savefig(os.path.join(repo_path,'QRaFT/3.0_PSI_Tests/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)))
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)))
     # plt.show()
     plt.close()
 

@@ -139,7 +139,6 @@ jobs:
           cat) |
           /Users/crura/Documents/bin/ssw
           mv $git_repo/Output/fits_images/*.sav $git_repo/Output/QRaFT_Results
-          mv $git_repo/Output/fits_images/*.png $git_repo/Output/QRaFT_Results
           cp $git_repo/Output/fits_images/*COR1__PSI*.fits $git_repo/Output/QRaFT_Results
           cp $git_repo/Output/fits_images/*KCor__PSI*.fits $git_repo/Output/QRaFT_Results
           deactivate

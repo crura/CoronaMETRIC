@@ -64,7 +64,7 @@ repo_path = repo.working_tree_dir
 
 
 
-fits_path = os.path.join(repo_path, 'QRaFT/3.0_PSI_Tests')
+fits_path = os.path.join(repo_path, 'Output/QRaFT_Results')
 fits_files_pB = get_files_from_pattern(fits_path, 'COR1__PSI_pB.fits')
 fits_files_ne = get_files_from_pattern(fits_path, 'COR1__PSI_ne.fits')
 fits_files_ne_LOS = get_files_from_pattern(fits_path, 'COR1__PSI_ne_LOS.fits')
@@ -398,7 +398,7 @@ res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ra
 print(res)
 
 
-fits_path = os.path.join(repo_path, 'QRaFT/3.0_PSI_Tests')
+fits_path = os.path.join(repo_path, 'Output/QRaFT_Results')
 fits_files_pB = get_files_from_pattern(fits_path, 'KCor__PSI_pB.fits')
 fits_files_ne = get_files_from_pattern(fits_path, 'KCor__PSI_ne.fits')
 fits_files_ne_LOS = get_files_from_pattern(fits_path, 'KCor__PSI_ne_LOS.fits')

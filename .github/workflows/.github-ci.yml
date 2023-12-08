@@ -140,6 +140,8 @@ jobs:
           /Users/crura/Documents/bin/ssw
           mv $git_repo/Output/fits_images/*.sav $git_repo/Output/QRaFT_Results
           mv $git_repo/Output/fits_images/*.png $git_repo/Output/QRaFT_Results
+          cp $git_repo/Output/fits_images/*COR1__PSI*.fits $git_repo/Output/QRaFT_Results
+          cp $git_repo/Output/fits_images/*KCor__PSI*.fits $git_repo/Output/QRaFT_Results
           deactivate
 
       # - uses: actions/upload-artifact@v3
@@ -161,6 +163,9 @@ jobs:
           python3 -m venv env &&
           source env/bin/activate &&
           pip install -r requirements.txt &&
+          # python Python_Scripts/new_plot_paper_figures.py
+          # python Python_Scripts/test_new_plot_paper_figs.py
+          # python Python_Scripts/calculate_KDE_statistics.py
           python Python_Scripts/Test_Plot_3_0_Features.py
           deactivate
 

@@ -469,7 +469,7 @@ def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
 # repo = git.Repo('.', search_parent_directories=True)
 # repo_path = repo.working_tree_dir
 
-def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data_type=None, PSI=True, enhanced=False):
+def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data_type=None, data_source=None, date=None, PSI=True, enhanced=False):
     # fig, axes = plt.subplots(nrows=int(n/2), ncols=2, figsize=(10, 10))
     fig = plt.figure(figsize=(10, 10))
 
@@ -695,8 +695,8 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data
     # for i, feature in enumerate(FEATURES):
         # axes.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
     # Scatter plot for angle errors
-    norm = mpl.colors.Normalize(vmin=0, vmax=90)
-    sc = axes.scatter(angles_xx_positions, angles_yy_positions, c=np.degrees(angles), cmap='viridis', label=False, norm=norm)
+    norm = mpl.colors.Normalize(vmin=-90, vmax=90)
+    sc = axes.scatter(angles_xx_positions, angles_yy_positions, c=np.degrees(angles_signed), cmap='coolwarm', label=False, norm=norm)
     divider = make_axes_locatable(axes)
     cax = divider.append_axes('right', size='5%', pad=0.6)
     # Add colorbar manually
@@ -704,7 +704,7 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data
 
     cax.yaxis.set_ticks_position('right')
     cax.yaxis.set_label_position('right')
-    norm = mpl.colors.Normalize(vmin=0, vmax=90)
+    norm = mpl.colors.Normalize(vmin=-90, vmax=90)
     cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical', norm=norm)
     # cax.set_xlabel(' ')
     # cax.grid(axis='y')
@@ -714,10 +714,11 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data
     lat.set_ticklabel_visible(False)
     lat.set_axislabel('')
     if PSI:
-        axes.set_title('Corresponding PSI/FORWARD pB Eclipse Model')
         if data_type:
+            axes.set_title('PSI/FORWARD {} Eclipse Model Corresponding to {} {} Observation'.format(data_type, date, data_source.strip('_PSI')))
             plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}_PSI.png'.format(string_print, detector, data_type)))
         else:
+            axes.set_title('Corresponding PSI/FORWARD pB Eclipse Model')
             plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.png'.format(string_print, detector)))
     else:
         axes.set_title('{} Observation {}'.format(detector, str_strip))

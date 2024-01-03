@@ -82,17 +82,17 @@ for i in range(len(fits_files_pB)):
 
     file_pB = fits_files_pB[i]
     data_source, date, data_type = determine_paths(file_pB)
-    angles_signed_arr_finite_pB, angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type)
+    angles_signed_arr_finite_pB, angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type, data_source=data_source, date=date)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB))
 
     file_ne = fits_files_ne[i]
     data_source, date, data_type = determine_paths(file_ne)
-    angles_signed_arr_finite_ne, angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type)
+    angles_signed_arr_finite_ne, angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type, data_source=data_source, date=date)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne))
 
     file_ne_LOS = fits_files_ne_LOS[i]
     data_source, date, data_type = determine_paths(file_ne_LOS)
-    angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type)
+    angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type, data_source=data_source, date=date)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS))
 
     cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2)
@@ -307,7 +307,7 @@ for row in rows:
 
 # Plot the scatter plot with error bars by date
 dates = sorted(list(data_by_date.keys()))
-data_types = list(set(data_by_date[dates[0]]['data_type']))  # Assuming data types are consistent across dates
+data_types = sorted(list(set(data_by_date[dates[0]]['data_type'])))  # Assuming data types are consistent across dates
 
 fig = plt.figure(figsize=(8, 8))
 # Create a scatter plot for each date
@@ -319,9 +319,9 @@ for i, date in enumerate(dates):
         if data_type_to_plot[j] == data_types[0]:
             plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C0' ,label=data_type_to_plot[j] if i == 0 else "")
         elif data_type_to_plot[j] == data_types[1]:
-            plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C1' ,label=data_type_to_plot[j] if i == 0 else "")
-        elif data_type_to_plot[j] == data_types[2]:
             plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C2' ,label=data_type_to_plot[j] if i == 0 else "")
+        elif data_type_to_plot[j] == data_types[2]:
+            plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C1' ,label=data_type_to_plot[j] if i == 0 else "")
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
@@ -388,6 +388,7 @@ else:
 fig, ax = plt.subplots(1, 1)
 ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr], showfliers=False)
 ax.set_xticklabels(["ne", "ne_LOS", "pB"]) 
+ax.set_ylim(0, 40)
 ax.set_ylabel("Mean (Degrees)") 
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
@@ -416,17 +417,17 @@ for i in range(len(fits_files_pB)):
 
     file_pB = fits_files_pB[i]
     data_source, date, data_type = determine_paths(file_pB)
-    angles_signed_arr_finite_pB, angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type)
+    angles_signed_arr_finite_pB, angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type, data_source=data_source, date=date)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB))
 
     file_ne = fits_files_ne[i]
     data_source, date, data_type = determine_paths(file_ne)
-    angles_signed_arr_finite_ne, angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type)
+    angles_signed_arr_finite_ne, angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type, data_source=data_source, date=date)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne))
 
     file_ne_LOS = fits_files_ne_LOS[i]
     data_source, date, data_type = determine_paths(file_ne_LOS)
-    angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type)
+    angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type, data_source=data_source, date=date)
     data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS))
 
     cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2)
@@ -632,7 +633,7 @@ for row in rows:
 
 # Plot the scatter plot with error bars by date
 dates = sorted(list(data_by_date.keys()))
-data_types = list(set(data_by_date[dates[0]]['data_type']))  # Assuming data types are consistent across dates
+data_types = sorted(list(set(data_by_date[dates[0]]['data_type'])))  # Assuming data types are consistent across dates
 
 fig = plt.figure(figsize=(8, 8))
 # Create a scatter plot for each date
@@ -644,9 +645,9 @@ for i, date in enumerate(dates):
         if data_type_to_plot[j] == data_types[0]:
             plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C0' ,label=data_type_to_plot[j] if i == 0 else "")
         elif data_type_to_plot[j] == data_types[1]:
-            plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C1' ,label=data_type_to_plot[j] if i == 0 else "")
-        elif data_type_to_plot[j] == data_types[2]:
             plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C2' ,label=data_type_to_plot[j] if i == 0 else "")
+        elif data_type_to_plot[j] == data_types[2]:
+            plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C1' ,label=data_type_to_plot[j] if i == 0 else "")
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
@@ -714,6 +715,7 @@ else:
 fig, ax = plt.subplots(1, 1)
 ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr], showfliers=False)
 ax.set_xticklabels(["ne", "ne_LOS", "pB"]) 
+ax.set_ylim(0, 40)
 ax.set_ylabel("Mean (Degrees)") 
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_KCor Combined Results')

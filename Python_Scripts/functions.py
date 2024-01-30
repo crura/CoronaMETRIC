@@ -22,6 +22,7 @@ import seaborn as sns
 import math
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import glob
+import sqlite3
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -508,6 +509,51 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data
 
     idl_save = readsav(idl_save_path)
     IMG = idl_save['img_d2_phi_r']
+    # fname_save, features, angle_err, angle_err_signed, IMG_d2_phi_r, blob_stat, blob_indices, XYCenter, d_phi, rot_angle, phi_shift, smooth_xy, smooth_phi_rho, detr_phi, rho_range, r_rho, p_range, n_p
+    d_phi = idl_save['d_phi']
+    d_rho = idl_save['d_rho']
+    XYCenter = idl_save['XYCenter']
+    rot_angle = idl_save['rot_angle']
+    phi_shift = idl_save['phi_shift']
+    smooth_xy = idl_save['smooth_xy']
+    smooth_phi_rho = idl_save['smooth_phi_rho']
+    detr_phi = idl_save['detr_phi']
+    rho_range = idl_save['rho_range']
+    n_rho = idl_save['n_rho']
+    p_range = idl_save['p_range']
+    n_p = idl_save['n_p']
+    n_nodes_min = idl_save['n_nodes_min']
+
+    con = sqlite3.connect("tutorial.db")
+    cur = con.cursor()
+
+    qraft_data = [(None, float(d_phi), float(d_rho), int(XYCenter[0]), int(XYCenter[1]), float(rot_angle), float(phi_shift), int(smooth_xy), int(smooth_phi_rho[0]), int(smooth_phi_rho[1]), int(detr_phi), int(rho_range[0]), int(rho_range[1]), int(n_rho), float(p_range[0]), float(p_range[1]), int(n_p), int(n_nodes_min))]
+
+    cur.executemany("""INSERT OR IGNORE INTO qraft_input_variables VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", qraft_data)
+    con.commit()
+
+    query = """SELECT qraft_parameters_id,
+            d_phi,
+            d_rho,
+            XYCenter_x,
+            XYCenter_y,
+            rot_angle,
+            phi_shift,
+            smooth_xy,
+            smooth_phi_rho_lower,
+            smooth_phi_rho_upper,
+            detr_phi,
+            rho_range_lower,
+            rho_range_upper,
+            n_rho,
+            p_range_lower,
+            p_range_upper,
+            n_p,
+            n_nodes_min FROM qraft_input_variables WHERE qraft_parameters_id=(SELECT MAX(qraft_parameters_id) FROM qraft_input_variables);"""
+    cur.execute(query)
+    rows = cur.fetchall()
+    (qraft_parameters_id, d_phi_db, d_rho_db, XYCenter_x_db, XYCenter_y_db, rot_angle_db, phi_shift_db, smooth_xy_db, smooth_phi_rho_lower_db, smooth_phi_rho_upper_db, detr_phi_db, rho_range_lower_db, rho_range_upper_db, n_rho_db, p_range_lower_db, p_range_upper_db, n_p_db, n_nodes_min_db) = rows[0]
+    foreign_key = qraft_parameters_id
     # img_enh = idl_save['img_enh']
     FEATURES = idl_save['features']
     # P = idl_save['P']
@@ -687,10 +733,6 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data
         map.plot(axes=axes,title=False)
     # axes.add_patch(Circle((int(data.shape[0]/2),int(data.shape[1]/2)), rsun, color='black',zorder=100))
 
-    idl_save = readsav(idl_save_path)
-    IMG = idl_save['img_d2_phi_r']
-    # FEATURES = idl_save['features']
-    # P = idl_save['P']
     colors = plt.cm.jet(np.linspace(0, 1, len(FEATURES)))
     # for i, feature in enumerate(FEATURES):
         # axes.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
@@ -730,7 +772,7 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data
     plt.close()
 
 
-    return angles_signed_arr_finite, angles_arr_finite, angles_arr_mean, angles_arr_median, confidence_interval, n
+    return angles_signed_arr_finite, angles_arr_finite, angles_arr_mean, angles_arr_median, confidence_interval, n, foreign_key
 
 
 

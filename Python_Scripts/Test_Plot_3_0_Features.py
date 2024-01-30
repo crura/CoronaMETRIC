@@ -47,15 +47,63 @@ cur = con.cursor()
 
 # cur.execute("CREATE TABLE stats(comparison, data_source, date, JSD, KLD)")
 
-# cur.execute("CREATE TABLE stats2_new(data_type, data_source, date, mean, median, confidence interval, n)")
+# cur.execute("CREATE TABLE stats2_new(data_type, data_source, date, mean, median, confidence_interval interval, n)")
+
+# cur.execute("DROP TABLE IF EXISTS qraft_input_variables")
+
+cur.execute("""CREATE TABLE IF NOT EXISTS qraft_input_variables (
+            qraft_parameters_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            d_phi REAL,
+            d_rho REAL,
+            XYCenter_x REAL,
+            XYCenter_y REAL,
+            rot_angle REAL,
+            phi_shift REAL,
+            smooth_xy INT,
+            smooth_phi_rho_lower INT,
+            smooth_phi_rho_upper INT,
+            detr_phi INT,
+            rho_range_lower REAL,
+            rho_range_upper REAL,
+            n_rho INT,
+            p_range_lower REAL,
+            p_range_upper REAL,
+            n_p INT,
+            n_nodes_min INT)"""
+            )
 
 cur.execute("DROP TABLE IF EXISTS central_tendency_stats_cor1_new")
 
-cur.execute("CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_new(data_type, data_source, date, mean, median, confidence interval, n)")
+cur.execute("""
+CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_new(
+    id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    data_type, 
+    data_source, 
+    date, 
+    mean, 
+    median, 
+    confidence_interval, 
+    n,
+    qraft_parameters_id INTEGER,
+    FOREIGN KEY(qraft_parameters_id) REFERENCES qraft_input_variables(qraft_parameters_id)
+)
+""")
 
 cur.execute("DROP TABLE IF EXISTS central_tendency_stats_kcor_new")
 
-cur.execute("CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_new(data_type, data_source, date, mean, median, confidence interval, n)")
+cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_new(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,  
+            data_type,  
+            data_source,  
+            date,  
+            mean,  
+            median,  
+            confidence_interval,  
+            n,   
+            qraft_parameters_id INTEGER,  
+            FOREIGN KEY(qraft_parameters_id) REFERENCES qraft_input_variables(qraft_parameters_id)
+            )
+""")
 
 
 repo = git.Repo('.', search_parent_directories=True)
@@ -77,25 +125,74 @@ combined_pB_signed = []
 combined_ne_signed = []
 combined_ne_signed_LOS = []
 
+idl_save_path = fits_files_pB[0]
+idl_save = readsav(idl_save_path)
+IMG = idl_save['img_d2_phi_r']
+# fname_save, features, angle_err, angle_err_signed, IMG_d2_phi_r, blob_stat, blob_indices, XYCenter, d_phi, rot_angle, phi_shift, smooth_xy, smooth_phi_rho, detr_phi, rho_range, r_rho, p_range, n_p
+d_phi = idl_save['d_phi']
+d_rho = idl_save['d_rho']
+XYCenter = idl_save['XYCenter']
+rot_angle = idl_save['rot_angle']
+phi_shift = idl_save['phi_shift']
+smooth_xy = idl_save['smooth_xy']
+smooth_phi_rho = idl_save['smooth_phi_rho']
+detr_phi = idl_save['detr_phi']
+rho_range = idl_save['rho_range']
+n_rho = idl_save['n_rho']
+p_range = idl_save['p_range']
+n_p = idl_save['n_p']
+n_nodes_min = idl_save['n_nodes_min']
+
+con = sqlite3.connect("tutorial.db")
+cur = con.cursor()
+
+qraft_data = [(None, float(d_phi), float(d_rho), int(XYCenter[0]), int(XYCenter[1]), float(rot_angle), float(phi_shift), int(smooth_xy), int(smooth_phi_rho[0]), int(smooth_phi_rho[1]), int(detr_phi), int(rho_range[0]), int(rho_range[1]), int(n_rho), float(p_range[0]), float(p_range[1]), int(n_p), int(n_nodes_min))]
+
+cur.executemany("""INSERT INTO qraft_input_variables VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", qraft_data)
+con.commit()
+
+query = """SELECT qraft_parameters_id,
+        d_phi,
+        d_rho,
+        XYCenter_x,
+        XYCenter_y,
+        rot_angle,
+        phi_shift,
+        smooth_xy,
+        smooth_phi_rho_lower,
+        smooth_phi_rho_upper,
+        detr_phi,
+        rho_range_lower,
+        rho_range_upper,
+        n_rho,
+        p_range_lower,
+        p_range_upper,
+        n_p,
+        n_nodes_min FROM qraft_input_variables WHERE qraft_parameters_id=(SELECT MAX(qraft_parameters_id) FROM qraft_input_variables);"""
+cur.execute(query)
+rows = cur.fetchall()
+(qraft_parameters_id, d_phi_db, d_rho_db, XYCenter_x_db, XYCenter_y_db, rot_angle_db, phi_shift_db, smooth_xy_db, smooth_phi_rho_lower_db, smooth_phi_rho_upper_db, detr_phi_db, rho_range_lower_db, rho_range_upper_db, n_rho_db, p_range_lower_db, p_range_upper_db, n_p_db, n_nodes_min_db) = rows[0]
+foreign_key_qraft_vars = qraft_parameters_id
+
 for i in range(len(fits_files_pB)):
     data_stats_2 = []
 
     file_pB = fits_files_pB[i]
     data_source, date, data_type = determine_paths(file_pB)
     angles_signed_arr_finite_pB, angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type, data_source=data_source, date=date)
-    data_stats_2.append((data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB, foreign_key_qraft_vars))
 
     file_ne = fits_files_ne[i]
     data_source, date, data_type = determine_paths(file_ne)
     angles_signed_arr_finite_ne, angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type, data_source=data_source, date=date)
-    data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne, foreign_key_qraft_vars))
 
     file_ne_LOS = fits_files_ne_LOS[i]
     data_source, date, data_type = determine_paths(file_ne_LOS)
     angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type, data_source=data_source, date=date)
-    data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_qraft_vars))
 
-    cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
 
     # retrieve probability density data from seaborne distplots
@@ -195,7 +292,7 @@ confidence_interval_pB_combined = np.round(1.96 * (std_pB_combined / np.sqrt(len
 data_type_pB_combined = 'pB'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-data_stats_2_combined.append((data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, confidence_interval_pB_combined, n_pB_combined))
+data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, confidence_interval_pB_combined, n_pB_combined, foreign_key_qraft_vars))
 
 combined_ne_ravel_arr = np.array(combined_ne_ravel)
 angles_arr_mean_ne_combined = np.round(np.mean(combined_ne_ravel_arr), 5)
@@ -206,7 +303,7 @@ confidence_interval_ne_combined = np.round(1.96 * (std_ne_combined / np.sqrt(len
 data_type_ne_combined = 'ne'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-data_stats_2_combined.append((data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, confidence_interval_ne_combined, n_ne_combined))
+data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, confidence_interval_ne_combined, n_ne_combined, foreign_key_qraft_vars))
 
 combined_ne_LOS_ravel_arr = np.array(combined_ne_LOS_ravel)
 angles_arr_mean_ne_LOS_combined = np.round(np.mean(combined_ne_LOS_ravel_arr), 5)
@@ -217,11 +314,11 @@ confidence_interval_ne_LOS_combined = np.round(1.96 * (std_ne_LOS_combined / np.
 data_type_ne_LOS_combined = 'ne_LOS'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-data_stats_2_combined.append((data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined))
+data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_qraft_vars))
 
 
 
-cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
@@ -235,7 +332,7 @@ combined_ne_signed_LOS_ravel_arr = np.array(combined_ne_signed_LOS_ravel)
 
 print(combined_ne_signed_ravel_arr)
 
-query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM central_tendency_stats_cor1_new WHERE date!='combined' ORDER BY mean ASC;"
+query = "SELECT mean, median, date, data_type, data_source, n, confidence_interval FROM central_tendency_stats_cor1_new WHERE date!='combined' ORDER BY mean ASC;"
 cur.execute(query)
 rows = cur.fetchall()
 print(rows)
@@ -286,7 +383,7 @@ plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_T
 # plt.show()
 #plt.close()
 
-query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM central_tendency_stats_cor1_new WHERE date!='combined' ORDER BY mean ASC;"
+query = "SELECT mean, median, date, data_type, data_source, n, confidence_interval FROM central_tendency_stats_cor1_new WHERE date!='combined' ORDER BY mean ASC;"
 cur.execute(query)
 rows = cur.fetchall()
 
@@ -298,11 +395,11 @@ rows = cur.fetchall()
 data_by_date = {}  # Dictionary to store data by date
 
 for row in rows:
-    mean, median, date, data_type, data_source, n, confidence = row
+    mean, median, date, data_type, data_source, n, confidence_interval = row
     if date not in data_by_date:
-        data_by_date[date] = {'mean': [], 'confidence': [], 'data_type': []}
+        data_by_date[date] = {'mean': [], 'confidence_interval': [], 'data_type': []}
     data_by_date[date]['mean'].append(mean)
-    data_by_date[date]['confidence'].append(confidence)
+    data_by_date[date]['confidence_interval'].append(confidence_interval)
     data_by_date[date]['data_type'].append(data_type)
 
 # Plot the scatter plot with error bars by date
@@ -313,7 +410,7 @@ fig = plt.figure(figsize=(8, 8))
 # Create a scatter plot for each date
 for i, date in enumerate(dates):
     data_to_plot = [data_by_date[date]['mean'][j] for j in range(len(data_by_date[date]['data_type']))]
-    confidence_to_plot = [data_by_date[date]['confidence'][j] for j in range(len(data_by_date[date]['data_type']))]
+    confidence_to_plot = [data_by_date[date]['confidence_interval'][j] for j in range(len(data_by_date[date]['data_type']))]
     data_type_to_plot = [data_by_date[date]['data_type'][j] for j in range(len(data_by_date[date]['data_type']))]
     for j in range(len(data_to_plot)):
         if data_type_to_plot[j] == data_types[0]:
@@ -418,19 +515,19 @@ for i in range(len(fits_files_pB)):
     file_pB = fits_files_pB[i]
     data_source, date, data_type = determine_paths(file_pB)
     angles_signed_arr_finite_pB, angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type, data_source=data_source, date=date)
-    data_stats_2.append((data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB, foreign_key_qraft_vars))
 
     file_ne = fits_files_ne[i]
     data_source, date, data_type = determine_paths(file_ne)
     angles_signed_arr_finite_ne, angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type, data_source=data_source, date=date)
-    data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne, foreign_key_qraft_vars))
 
     file_ne_LOS = fits_files_ne_LOS[i]
     data_source, date, data_type = determine_paths(file_ne_LOS)
     angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type, data_source=data_source, date=date)
-    data_stats_2.append((data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_qraft_vars))
 
-    cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
 
     # retrieve probability density data from seaborne distplots
@@ -530,7 +627,7 @@ confidence_interval_pB_combined = np.round(1.96 * (std_pB_combined / np.sqrt(len
 data_type_pB_combined = 'pB'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-data_stats_2_combined.append((data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, confidence_interval_pB_combined, n_pB_combined))
+data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, confidence_interval_pB_combined, n_pB_combined, foreign_key_qraft_vars))
 
 combined_ne_ravel_arr = np.array(combined_ne_ravel)
 angles_arr_mean_ne_combined = np.round(np.mean(combined_ne_ravel_arr), 5)
@@ -541,7 +638,7 @@ confidence_interval_ne_combined = np.round(1.96 * (std_ne_combined / np.sqrt(len
 data_type_ne_combined = 'ne'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-data_stats_2_combined.append((data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, confidence_interval_ne_combined, n_ne_combined))
+data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, confidence_interval_ne_combined, n_ne_combined, foreign_key_qraft_vars))
 
 combined_ne_LOS_ravel_arr = np.array(combined_ne_LOS_ravel)
 angles_arr_mean_ne_LOS_combined = np.round(np.mean(combined_ne_LOS_ravel_arr), 5)
@@ -552,11 +649,11 @@ confidence_interval_ne_LOS_combined = np.round(1.96 * (std_ne_LOS_combined / np.
 data_type_ne_LOS_combined = 'ne_LOS'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-data_stats_2_combined.append((data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined))
+data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_qraft_vars))
 
 
 
-cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
@@ -612,7 +709,7 @@ plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_T
 # plt.show()
 #plt.close()
 
-query = "SELECT mean, median, date, data_type, data_source, n, confidence FROM central_tendency_stats_kcor_new WHERE date!='combined' ORDER BY mean ASC;"
+query = "SELECT mean, median, date, data_type, data_source, n, confidence_interval FROM central_tendency_stats_kcor_new WHERE date!='combined' ORDER BY mean ASC;"
 cur.execute(query)
 rows = cur.fetchall()
 
@@ -624,11 +721,11 @@ rows = cur.fetchall()
 data_by_date = {}  # Dictionary to store data by date
 
 for row in rows:
-    mean, median, date, data_type, data_source, n, confidence = row
+    mean, median, date, data_type, data_source, n, confidence_interval = row
     if date not in data_by_date:
-        data_by_date[date] = {'mean': [], 'confidence': [], 'data_type': []}
+        data_by_date[date] = {'mean': [], 'confidence_interval': [], 'data_type': []}
     data_by_date[date]['mean'].append(mean)
-    data_by_date[date]['confidence'].append(confidence)
+    data_by_date[date]['confidence_interval'].append(confidence_interval)
     data_by_date[date]['data_type'].append(data_type)
 
 # Plot the scatter plot with error bars by date
@@ -639,7 +736,7 @@ fig = plt.figure(figsize=(8, 8))
 # Create a scatter plot for each date
 for i, date in enumerate(dates):
     data_to_plot = [data_by_date[date]['mean'][j] for j in range(len(data_by_date[date]['data_type']))]
-    confidence_to_plot = [data_by_date[date]['confidence'][j] for j in range(len(data_by_date[date]['data_type']))]
+    confidence_to_plot = [data_by_date[date]['confidence_interval'][j] for j in range(len(data_by_date[date]['data_type']))]
     data_type_to_plot = [data_by_date[date]['data_type'][j] for j in range(len(data_by_date[date]['data_type']))]
     for j in range(len(data_to_plot)):
         if data_type_to_plot[j] == data_types[0]:

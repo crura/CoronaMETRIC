@@ -1,9 +1,7 @@
 PRO run_qraft_test, input_file_path
 
-  dir = input_file_path +  "/Output/fits_images"
-
+  dir = input_file_path + '/Output/fits_images'
   ; print, dir
-  
   f_COR1 = file_search(dir+'/*rep_med*')
   f_pB = file_search(dir+'/*COR1__PSI_pB.fits')
   f_ne = file_search(dir+'/*COR1__PSI_ne.fits')

@@ -166,6 +166,7 @@ jobs:
           # python Python_Scripts/test_new_plot_paper_figs.py
           # python Python_Scripts/calculate_KDE_statistics.py
           python Python_Scripts/Test_Plot_3_0_Features.py
+          python Python_Scripts/forward_model_db_cleanup.py
           deactivate
 
       - uses: actions/upload-artifact@v3

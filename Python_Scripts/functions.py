@@ -531,28 +531,28 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data
 
     cur.executemany("""INSERT OR IGNORE INTO qraft_input_variables VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", qraft_data)
     con.commit()
+    query = """SELECT * from qraft_input_variables where 
+            d_phi={} and 
+            d_rho={} and 
+            XYCenter_x={} and 
+            XYCenter_y={} and
+            rot_angle={} and
+            phi_shift={} and
+            smooth_xy={} and
+            smooth_phi_rho_lower={} and
+            smooth_phi_rho_upper={} and
+            detr_phi={} and
+            rho_range_lower={} and
+            rho_range_upper={} and
+            n_rho={} and
+            p_range_lower={} and
+            p_range_upper={} and
+            n_p={} and
+            n_nodes_min={};""".format(float(d_phi), float(d_rho), int(XYCenter[0]), int(XYCenter[1]), float(rot_angle), float(phi_shift), int(smooth_xy), int(smooth_phi_rho[0]), int(smooth_phi_rho[1]), int(detr_phi), int(rho_range[0]), int(rho_range[1]), int(n_rho), float(p_range[0]), float(p_range[1]), int(n_p), int(n_nodes_min))
 
-    query = """SELECT qraft_parameters_id,
-            d_phi,
-            d_rho,
-            XYCenter_x,
-            XYCenter_y,
-            rot_angle,
-            phi_shift,
-            smooth_xy,
-            smooth_phi_rho_lower,
-            smooth_phi_rho_upper,
-            detr_phi,
-            rho_range_lower,
-            rho_range_upper,
-            n_rho,
-            p_range_lower,
-            p_range_upper,
-            n_p,
-            n_nodes_min FROM qraft_input_variables WHERE qraft_parameters_id=(SELECT MAX(qraft_parameters_id) FROM qraft_input_variables);"""
     cur.execute(query)
-    rows = cur.fetchall()
-    (qraft_parameters_id, d_phi_db, d_rho_db, XYCenter_x_db, XYCenter_y_db, rot_angle_db, phi_shift_db, smooth_xy_db, smooth_phi_rho_lower_db, smooth_phi_rho_upper_db, detr_phi_db, rho_range_lower_db, rho_range_upper_db, n_rho_db, p_range_lower_db, p_range_upper_db, n_p_db, n_nodes_min_db) = rows[0]
+    row = cur.fetchone()
+    (qraft_parameters_id, d_phi_db, d_rho_db, XYCenter_x_db, XYCenter_y_db, rot_angle_db, phi_shift_db, smooth_xy_db, smooth_phi_rho_lower_db, smooth_phi_rho_upper_db, detr_phi_db, rho_range_lower_db, rho_range_upper_db, n_rho_db, p_range_lower_db, p_range_upper_db, n_p_db, n_nodes_min_db) = row
     foreign_key = qraft_parameters_id
     # img_enh = idl_save['img_enh']
     FEATURES = idl_save['features']

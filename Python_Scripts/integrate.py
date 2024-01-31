@@ -48,6 +48,16 @@ forward_input_data = [(None, float(crln_obs), float(crlt_obs), float(occlt), flo
 cur.executemany("""INSERT OR IGNORE INTO forward_input_variables VALUES(?, ?, ?, ?, ?)""", forward_input_data)
 con.commit()
 
+query = """SELECT * from forward_input_variables where 
+            crln_obs={} and 
+            crlt_obs={} and 
+            occlt={} and 
+            r_sun_range={};""".format(float(crln_obs), float(crlt_obs), float(occlt), float(r_sun_range))
+
+cur.execute(query)
+row = cur.fetchone()
+forward_input_data_id, crln_obs_db, crlt_obs_db, occlt_db, r_sun_range_db = row
+
 params = str(crlt_obs_print,'utf-8') + '_' +  str(crln_obs_print,'utf-8')
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir

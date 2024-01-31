@@ -39,7 +39,9 @@ cur.execute("""CREATE TABLE IF NOT EXISTS forward_input_variables (
             crlt_obs,
             occlt,
             r_sun_range,
-            unique(crln_obs, crlt_obs, occlt, r_sun_range)"""
+            unique(crln_obs, crlt_obs, occlt, r_sun_range)
+            )
+            """
             )
 forward_input_data = [(None, float(crln_obs), float(crlt_obs), float(occlt), float(r_sun_range))]
 

@@ -52,7 +52,7 @@ cur = con.cursor()
 # cur.execute("DROP TABLE IF EXISTS qraft_input_variables")
 
 cur.execute("""CREATE TABLE IF NOT EXISTS qraft_input_variables (
-            qraft_parameters_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            qraft_parameters_id INTEGER PRIMARY KEY,
             d_phi REAL,
             d_rho REAL,
             XYCenter_x REAL,
@@ -77,7 +77,24 @@ cur.execute("DROP TABLE IF EXISTS central_tendency_stats_cor1_new")
 
 cur.execute("""
 CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_new(
-    id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    id INTEGER PRIMARY KEY, 
+    data_type, 
+    data_source, 
+    date, 
+    mean, 
+    median, 
+    confidence_interval, 
+    n,
+    qraft_parameters_id INTEGER,
+    forward_input_data_id INTEGER,  
+    FOREIGN KEY(qraft_parameters_id) REFERENCES qraft_input_variables(qraft_parameters_id),
+    FOREIGN KEY(forward_input_data_id) REFERENCES forward_input_variables(forward_input_data_id)
+)
+""")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_all(
+    id INTEGER PRIMARY KEY, 
     data_type, 
     data_source, 
     date, 
@@ -95,7 +112,23 @@ CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_new(
 cur.execute("DROP TABLE IF EXISTS central_tendency_stats_kcor_new")
 
 cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_new(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,  
+            id INTEGER PRIMARY KEY,  
+            data_type,  
+            data_source,  
+            date,  
+            mean,  
+            median,  
+            confidence_interval,  
+            n,   
+            qraft_parameters_id INTEGER,  
+            forward_input_data_id INTEGER,  
+            FOREIGN KEY(qraft_parameters_id) REFERENCES qraft_input_variables(qraft_parameters_id),
+            FOREIGN KEY(forward_input_data_id) REFERENCES forward_input_variables(forward_input_data_id)
+            )
+""")
+
+cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_all(
+            id INTEGER PRIMARY KEY,  
             data_type,  
             data_source,  
             date,  
@@ -155,6 +188,7 @@ for i in range(len(fits_files_pB)):
     data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS, forward_input_data_id_ne_LOS))
 
     cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
 
     # retrieve probability density data from seaborne distplots
@@ -281,6 +315,7 @@ data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date
 
 
 cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
@@ -336,6 +371,7 @@ detector = 'COR1_PSI'
 ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
 ax.set_xlim(-95,95)
 #ax.set_ylim(0,0.07)
+ax.set_yscale('log')
 ax.legend(fontsize=13)
 
 # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
@@ -496,6 +532,7 @@ for i in range(len(fits_files_pB)):
     data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS, forward_input_data_id_ne_LOS))
 
     cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
 
     # retrieve probability density data from seaborne distplots
@@ -622,6 +659,7 @@ data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date
 
 
 cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
@@ -668,6 +706,7 @@ detector = 'KCor_PSI'
 ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
 ax.set_xlim(-95,95)
 #ax.set_ylim(0,0.07)
+ax.set_yscale('log')
 ax.legend(fontsize=13)
 
 # plt.text(20,0.045,"kcor average discrepancy: " + str(np.round(np.average(err_kcor_central_deg),5)))

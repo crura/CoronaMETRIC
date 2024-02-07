@@ -34,7 +34,7 @@ cur = con.cursor()
 # cur.execute("DROP TABLE IF EXISTS forward_input_variables")
 
 cur.execute("""CREATE TABLE IF NOT EXISTS forward_input_variables (
-            forward_parameters_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            forward_parameters_id INTEGER PRIMARY KEY,
             crln_obs,
             crlt_obs,
             occlt,

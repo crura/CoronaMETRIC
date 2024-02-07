@@ -54,22 +54,22 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
   ; Tunable parameters:
   ;   
   XYCenter = [Nx, Ny] / 2.0
-  d_phi = 2*0.00872665
-  d_rho = 2*1.0 ; 2*1.0
-  rot_angle = 2.5 
-  phi_shift = 2.0 ; 2.0 
+  d_phi = 2*0.00872665 ;  bin aize in azimuthal coordinate
+  d_rho = 2*1.0 ; 2*1.0 ;  bin size in radial coordindate
+  rot_angle = 2.5 ; 
+  phi_shift = 2.0 ;* (in units of d_phi bins) can definitely play with this
 
-  smooth_xy = 12 ;[5,5]
-  smooth_phi_rho = [5,8] ;[3,3]
-  detr_phi = 10 ;10
+  smooth_xy = 12 ;*[5,5] important, noise reduction (greate the number greater the mask code uses to redue the noise) (trade off between noise reduction and sharpness)
+  smooth_phi_rho = [5,8] ;[3,3] different bin sizes for noise reduction smoothing along phi bins and rho bins (number of bins in each directions)
+  detr_phi = 10 ;*can play arpnd with this detrended phi, detrends the image in the azimuthal direction to stabilize brightness (such as coronl hole vs active region), this parameter controls the bin size for this detrending
 
-  rho_range = [rho_min, min([Nx/2, Ny/2])]/d_rho
-  n_rho = 20 ; number of rho_min levels used for tracing 
+  rho_range = [rho_min, min([Nx/2, Ny/2])]/d_rho ; play with this
+  n_rho = 20 ; number of rho_min levels used for tracing, number of virtual occulting disks used to ask 
   
-  p_range = [0.90, 0.99]
-  n_p = 10  ; number of probability levels
+  p_range = [0.90, 0.99] ;** range of the probabilities onf which calculating percentile thresholds, important parameter
+  n_p = 10  ;* number of probability levels, these many sets of thresholds are applies within p_range
 
-  n_nodes_min = 10
+  n_nodes_min = 10 ; minor parameter, minimum number of pixels in the features to be inlcuded in final output
 
   ;-------- IMAGE PREPROCESSING -------------
 

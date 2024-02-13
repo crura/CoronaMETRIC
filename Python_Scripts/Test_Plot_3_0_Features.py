@@ -106,8 +106,8 @@ CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_all(
     qraft_parameters_id INTEGER,
     forward_input_data_id INTEGER,  
     FOREIGN KEY(qraft_parameters_id) REFERENCES qraft_input_variables(qraft_parameters_id),
-    FOREIGN KEY(forward_input_data_id) REFERENCES forward_input_variables(forward_input_data_id)
-)
+    FOREIGN KEY(forward_input_data_id) REFERENCES forward_input_variables(forward_input_data_id),
+    unique(data_type, data_source, date, mean, median, confidence_interval, n, qraft_parameters_id, forward_input_data_id))
 """)
 
 cur.execute("DROP TABLE IF EXISTS central_tendency_stats_kcor_new")
@@ -140,8 +140,8 @@ cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_all(
             qraft_parameters_id INTEGER,  
             forward_input_data_id INTEGER,  
             FOREIGN KEY(qraft_parameters_id) REFERENCES qraft_input_variables(qraft_parameters_id),
-            FOREIGN KEY(forward_input_data_id) REFERENCES forward_input_variables(forward_input_data_id)
-            )
+            FOREIGN KEY(forward_input_data_id) REFERENCES forward_input_variables(forward_input_data_id),
+            unique(data_type, data_source, date, mean, median, confidence_interval, n, qraft_parameters_id, forward_input_data_id))
 """)
 
 
@@ -216,7 +216,7 @@ for i in range(len(fits_files_pB)):
     data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_cor1, angles_arr_median_cor1, confidence_interval_cor1, n_cor1, foreign_key_cor1, forward_input_data_id_cor1))
 
     cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
-    cur.executemany("INSERT INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
 
     # retrieve probability density data from seaborne distplots
@@ -357,7 +357,7 @@ data_stats_2_combined.append((None, data_type_cor1_combined, data_source, date_c
 
 
 cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
-cur.executemany("INSERT INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
@@ -606,7 +606,7 @@ for i in range(len(fits_files_pB)):
     data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_kcor, angles_arr_median_kcor, confidence_interval_kcor, n_kcor, foreign_key_kcor, forward_input_data_id_kcor))
 
     cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
-    cur.executemany("INSERT INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
 
     # retrieve probability density data from seaborne distplots
@@ -747,7 +747,7 @@ data_stats_2_combined.append((None, data_type_kcor_combined, data_source, date_c
 
 
 cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
-cur.executemany("INSERT INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 

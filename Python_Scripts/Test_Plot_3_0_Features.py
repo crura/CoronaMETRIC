@@ -364,10 +364,12 @@ con.commit()  # Remember to commit the transaction after executing INSERT.
 combined_pB_signed_ravel = [item for sublist in combined_pB_signed for item in sublist]
 combined_ne_signed_ravel = [item for sublist in combined_ne_signed for item in sublist]
 combined_ne_signed_LOS_ravel = [item for sublist in combined_ne_signed_LOS for item in sublist]
+combined_cor1_signed_ravel = [item for sublist in combined_cor1_signed for item in sublist]
 
 combined_pB_signed_ravel_arr = np.array(combined_pB_signed_ravel)
 combined_ne_signed_ravel_arr = np.array(combined_ne_signed_ravel)
 combined_ne_signed_LOS_ravel_arr = np.array(combined_ne_signed_LOS_ravel)
+combined_cor1_signed_ravel_arr = np.array(combined_cor1_signed_ravel)
 
 print(combined_ne_signed_ravel_arr)
 
@@ -395,6 +397,7 @@ ax = fig.subplots(1,1)
 sns.histplot(combined_ne_signed_ravel_arr,kde=True,label='ne',bins=30,ax=ax,color='tab:blue')
 sns.histplot(combined_pB_signed_ravel,kde=True,label='pB',bins=30,ax=ax,color='tab:orange')
 sns.histplot(combined_ne_signed_LOS_ravel,kde=True, bins=30, label='ne_LOS',ax=ax, color='tab:green')
+sns.histplot(combined_cor1_signed_ravel, kde=True, bins=30, label='COR1',ax=ax, color='tab:red')
 #x_axis = np.linspace(-90, 90, len(KDE_cor1_central_deg_new))
 
 
@@ -459,6 +462,8 @@ for i, date in enumerate(dates):
             plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C2' ,label=data_type_to_plot[j] if i == 0 else "")
         elif data_type_to_plot[j] == data_types[2]:
             plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C1' ,label=data_type_to_plot[j] if i == 0 else "")
+        elif data_type_to_plot[j] == data_types[3]:
+            plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C3' ,label=data_type_to_plot[j] if i == 0 else "")
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
@@ -473,17 +478,17 @@ plt.savefig(os.path.join(repo_path, 'Output/Plots', '{}_Angle_Discrepancy_By_Dat
 plt.show()
 
 # Combine data into a single array
-all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr])
+all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_cor1_signed_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr)
+labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr) + ['COR1'] * len(combined_cor1_signed_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
 print(tukey_result)
 
 
-f_statistic, p_value = f_oneway(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr)
+f_statistic, p_value = f_oneway(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_cor1_signed_ravel_arr)
 # Check for statistical significance
 if p_value < 0.05:
     print("There are significant differences between at least two data types.")
@@ -491,15 +496,15 @@ else:
     print("No significant differences detected between data types.")
 
 
-res = tukey_hsd(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr)
+res = tukey_hsd(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_cor1_signed_ravel_arr)
 print(res)
 
 
 # Combine data into a single array
-all_data = np.concatenate([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr])
+all_data = np.concatenate([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr)
+labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr) + ['COR1'] * len(combined_cor1_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
@@ -514,7 +519,7 @@ tukey_result.plot_simultaneous(xlabel='Mean (Degrees)', ax=ax)
 plt.savefig(os.path.join(repo_path,'Output/Plots/testfig1.png'))
 plt.show()
 
-f_statistic, p_value = f_oneway(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr)
+f_statistic, p_value = f_oneway(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr)
 # Check for statistical significance
 if p_value < 0.05:
     print("There are significant differences between at least two data types.")
@@ -523,8 +528,8 @@ else:
 
 
 fig, ax = plt.subplots(1, 1)
-ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr], showfliers=False)
-ax.set_xticklabels(["ne", "ne_LOS", "pB"]) 
+ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr], showfliers=False)
+ax.set_xticklabels(["ne", "ne_LOS", "pB", "COR1"]) 
 ax.set_ylim(0, 40)
 ax.set_ylabel("Mean (Degrees)") 
 ax.set_xlabel("Data Type") 
@@ -532,7 +537,7 @@ ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.png'))
 plt.show()
 
-res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr)
+res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr)
 print(res)
 
 

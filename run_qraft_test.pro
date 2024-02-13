@@ -16,10 +16,11 @@ PRO run_qraft_test, input_file_path
     QRaFT_TEST, 1, f_pB[i], f_By[i], f_Bz[i], 110.0
     QRaFT_TEST, 1, f_ne[i], f_By[i], f_Bz[i], 110.0
     QRaFT_TEST, 1, f_ne_LOS[i], f_By[i], f_Bz[i], 110.0
+    QRaFT_TEST, 1, f_COR1[i], f_By[i], f_Bz[i], 110.0
     
   endfor
   
-  f_KCor = file_search(dir+'/*rep_med*')
+  f_KCor = file_search(dir+'/*kcor*')
   f_pB = file_search(dir+'/*KCor__PSI_pB.fits')
   f_ne = file_search(dir+'/*KCor__PSI_ne.fits')
   f_ne_LOS = file_search(dir+'/*KCor__PSI_ne_LOS.fits')
@@ -33,6 +34,7 @@ PRO run_qraft_test, input_file_path
     QRaFT_TEST, 1, f_pB[i], f_By[i], f_Bz[i], 220.0
     QRaFT_TEST, 1, f_ne[i], f_By[i], f_Bz[i], 220.0
     QRaFT_TEST, 1, f_ne_LOS[i], f_By[i], f_Bz[i], 220.0
+    QRaFT_TEST, 1, f_KCor[i], f_By[i], f_Bz[i], 220.0
 
   endfor
   

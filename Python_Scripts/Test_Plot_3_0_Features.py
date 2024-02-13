@@ -1,5 +1,6 @@
 
 import os
+import shutil
 from scipy.io import readsav
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -151,17 +152,28 @@ repo_path = repo.working_tree_dir
 
 
 fits_path = os.path.join(repo_path, 'Output/QRaFT_Results')
+fits_input_path = os.path.join(repo_path, 'Data/COR1')
+# copy all fits input files to the output directory
+source_dir = fits_input_path
+target_dir = fits_path
+file_names = os.listdir(source_dir)
+for file_name in file_names:
+    shutil.copy(os.path.join(source_dir, file_name), target_dir)
+
 fits_files_pB = get_files_from_pattern(fits_path, 'COR1__PSI_pB.fits')
 fits_files_ne = get_files_from_pattern(fits_path, 'COR1__PSI_ne.fits')
 fits_files_ne_LOS = get_files_from_pattern(fits_path, 'COR1__PSI_ne_LOS.fits')
+fits_files_cor1 = get_files_from_pattern(fits_path, 'rep_med.fts')
 
 combined_pB = []
 combined_ne = []
 combined_ne_LOS = []
+combined_cor1 = []
 
 combined_pB_signed = []
 combined_ne_signed = []
 combined_ne_signed_LOS = []
+combined_cor1_signed = []
 
 for i in range(len(fits_files_pB)):
     data_stats_2 = []
@@ -186,6 +198,22 @@ for i in range(len(fits_files_pB)):
     head_ne_LOS = fits.getheader(file_ne_LOS)
     forward_input_data_id_ne_LOS = head_ne_LOS['forward_input_data_id']
     data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS, forward_input_data_id_ne_LOS))
+
+    file_cor1 = fits_files_cor1[i]
+    head_cor1 = fits.getheader(file_cor1)
+    # search fits headers of all files in directory for header that matches head
+    for file in fits_files_pB:
+        head = fits.getheader(file)
+        if head['date-obs'] == head_cor1['date-obs']:
+            corresponding_file_pB = file
+            corresponding_file_By = file.replace('pB', 'By')
+            corresponding_file_Bz = file.replace('pB', 'Bz')
+            break
+    data_source, date, data_type = determine_paths(file_cor1, PSI=False)
+    angles_signed_arr_finite_cor1, angles_arr_finite_cor1, angles_arr_mean_cor1, angles_arr_median_cor1, confidence_interval_cor1, n_cor1, foreign_key_cor1 = display_fits_image_with_3_0_features_and_B_field(file_cor1, file_cor1+'.sav', data_type=data_type, data_source=data_source, date=date, PSI=False, corresponding_By_file=corresponding_file_By, corresponding_Bz_file=corresponding_file_Bz)
+
+    forward_input_data_id_cor1 = head_cor1['forward_input_data_id']
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_cor1, angles_arr_median_cor1, confidence_interval_cor1, n_cor1, foreign_key_cor1, forward_input_data_id_cor1))
 
     cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     cur.executemany("INSERT INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
@@ -267,17 +295,20 @@ for i in range(len(fits_files_pB)):
     combined_pB.append(angles_arr_finite_pB)
     combined_ne.append(angles_arr_finite_ne)
     combined_ne_LOS.append(angles_arr_finite_ne_LOS)
+    combined_cor1.append(angles_arr_finite_cor1)
 
 
     combined_pB_signed.append(angles_signed_arr_finite_pB)
     combined_ne_signed.append(angles_signed_arr_finite_ne)
     combined_ne_signed_LOS.append(angles_signed_arr_finite_ne_LOS)
+    combined_cor1_signed.append(angles_signed_arr_finite_cor1)
 
 data_stats_2_combined = []
 
 combined_pB_ravel = [item for sublist in combined_pB for item in sublist]
 combined_ne_ravel = [item for sublist in combined_ne for item in sublist]
 combined_ne_LOS_ravel = [item for sublist in combined_ne_LOS for item in sublist]
+combined_cor1_ravel = [item for sublist in combined_cor1 for item in sublist]
 
 combined_pB_ravel_arr = np.array(combined_pB_ravel)
 angles_arr_mean_pB_combined = np.round(np.mean(combined_pB_ravel_arr), 5)
@@ -311,6 +342,17 @@ data_type_ne_LOS_combined = 'ne_LOS'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
 data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_ne_LOS, None))
+
+combined_cor1_ravel_arr = np.array(combined_cor1_ravel)
+angles_arr_mean_cor1_combined = np.round(np.mean(combined_cor1_ravel_arr), 5)
+angles_arr_median_cor1_combined = np.round(np.median(combined_cor1_ravel_arr), 5)
+n_cor1_combined = len(combined_cor1_ravel_arr)
+std_cor1_combined = np.round(np.std(abs(combined_cor1_ravel_arr)),5)
+confidence_interval_cor1_combined = np.round(1.96 * (std_cor1_combined / np.sqrt(len(combined_cor1_ravel_arr))),5)
+data_type_cor1_combined = 'med'
+date_combined = 'combined'
+data_source = 'COR1'
+data_stats_2_combined.append((None, data_type_cor1_combined, data_source, date_combined, angles_arr_mean_cor1_combined, angles_arr_median_cor1_combined, confidence_interval_cor1_combined, n_cor1_combined, foreign_key_cor1, None))
 
 
 

@@ -59,7 +59,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
   rot_angle = 2.5 ; 
   phi_shift = 2.0 ;* (in units of d_phi bins) can definitely play with this
 
-  smooth_xy = 12 ;*[5,5] important, noise reduction (greate the number greater the mask code uses to redue the noise) (trade off between noise reduction and sharpness)
+  smooth_xy = 10 ;*[5,5] important, noise reduction (greate the number greater the mask code uses to redue the noise) (trade off between noise reduction and sharpness)
   smooth_phi_rho = [5,8] ;[3,3] different bin sizes for noise reduction smoothing along phi bins and rho bins (number of bins in each directions)
   detr_phi = 10 ;*can play arpnd with this detrended phi, detrends the image in the azimuthal direction to stabilize brightness (such as coronl hole vs active region), this parameter controls the bin size for this detrending
 

@@ -23,6 +23,7 @@ import math
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import glob
 import sqlite3
+import astropy.units as u
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -459,7 +460,6 @@ def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
 # from datetime import datetime, timedelta
 # from sunpy.sun import constants
 # import astropy.constants
-# import astropy.units as u
 # matplotlib.use('TkAgg')
 # mpl.use('TkAgg')
 # mpl.rcParams.update(mpl.rcParamsDefault)
@@ -470,7 +470,7 @@ def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
 # repo = git.Repo('.', search_parent_directories=True)
 # repo_path = repo.working_tree_dir
 
-def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data_type=None, data_source=None, date=None, PSI=True, enhanced=False):
+def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corresponding_By_file=None, corresponding_Bz_file=None, data_type=None, data_source=None, date=None, PSI=True, enhanced=False):
     # fig, axes = plt.subplots(nrows=int(n/2), ncols=2, figsize=(10, 10))
     fig = plt.figure(figsize=(10, 10))
 
@@ -578,21 +578,12 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data
                 file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('COR1')[0] + keyword_Bz)
     else:
         if detector == 'KCor':
-            for i in outstring_list_1:
-                if head['date-obs'].replace('-','_').split('T')[0] in i:
-                    file1_y = i.replace('pB','By')
-                    file1_z = i.replace('pB', 'Bz')
+            file1_y = corresponding_By_file
+            file1_z = corresponding_Bz_file
 
         elif detector == 'COR1':
-            for i in outstring_list_2:
-                if head['date-obs'].replace('-','_').split('T')[0] in i:
-                    print('input file: {}'.format(fits_file))
-                    print('qraft file: {}'.format(qraft_file))
-                    # print('corresponding B field file: {}'.format(i))
-                    file1_y = i.replace('pB','By')
-                    file1_z = i.replace('pB', 'Bz')
-                    print('By file: {}'.format(file1_y))
-                    print('Bz file: {}'.format(file1_z))
+            file1_y = corresponding_By_file
+            file1_z = corresponding_Bz_file
 
 
 
@@ -602,7 +593,8 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, data
     fits_dir_bz_los_coaligned = file1_z
     data_bz_los_coaligned = fits.getdata(fits_dir_bz_los_coaligned)
     head_bz_los_coaligned = fits.getheader(fits_dir_bz_los_coaligned)
-    head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
+    if PSI:
+        head_bz_los_coaligned['Observatory'] = ('PSI-MAS')
     head_bz_los_coaligned['detector'] = (detector)
     # print('CRLT_OBS: ' + str(head['CRLT_OBS']),'CRLN_OBS: ' + str(head['CRLN_OBS']))
     bz_los_coaligned_map = sunpy.map.Map(data_bz_los_coaligned, head_bz_los_coaligned)
@@ -819,7 +811,10 @@ def determine_paths(fits_file, PSI=True):
     data_type = filename.split('_')[-1].strip('.fits')
     if data_type == 'LOS':
         data_type = 'ne_LOS'
-    data_source = keyword
+    if PSI:
+        data_source = keyword
+    else:
+        data_source = detector
 
     return data_source, date, data_type
 

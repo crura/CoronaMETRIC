@@ -542,17 +542,28 @@ print(res)
 
 
 fits_path = os.path.join(repo_path, 'Output/QRaFT_Results')
+fits_input_path = os.path.join(repo_path, 'Data/MLSO')
+# copy all fits input files to the output directory
+source_dir = fits_input_path
+target_dir = fits_path
+file_names = os.listdir(source_dir)
+for file_name in file_names:
+    shutil.copy(os.path.join(source_dir, file_name), target_dir)
+
 fits_files_pB = get_files_from_pattern(fits_path, 'KCor__PSI_pB.fits')
 fits_files_ne = get_files_from_pattern(fits_path, 'KCor__PSI_ne.fits')
 fits_files_ne_LOS = get_files_from_pattern(fits_path, 'KCor__PSI_ne_LOS.fits')
+fits_files_kcor = get_files_from_pattern(fits_path, 'kcor_l2_avg.fts')
 
 combined_pB = []
 combined_ne = []
 combined_ne_LOS = []
+combined_kcor = []
 
 combined_pB_signed = []
 combined_ne_signed = []
 combined_ne_signed_LOS = []
+combined_kcor_signed = []
 
 for i in range(len(fits_files_pB)):
     data_stats_2 = []
@@ -577,6 +588,22 @@ for i in range(len(fits_files_pB)):
     head_ne_LOS = fits.getheader(file_ne_LOS)
     forward_input_data_id_ne_LOS = head_ne_LOS['forward_input_data_id']
     data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS, forward_input_data_id_ne_LOS))
+
+    file_kcor = fits_files_kcor[i]
+    head_kcor = fits.getheader(file_kcor)
+    # search fits headers of all files in directory for header that matches head
+    for file in fits_files_pB:
+        head = fits.getheader(file)
+        if head['date-obs'] == head_kcor['date-obs']:
+            corresponding_file_pB = file
+            corresponding_file_By = file.replace('pB', 'By')
+            corresponding_file_Bz = file.replace('pB', 'Bz')
+            break
+    data_source, date, data_type = determine_paths(file_kcor, PSI=False)
+    angles_signed_arr_finite_kcor, angles_arr_finite_kcor, angles_arr_mean_kcor, angles_arr_median_kcor, confidence_interval_kcor, n_kcor, foreign_key_kcor = display_fits_image_with_3_0_features_and_B_field(file_kcor, file_kcor+'.sav', data_type=data_type, data_source=data_source, date=date, PSI=False, corresponding_By_file=corresponding_file_By, corresponding_Bz_file=corresponding_file_Bz)
+
+    forward_input_data_id_kcor = head_kcor['forward_input_data_id']
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_kcor, angles_arr_median_kcor, confidence_interval_kcor, n_kcor, foreign_key_kcor, forward_input_data_id_kcor))
 
     cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     cur.executemany("INSERT INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
@@ -658,17 +685,20 @@ for i in range(len(fits_files_pB)):
     combined_pB.append(angles_arr_finite_pB)
     combined_ne.append(angles_arr_finite_ne)
     combined_ne_LOS.append(angles_arr_finite_ne_LOS)
+    combined_kcor.append(angles_arr_finite_kcor)
 
 
     combined_pB_signed.append(angles_signed_arr_finite_pB)
     combined_ne_signed.append(angles_signed_arr_finite_ne)
     combined_ne_signed_LOS.append(angles_signed_arr_finite_ne_LOS)
+    combined_kcor_signed.append(angles_signed_arr_finite_kcor)
 
 data_stats_2_combined = []
 
 combined_pB_ravel = [item for sublist in combined_pB for item in sublist]
 combined_ne_ravel = [item for sublist in combined_ne for item in sublist]
 combined_ne_LOS_ravel = [item for sublist in combined_ne_LOS for item in sublist]
+combined_kcor_ravel = [item for sublist in combined_kcor for item in sublist]
 
 combined_pB_ravel_arr = np.array(combined_pB_ravel)
 angles_arr_mean_pB_combined = np.round(np.mean(combined_pB_ravel_arr), 5)
@@ -703,6 +733,17 @@ date_combined = 'combined'
 data_source = 'KCor_PSI'
 data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_ne_LOS, None))
 
+combined_kcor_ravel_arr = np.array(combined_kcor_ravel)
+angles_arr_mean_kcor_combined = np.round(np.mean(combined_kcor_ravel_arr), 5)
+angles_arr_median_kcor_combined = np.round(np.median(combined_kcor_ravel_arr), 5)
+n_kcor_combined = len(combined_kcor_ravel_arr)
+std_kcor_combined = np.round(np.std(abs(combined_kcor_ravel_arr)),5)
+confidence_interval_kcor_combined = np.round(1.96 * (std_kcor_combined / np.sqrt(len(combined_kcor_ravel_arr))),5)
+data_type_kcor_combined = 'l2_avg'
+date_combined = 'combined'
+data_source = 'KCor'
+data_stats_2_combined.append((None, data_type_kcor_combined, data_source, date_combined, angles_arr_mean_kcor_combined, angles_arr_median_kcor_combined, confidence_interval_kcor_combined, n_kcor_combined, foreign_key_kcor, None))
+
 
 
 cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
@@ -713,10 +754,13 @@ con.commit()  # Remember to commit the transaction after executing INSERT.
 combined_pB_signed_ravel = [item for sublist in combined_pB_signed for item in sublist]
 combined_ne_signed_ravel = [item for sublist in combined_ne_signed for item in sublist]
 combined_ne_signed_LOS_ravel = [item for sublist in combined_ne_signed_LOS for item in sublist]
+combined_kcor_signed_ravel = [item for sublist in combined_kcor_signed for item in sublist]
 
 combined_pB_signed_ravel_arr = np.array(combined_pB_signed_ravel)
 combined_ne_signed_ravel_arr = np.array(combined_ne_signed_ravel)
 combined_ne_signed_LOS_ravel_arr = np.array(combined_ne_signed_LOS_ravel)
+combined_kcor_signed_ravel_arr = np.array(combined_kcor_signed_ravel)
+
 
 what = sns.histplot(combined_ne_signed_ravel_arr,kde=True, bins=30)
 norm_max_ne = max(what.get_lines()[0].get_data()[1])
@@ -735,6 +779,7 @@ ax = fig.subplots(1,1)
 sns.histplot(combined_ne_signed_ravel_arr,kde=True,label='ne',bins=30,ax=ax,color='tab:blue')
 sns.histplot(combined_pB_signed_ravel,kde=True,label='pB',bins=30,ax=ax,color='tab:orange')
 sns.histplot(combined_ne_signed_LOS_ravel,kde=True, bins=30, label='ne_LOS',ax=ax, color='tab:green')
+sns.histplot(combined_kcor_signed_ravel, kde=True, bins=30, label='KCor',ax=ax, color='tab:red')
 #x_axis = np.linspace(-90, 90, len(KDE_kcor_central_deg_new))
 
 
@@ -799,6 +844,8 @@ for i, date in enumerate(dates):
             plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C2' ,label=data_type_to_plot[j] if i == 0 else "")
         elif data_type_to_plot[j] == data_types[2]:
             plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C1' ,label=data_type_to_plot[j] if i == 0 else "")
+        elif data_type_to_plot[j] == data_types[3]:
+            plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C3' ,label=data_type_to_plot[j] if i == 0 else "")
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
@@ -814,17 +861,17 @@ plt.show()
 
 
 # Combine data into a single array
-all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr])
+all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_kcor_signed_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr)
+labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr) + ['KCor'] * len(combined_kcor_signed_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
 print(tukey_result)
 
 
-f_statistic, p_value = f_oneway(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr)
+f_statistic, p_value = f_oneway(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_kcor_signed_ravel_arr)
 # Check for statistical significance
 if p_value < 0.05:
     print("There are significant differences between at least two data types.")
@@ -832,15 +879,15 @@ else:
     print("No significant differences detected between data types.")
 
 
-res = tukey_hsd(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr)
+res = tukey_hsd(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_kcor_signed_ravel_arr)
 print(res)
 
 
 # Combine data into a single array
-all_data = np.concatenate([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr])
+all_data = np.concatenate([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_kcor_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr)
+labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr) + ['KCor'] * len(combined_kcor_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
@@ -855,7 +902,7 @@ tukey_result.plot_simultaneous(xlabel='Mean (Degrees)', ax=ax)
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig1_kcor.png'))
 plt.show()
 
-f_statistic, p_value = f_oneway(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr)
+f_statistic, p_value = f_oneway(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_kcor_ravel_arr)
 # Check for statistical significance
 if p_value < 0.05:
     print("There are significant differences between at least two data types.")
@@ -864,8 +911,8 @@ else:
 
 
 fig, ax = plt.subplots(1, 1)
-ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr], showfliers=False)
-ax.set_xticklabels(["ne", "ne_LOS", "pB"]) 
+ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_kcor_ravel_arr], showfliers=False)
+ax.set_xticklabels(["ne", "ne_LOS", "pB", "KCor"]) 
 ax.set_ylim(0, 40)
 ax.set_ylabel("Mean (Degrees)") 
 ax.set_xlabel("Data Type") 
@@ -873,5 +920,5 @@ ax.set_title('Box Plot Comparison of Data Types for PSI_KCor Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2_kcor.png'))
 plt.show()
 
-res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr)
+res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_kcor_ravel_arr)
 print(res)

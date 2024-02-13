@@ -319,7 +319,7 @@ confidence_interval_pB_combined = np.round(1.96 * (std_pB_combined / np.sqrt(len
 data_type_pB_combined = 'pB'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, confidence_interval_pB_combined, n_pB_combined, foreign_key_pB, None))
+data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, confidence_interval_pB_combined, n_pB_combined, foreign_key_pB, ''))
 
 combined_ne_ravel_arr = np.array(combined_ne_ravel)
 angles_arr_mean_ne_combined = np.round(np.mean(combined_ne_ravel_arr), 5)
@@ -330,7 +330,7 @@ confidence_interval_ne_combined = np.round(1.96 * (std_ne_combined / np.sqrt(len
 data_type_ne_combined = 'ne'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, confidence_interval_ne_combined, n_ne_combined, foreign_key_ne, None))
+data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, confidence_interval_ne_combined, n_ne_combined, foreign_key_ne, ''))
 
 combined_ne_LOS_ravel_arr = np.array(combined_ne_LOS_ravel)
 angles_arr_mean_ne_LOS_combined = np.round(np.mean(combined_ne_LOS_ravel_arr), 5)
@@ -341,7 +341,7 @@ confidence_interval_ne_LOS_combined = np.round(1.96 * (std_ne_LOS_combined / np.
 data_type_ne_LOS_combined = 'ne_LOS'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_ne_LOS, None))
+data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_ne_LOS, ''))
 
 combined_cor1_ravel_arr = np.array(combined_cor1_ravel)
 angles_arr_mean_cor1_combined = np.round(np.mean(combined_cor1_ravel_arr), 5)
@@ -352,7 +352,7 @@ confidence_interval_cor1_combined = np.round(1.96 * (std_cor1_combined / np.sqrt
 data_type_cor1_combined = 'med'
 date_combined = 'combined'
 data_source = 'COR1'
-data_stats_2_combined.append((None, data_type_cor1_combined, data_source, date_combined, angles_arr_mean_cor1_combined, angles_arr_median_cor1_combined, confidence_interval_cor1_combined, n_cor1_combined, foreign_key_cor1, None))
+data_stats_2_combined.append((None, data_type_cor1_combined, data_source, date_combined, angles_arr_mean_cor1_combined, angles_arr_median_cor1_combined, confidence_interval_cor1_combined, n_cor1_combined, foreign_key_cor1, ''))
 
 
 
@@ -709,7 +709,7 @@ confidence_interval_pB_combined = np.round(1.96 * (std_pB_combined / np.sqrt(len
 data_type_pB_combined = 'pB'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, confidence_interval_pB_combined, n_pB_combined, foreign_key_pB, None))
+data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, confidence_interval_pB_combined, n_pB_combined, foreign_key_pB, ''))
 
 combined_ne_ravel_arr = np.array(combined_ne_ravel)
 angles_arr_mean_ne_combined = np.round(np.mean(combined_ne_ravel_arr), 5)
@@ -720,7 +720,7 @@ confidence_interval_ne_combined = np.round(1.96 * (std_ne_combined / np.sqrt(len
 data_type_ne_combined = 'ne'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, confidence_interval_ne_combined, n_ne_combined, foreign_key_ne, None))
+data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, confidence_interval_ne_combined, n_ne_combined, foreign_key_ne, ''))
 
 combined_ne_LOS_ravel_arr = np.array(combined_ne_LOS_ravel)
 angles_arr_mean_ne_LOS_combined = np.round(np.mean(combined_ne_LOS_ravel_arr), 5)
@@ -731,7 +731,7 @@ confidence_interval_ne_LOS_combined = np.round(1.96 * (std_ne_LOS_combined / np.
 data_type_ne_LOS_combined = 'ne_LOS'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_ne_LOS, None))
+data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_ne_LOS, ''))
 
 combined_kcor_ravel_arr = np.array(combined_kcor_ravel)
 angles_arr_mean_kcor_combined = np.round(np.mean(combined_kcor_ravel_arr), 5)
@@ -742,7 +742,7 @@ confidence_interval_kcor_combined = np.round(1.96 * (std_kcor_combined / np.sqrt
 data_type_kcor_combined = 'l2_avg'
 date_combined = 'combined'
 data_source = 'KCor'
-data_stats_2_combined.append((None, data_type_kcor_combined, data_source, date_combined, angles_arr_mean_kcor_combined, angles_arr_median_kcor_combined, confidence_interval_kcor_combined, n_kcor_combined, foreign_key_kcor, None))
+data_stats_2_combined.append((None, data_type_kcor_combined, data_source, date_combined, angles_arr_mean_kcor_combined, angles_arr_median_kcor_combined, confidence_interval_kcor_combined, n_kcor_combined, foreign_key_kcor, ''))
 
 
 

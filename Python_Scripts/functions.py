@@ -811,6 +811,10 @@ def determine_paths(fits_file, PSI=True):
     data_type = filename.split('_')[-1].strip('.fits')
     if data_type == 'LOS':
         data_type = 'ne_LOS'
+    if data_type == 'med':
+        data_type = 'COR1 median filtered'
+    if data_type == 'avg':
+        data_type = 'KCor l2 avg'
     if PSI:
         data_source = keyword
     else:

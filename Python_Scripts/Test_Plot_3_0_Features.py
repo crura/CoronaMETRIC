@@ -35,7 +35,7 @@ from functions import display_fits_image_with_3_0_features_and_B_field
 from scipy.stats import norm
 from matplotlib import pyplot as plt
 import seaborn as sns
-from functions import calculate_KDE_statistics, determine_paths, get_files_from_pattern
+from functions import calculate_KDE_statistics, determine_paths, get_files_from_pattern, calculate_KDE
 import sqlite3
 from scipy.stats import f_oneway
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
@@ -93,6 +93,8 @@ CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_new(
 )
 """)
 
+cur.execute("DROP TABLE IF EXISTS central_tendency_stats_cor1_all")
+
 cur.execute("""
 CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_all(
     id INTEGER PRIMARY KEY, 
@@ -127,6 +129,8 @@ cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_new(
             FOREIGN KEY(forward_input_data_id) REFERENCES forward_input_variables(forward_input_data_id)
             )
 """)
+
+cur.execute("DROP TABLE IF EXISTS central_tendency_stats_kcor_all")
 
 cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_all(
             id INTEGER PRIMARY KEY,  
@@ -349,7 +353,7 @@ angles_arr_median_cor1_combined = np.round(np.median(combined_cor1_ravel_arr), 5
 n_cor1_combined = len(combined_cor1_ravel_arr)
 std_cor1_combined = np.round(np.std(abs(combined_cor1_ravel_arr)),5)
 confidence_interval_cor1_combined = np.round(1.96 * (std_cor1_combined / np.sqrt(len(combined_cor1_ravel_arr))),5)
-data_type_cor1_combined = 'med'
+data_type_cor1_combined = 'COR1 median filtered'
 date_combined = 'combined'
 data_source = 'COR1'
 data_stats_2_combined.append((None, data_type_cor1_combined, data_source, date_combined, angles_arr_mean_cor1_combined, angles_arr_median_cor1_combined, confidence_interval_cor1_combined, n_cor1_combined, foreign_key_cor1, ''))
@@ -397,7 +401,7 @@ ax = fig.subplots(1,1)
 sns.histplot(combined_ne_signed_ravel_arr,kde=True,label='ne',bins=30,ax=ax,color='tab:blue')
 sns.histplot(combined_pB_signed_ravel,kde=True,label='pB',bins=30,ax=ax,color='tab:orange')
 sns.histplot(combined_ne_signed_LOS_ravel,kde=True, bins=30, label='ne_LOS',ax=ax, color='tab:green')
-sns.histplot(combined_cor1_signed_ravel, kde=True, bins=30, label='COR1',ax=ax, color='tab:red')
+sns.histplot(combined_cor1_signed_ravel, kde=True, bins=30, label='COR1 median filtered',ax=ax, color='tab:red')
 #x_axis = np.linspace(-90, 90, len(KDE_cor1_central_deg_new))
 
 
@@ -481,7 +485,7 @@ plt.show()
 all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_cor1_signed_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr) + ['COR1'] * len(combined_cor1_signed_ravel_arr)
+labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr) + ['COR1 median filtered'] * len(combined_cor1_signed_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
@@ -504,7 +508,7 @@ print(res)
 all_data = np.concatenate([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr) + ['COR1'] * len(combined_cor1_ravel_arr)
+labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr) + ['COR1 median filtered'] * len(combined_cor1_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
@@ -529,7 +533,7 @@ else:
 
 fig, ax = plt.subplots(1, 1)
 ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr], showfliers=False)
-ax.set_xticklabels(["ne", "ne_LOS", "pB", "COR1"]) 
+ax.set_xticklabels(["ne", "ne_LOS", "pB", "COR1 median filtered"]) 
 ax.set_ylim(0, 40)
 ax.set_ylabel("Mean (Degrees)") 
 ax.set_xlabel("Data Type") 
@@ -739,7 +743,7 @@ angles_arr_median_kcor_combined = np.round(np.median(combined_kcor_ravel_arr), 5
 n_kcor_combined = len(combined_kcor_ravel_arr)
 std_kcor_combined = np.round(np.std(abs(combined_kcor_ravel_arr)),5)
 confidence_interval_kcor_combined = np.round(1.96 * (std_kcor_combined / np.sqrt(len(combined_kcor_ravel_arr))),5)
-data_type_kcor_combined = 'l2_avg'
+data_type_kcor_combined = 'KCor l2 avg'
 date_combined = 'combined'
 data_source = 'KCor'
 data_stats_2_combined.append((None, data_type_kcor_combined, data_source, date_combined, angles_arr_mean_kcor_combined, angles_arr_median_kcor_combined, confidence_interval_kcor_combined, n_kcor_combined, foreign_key_kcor, ''))
@@ -779,7 +783,7 @@ ax = fig.subplots(1,1)
 sns.histplot(combined_ne_signed_ravel_arr,kde=True,label='ne',bins=30,ax=ax,color='tab:blue')
 sns.histplot(combined_pB_signed_ravel,kde=True,label='pB',bins=30,ax=ax,color='tab:orange')
 sns.histplot(combined_ne_signed_LOS_ravel,kde=True, bins=30, label='ne_LOS',ax=ax, color='tab:green')
-sns.histplot(combined_kcor_signed_ravel, kde=True, bins=30, label='KCor',ax=ax, color='tab:red')
+sns.histplot(combined_kcor_signed_ravel, kde=True, bins=30, label='KCor l2 avg',ax=ax, color='tab:red')
 #x_axis = np.linspace(-90, 90, len(KDE_kcor_central_deg_new))
 
 
@@ -852,7 +856,7 @@ plt.xlabel('Date of Corresponding Observation')
 plt.ylabel('Mean Value (Degrees)')
 plt.title('PSI K-COR Projection Angle Discrepancy by Date')
 plt.legend()
-plt.ylim(0,20)
+plt.ylim(0,30)
 
 # Set x-axis ticks and labels
 plt.xticks(range(len(dates)), dates)
@@ -864,7 +868,7 @@ plt.show()
 all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_kcor_signed_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr) + ['KCor'] * len(combined_kcor_signed_ravel_arr)
+labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr) + ['KCor l2 avg'] * len(combined_kcor_signed_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
@@ -887,7 +891,7 @@ print(res)
 all_data = np.concatenate([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_kcor_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr) + ['KCor'] * len(combined_kcor_ravel_arr)
+labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr) + ['KCor l2 avg'] * len(combined_kcor_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
@@ -912,8 +916,8 @@ else:
 
 fig, ax = plt.subplots(1, 1)
 ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_kcor_ravel_arr], showfliers=False)
-ax.set_xticklabels(["ne", "ne_LOS", "pB", "KCor"]) 
-ax.set_ylim(0, 40)
+ax.set_xticklabels(["ne", "ne_LOS", "pB", "KCor l2 avg"]) 
+ax.set_ylim(0, 90)
 ax.set_ylabel("Mean (Degrees)") 
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_KCor Combined Results')

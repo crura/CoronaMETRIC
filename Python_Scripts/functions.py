@@ -24,6 +24,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import glob
 import sqlite3
 import astropy.units as u
+from prettytable import PrettyTable
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -245,6 +246,12 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
     else:
         plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_{}.png'.format(detector.replace('-',''), date)))
     #plt.show()
+        
+    gaussian_fit_pB = np.random.normal(forward_avg, forward_std, 1000)
+    plt.plot(x_1_forward_cor1_central_deg_new, (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward, color='tab:orange', label='PSI/FORWARD pB')
+    plt.plot(gaussian_fit_pB, label='gaussian fit', color='tab:blue')
+    plt.yscale('log')
+    plt.show()
 
     if masked:
         return combined_dict, data_dict, mask
@@ -823,3 +830,17 @@ def determine_paths(fits_file, PSI=True):
     return data_source, date, data_type
 
 
+
+def print_sql_query(dbName, query):
+    con = sqlite3.connect(dbName)
+    cur = con.cursor()
+    cur.execute(query)
+    rows = cur.fetchall()
+    column_names = [description[0] for description in cur.description]
+
+    table = PrettyTable()
+    table.field_names = column_names
+    for row in rows:
+        table.add_row(row)
+    print(table)
+    con.close()

@@ -83,7 +83,8 @@ CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_new(
     data_source, 
     date, 
     mean, 
-    median, 
+    median,
+    standard_deviation,
     confidence_interval, 
     n,
     qraft_parameters_id INTEGER,
@@ -102,7 +103,8 @@ CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_all(
     data_source, 
     date, 
     mean, 
-    median, 
+    median,
+    standard_deviation,
     confidence_interval, 
     n,
     qraft_parameters_id INTEGER,
@@ -120,7 +122,8 @@ cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_new(
             data_source,  
             date,  
             mean,  
-            median,  
+            median,
+            standard_deviation,
             confidence_interval,  
             n,   
             qraft_parameters_id INTEGER,  
@@ -138,7 +141,8 @@ cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_all(
             data_source,  
             date,  
             mean,  
-            median,  
+            median,
+            standard_deviation,
             confidence_interval,  
             n,   
             qraft_parameters_id INTEGER,  
@@ -184,24 +188,24 @@ for i in range(len(fits_files_pB)):
 
     file_pB = fits_files_pB[i]
     data_source, date, data_type = determine_paths(file_pB)
-    angles_signed_arr_finite_pB, angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB, foreign_key_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type, data_source=data_source, date=date)
+    angles_signed_arr_finite_pB, angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, standard_dev_pB, confidence_interval_pB, n_pB, foreign_key_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type, data_source=data_source, date=date)
     head_pB = fits.getheader(file_pB)
     forward_input_data_id_pB = head_pB['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB, foreign_key_pB, forward_input_data_id_pB))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, standard_dev_pB, confidence_interval_pB, n_pB, foreign_key_pB, forward_input_data_id_pB))
 
     file_ne = fits_files_ne[i]
     data_source, date, data_type = determine_paths(file_ne)
-    angles_signed_arr_finite_ne, angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne, foreign_key_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type, data_source=data_source, date=date)
+    angles_signed_arr_finite_ne, angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, standard_dev_ne, confidence_interval_ne, n_ne, foreign_key_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type, data_source=data_source, date=date)
     head_ne = fits.getheader(file_ne)
     forward_input_data_id_ne = head_ne['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne, foreign_key_ne, forward_input_data_id_ne))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, standard_dev_ne, confidence_interval_ne, n_ne, foreign_key_ne, forward_input_data_id_ne))
 
     file_ne_LOS = fits_files_ne_LOS[i]
     data_source, date, data_type = determine_paths(file_ne_LOS)
-    angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type, data_source=data_source, date=date)
+    angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, standard_dev_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type, data_source=data_source, date=date)
     head_ne_LOS = fits.getheader(file_ne_LOS)
     forward_input_data_id_ne_LOS = head_ne_LOS['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS, forward_input_data_id_ne_LOS))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, standard_dev_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS, forward_input_data_id_ne_LOS))
 
     file_cor1 = fits_files_cor1[i]
     head_cor1 = fits.getheader(file_cor1)
@@ -214,13 +218,13 @@ for i in range(len(fits_files_pB)):
             corresponding_file_Bz = file.replace('pB', 'Bz')
             break
     data_source, date, data_type = determine_paths(file_cor1, PSI=False)
-    angles_signed_arr_finite_cor1, angles_arr_finite_cor1, angles_arr_mean_cor1, angles_arr_median_cor1, confidence_interval_cor1, n_cor1, foreign_key_cor1 = display_fits_image_with_3_0_features_and_B_field(file_cor1, file_cor1+'.sav', data_type=data_type, data_source=data_source, date=date, PSI=False, corresponding_By_file=corresponding_file_By, corresponding_Bz_file=corresponding_file_Bz)
+    angles_signed_arr_finite_cor1, angles_arr_finite_cor1, angles_arr_mean_cor1, angles_arr_median_cor1, standard_dev_cor1, confidence_interval_cor1, n_cor1, foreign_key_cor1 = display_fits_image_with_3_0_features_and_B_field(file_cor1, file_cor1+'.sav', data_type=data_type, data_source=data_source, date=date, PSI=False, corresponding_By_file=corresponding_file_By, corresponding_Bz_file=corresponding_file_Bz)
 
     forward_input_data_id_cor1 = head_cor1['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_cor1, angles_arr_median_cor1, confidence_interval_cor1, n_cor1, foreign_key_cor1, forward_input_data_id_cor1))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_cor1, angles_arr_median_cor1, standard_dev_cor1, confidence_interval_cor1, n_cor1, foreign_key_cor1, forward_input_data_id_cor1))
 
-    cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
-    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
 
     # retrieve probability density data from seaborne distplots
@@ -323,7 +327,7 @@ confidence_interval_pB_combined = np.round(1.96 * (std_pB_combined / np.sqrt(len
 data_type_pB_combined = 'pB'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, confidence_interval_pB_combined, n_pB_combined, foreign_key_pB, ''))
+data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, std_pB_combined, confidence_interval_pB_combined, n_pB_combined, foreign_key_pB, ''))
 
 combined_ne_ravel_arr = np.array(combined_ne_ravel)
 angles_arr_mean_ne_combined = np.round(np.mean(combined_ne_ravel_arr), 5)
@@ -334,7 +338,7 @@ confidence_interval_ne_combined = np.round(1.96 * (std_ne_combined / np.sqrt(len
 data_type_ne_combined = 'ne'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, confidence_interval_ne_combined, n_ne_combined, foreign_key_ne, ''))
+data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, std_ne_combined, confidence_interval_ne_combined, n_ne_combined, foreign_key_ne, ''))
 
 combined_ne_LOS_ravel_arr = np.array(combined_ne_LOS_ravel)
 angles_arr_mean_ne_LOS_combined = np.round(np.mean(combined_ne_LOS_ravel_arr), 5)
@@ -345,7 +349,7 @@ confidence_interval_ne_LOS_combined = np.round(1.96 * (std_ne_LOS_combined / np.
 data_type_ne_LOS_combined = 'ne_LOS'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_ne_LOS, ''))
+data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, std_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_ne_LOS, ''))
 
 combined_cor1_ravel_arr = np.array(combined_cor1_ravel)
 angles_arr_mean_cor1_combined = np.round(np.mean(combined_cor1_ravel_arr), 5)
@@ -356,12 +360,12 @@ confidence_interval_cor1_combined = np.round(1.96 * (std_cor1_combined / np.sqrt
 data_type_cor1_combined = 'COR1 median filtered'
 date_combined = 'combined'
 data_source = 'COR1'
-data_stats_2_combined.append((None, data_type_cor1_combined, data_source, date_combined, angles_arr_mean_cor1_combined, angles_arr_median_cor1_combined, confidence_interval_cor1_combined, n_cor1_combined, foreign_key_cor1, ''))
+data_stats_2_combined.append((None, data_type_cor1_combined, data_source, date_combined, angles_arr_mean_cor1_combined, angles_arr_median_cor1_combined, std_cor1_combined, confidence_interval_cor1_combined, n_cor1_combined, foreign_key_cor1, ''))
 
 
 
-cur.executemany("INSERT INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
-cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
@@ -574,24 +578,24 @@ for i in range(len(fits_files_pB)):
 
     file_pB = fits_files_pB[i]
     data_source, date, data_type = determine_paths(file_pB)
-    angles_signed_arr_finite_pB, angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB, foreign_key_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type, data_source=data_source, date=date)
+    angles_signed_arr_finite_pB, angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, standard_dev_pB, confidence_interval_pB, n_pB, foreign_key_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type, data_source=data_source, date=date)
     head_pB = fits.getheader(file_pB)
     forward_input_data_id_pB = head_pB['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, confidence_interval_pB, n_pB, foreign_key_pB, forward_input_data_id_pB))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, standard_dev_pB, confidence_interval_pB, n_pB, foreign_key_pB, forward_input_data_id_pB))
 
     file_ne = fits_files_ne[i]
     data_source, date, data_type = determine_paths(file_ne)
-    angles_signed_arr_finite_ne, angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne, foreign_key_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type, data_source=data_source, date=date)
+    angles_signed_arr_finite_ne, angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, standard_dev_ne, confidence_interval_ne, n_ne, foreign_key_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type, data_source=data_source, date=date)
     head_ne = fits.getheader(file_ne)
     forward_input_data_id_ne = head_ne['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, confidence_interval_ne, n_ne, foreign_key_ne, forward_input_data_id_ne))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, standard_dev_ne, confidence_interval_ne, n_ne, foreign_key_ne, forward_input_data_id_ne))
 
     file_ne_LOS = fits_files_ne_LOS[i]
     data_source, date, data_type = determine_paths(file_ne_LOS)
-    angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type, data_source=data_source, date=date)
+    angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, standard_dev_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type, data_source=data_source, date=date)
     head_ne_LOS = fits.getheader(file_ne_LOS)
     forward_input_data_id_ne_LOS = head_ne_LOS['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS, forward_input_data_id_ne_LOS))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, standard_dev_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS, forward_input_data_id_ne_LOS))
 
     file_kcor = fits_files_kcor[i]
     head_kcor = fits.getheader(file_kcor)
@@ -604,13 +608,13 @@ for i in range(len(fits_files_pB)):
             corresponding_file_Bz = file.replace('pB', 'Bz')
             break
     data_source, date, data_type = determine_paths(file_kcor, PSI=False)
-    angles_signed_arr_finite_kcor, angles_arr_finite_kcor, angles_arr_mean_kcor, angles_arr_median_kcor, confidence_interval_kcor, n_kcor, foreign_key_kcor = display_fits_image_with_3_0_features_and_B_field(file_kcor, file_kcor+'.sav', data_type=data_type, data_source=data_source, date=date, PSI=False, corresponding_By_file=corresponding_file_By, corresponding_Bz_file=corresponding_file_Bz)
+    angles_signed_arr_finite_kcor, angles_arr_finite_kcor, angles_arr_mean_kcor, angles_arr_median_kcor, standard_dev_kcor, confidence_interval_kcor, n_kcor, foreign_key_kcor = display_fits_image_with_3_0_features_and_B_field(file_kcor, file_kcor+'.sav', data_type=data_type, data_source=data_source, date=date, PSI=False, corresponding_By_file=corresponding_file_By, corresponding_Bz_file=corresponding_file_Bz)
 
     forward_input_data_id_kcor = head_kcor['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_kcor, angles_arr_median_kcor, confidence_interval_kcor, n_kcor, foreign_key_kcor, forward_input_data_id_kcor))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_kcor, angles_arr_median_kcor, standard_dev_kcor, confidence_interval_kcor, n_kcor, foreign_key_kcor, forward_input_data_id_kcor))
 
-    cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
-    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
 
     # retrieve probability density data from seaborne distplots
@@ -713,7 +717,7 @@ confidence_interval_pB_combined = np.round(1.96 * (std_pB_combined / np.sqrt(len
 data_type_pB_combined = 'pB'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, confidence_interval_pB_combined, n_pB_combined, foreign_key_pB, ''))
+data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, std_pB_combined, confidence_interval_pB_combined, n_pB_combined, foreign_key_pB, ''))
 
 combined_ne_ravel_arr = np.array(combined_ne_ravel)
 angles_arr_mean_ne_combined = np.round(np.mean(combined_ne_ravel_arr), 5)
@@ -724,7 +728,7 @@ confidence_interval_ne_combined = np.round(1.96 * (std_ne_combined / np.sqrt(len
 data_type_ne_combined = 'ne'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, confidence_interval_ne_combined, n_ne_combined, foreign_key_ne, ''))
+data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, std_ne_combined, confidence_interval_ne_combined, n_ne_combined, foreign_key_ne, ''))
 
 combined_ne_LOS_ravel_arr = np.array(combined_ne_LOS_ravel)
 angles_arr_mean_ne_LOS_combined = np.round(np.mean(combined_ne_LOS_ravel_arr), 5)
@@ -735,7 +739,7 @@ confidence_interval_ne_LOS_combined = np.round(1.96 * (std_ne_LOS_combined / np.
 data_type_ne_LOS_combined = 'ne_LOS'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_ne_LOS, ''))
+data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, std_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_ne_LOS, ''))
 
 combined_kcor_ravel_arr = np.array(combined_kcor_ravel)
 angles_arr_mean_kcor_combined = np.round(np.mean(combined_kcor_ravel_arr), 5)
@@ -746,12 +750,12 @@ confidence_interval_kcor_combined = np.round(1.96 * (std_kcor_combined / np.sqrt
 data_type_kcor_combined = 'KCor l2 avg'
 date_combined = 'combined'
 data_source = 'KCor'
-data_stats_2_combined.append((None, data_type_kcor_combined, data_source, date_combined, angles_arr_mean_kcor_combined, angles_arr_median_kcor_combined, confidence_interval_kcor_combined, n_kcor_combined, foreign_key_kcor, ''))
+data_stats_2_combined.append((None, data_type_kcor_combined, data_source, date_combined, angles_arr_mean_kcor_combined, angles_arr_median_kcor_combined, std_kcor_combined, confidence_interval_kcor_combined, n_kcor_combined, foreign_key_kcor, ''))
 
 
 
-cur.executemany("INSERT INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
-cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 

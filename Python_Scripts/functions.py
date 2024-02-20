@@ -771,7 +771,7 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
     plt.close()
 
 
-    return angles_signed_arr_finite, angles_arr_finite, angles_arr_mean, angles_arr_median, confidence_interval, n, foreign_key
+    return angles_signed_arr_finite, angles_arr_finite, angles_arr_mean, angles_arr_median, std, confidence_interval, n, foreign_key
 
 
 

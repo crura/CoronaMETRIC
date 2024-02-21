@@ -156,12 +156,17 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
       
       B1 = readfits(fname_B1) & B2 = readfits(fname_B2)
       
-      features = blob_stat_to_features(blob_stat, d_phi, d_rho, rho_min, XYCenter)
+      features = blob_stat_to_features(blob_stat, d_phi, d_rho, rho_min, XYCenter, abs(IMG_orig))
        
       ; removing short features
       w = where(features[*].n_nodes gt n_nodes_min)
       features = features[w]
-        
+      ; do only for data
+      ; removing features with low intensity
+      intensity_removal_coef = 0.4
+      w = where(features.intensity gt intensity_removal_coef*mean(abs(IMG_orig[where(IMG_orig gt 0)])))
+
+      features = features[w]
       angle_err = features_vs_B(features, B1, B2, angle_err_avr=angle_err_avr, angle_err_sd=angle_err_sd, angle_err_signed=angle_err_signed)
 
       ;-------------------------------------

@@ -133,7 +133,7 @@ cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_new(
             )
 """)
 
-cur.execute("DROP TABLE IF EXISTS central_tendency_stats_kcor_all")
+# cur.execute("DROP TABLE IF EXISTS central_tendency_stats_kcor_all")
 
 cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_all(
             id INTEGER PRIMARY KEY,  
@@ -433,6 +433,34 @@ ax.legend(fontsize=13)
 plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
 # plt.show()
 #plt.close()
+
+x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new = calculate_KDE(combined_pB_signed_ravel_arr)
+gaussian_fit_pB = np.random.normal(np.mean(combined_pB_signed_ravel_arr), np.std(abs(combined_pB_signed_ravel_arr)), 1000)
+hi = sci.stats.norm(np.mean(combined_pB_signed_ravel_arr), np.std(abs(combined_pB_signed_ravel_arr)))
+
+min_height = min(combined_pB_signed_ravel_arr)
+max_height = max(combined_pB_signed_ravel_arr)
+height_values = np.linspace(min_height, max_height, num=1000)
+probabilities = hi.pdf(x=height_values)
+
+JSD_pB_gaussain, KLD_pB_gaussian = calculate_KDE_statistics(KDE_forward_cor1_central_deg_new, probabilities)
+
+fig = plt.figure(figsize=(10,10))
+ax = fig.subplots(1,1)
+ax.plot(x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new, color='tab:orange', label='PSI/FORWARD pB Probability Density')
+ax.plot(height_values, probabilities, label='Corresponding Gaussian Fit', color='tab:blue')
+# plt.plot(x_1_forward_cor1_central_deg_new, gaussian_fit_pB*norm_max_pB, label='gaussian fit', color='tab:blue')
+# plt.yscale('log')
+ax.set_xlabel('Angle Discrepancy (Degrees)')
+ax.set_ylabel('Probability Density')
+ax.text(25,0.008,"average discrepancy: " + str(np.round(np.average(combined_pB_signed_ravel_arr),5)))
+ax.text(25,0.007,"standard deviation: " + str(np.round(np.std(abs(combined_pB_signed_ravel_arr)),5)))
+ax.text(25,0.006,"JSD: " + str(np.round(JSD_pB_gaussain,5)))
+# ax.set_yscale('log')
+ax.set_title('PSI/FORWARD pB Angle Discrepancy Probability Density vs Corresponding Gaussian Fit')
+ax.legend()
+plt.savefig(os.path.join(repo_path,'Output/Plots/Test_Comparison_Fig.png'))
+plt.show()
 
 query = "SELECT mean, median, date, data_type, data_source, n, confidence_interval FROM central_tendency_stats_cor1_new WHERE date!='combined' ORDER BY mean ASC;"
 cur.execute(query)

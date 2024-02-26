@@ -844,3 +844,15 @@ def print_sql_query(dbName, query):
         table.add_row(row)
     print(table)
     con.close()
+
+
+def plot_sql_query(dbName, query, parameter_x, parameter_y, title=None, xlabel=None, ylabel=None):
+    con = sqlite3.connect(dbName)
+    df = pd.read_sql_query(query, con)
+    fig, ax = plt.subplots()
+    ax.plot(df[parameter_x], df[parameter_y])
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    # plt.savefig(outpath)
+    plt.show()

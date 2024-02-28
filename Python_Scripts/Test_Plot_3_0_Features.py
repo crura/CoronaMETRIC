@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_new(
 )
 """)
 
-cur.execute("DROP TABLE IF EXISTS central_tendency_stats_cor1_all")
+# cur.execute("DROP TABLE IF EXISTS central_tendency_stats_cor1_all")
 
 cur.execute("""
 CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_all(

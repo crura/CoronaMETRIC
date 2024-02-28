@@ -71,7 +71,8 @@ cur.execute("""CREATE TABLE IF NOT EXISTS qraft_input_variables (
             p_range_upper REAL,
             n_p INT,
             n_nodes_min INT,
-            unique(d_phi, d_rho, XYCenter_x, XYCenter_y, rot_angle, phi_shift, smooth_xy, smooth_phi_rho_lower, smooth_phi_rho_upper, detr_phi, rho_range_lower, rho_range_upper, n_rho, p_range_lower, p_range_upper, n_p, n_nodes_min))"""
+            intensity_removal_coefficient REAL,
+            unique(d_phi, d_rho, XYCenter_x, XYCenter_y, rot_angle, phi_shift, smooth_xy, smooth_phi_rho_lower, smooth_phi_rho_upper, detr_phi, rho_range_lower, rho_range_upper, n_rho, p_range_lower, p_range_upper, n_p, n_nodes_min, intensity_removal_coefficient))"""
             )
 
 cur.execute("DROP TABLE IF EXISTS central_tendency_stats_cor1_new")

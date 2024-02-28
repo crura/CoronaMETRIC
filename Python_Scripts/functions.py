@@ -530,13 +530,14 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
     p_range = idl_save['p_range']
     n_p = idl_save['n_p']
     n_nodes_min = idl_save['n_nodes_min']
+    intensity_removal_coefficient = idl_save['intensity_removal_coef']
 
     con = sqlite3.connect("tutorial.db")
     cur = con.cursor()
 
-    qraft_data = [(None, float(d_phi), float(d_rho), int(XYCenter[0]), int(XYCenter[1]), float(rot_angle), float(phi_shift), int(smooth_xy), int(smooth_phi_rho[0]), int(smooth_phi_rho[1]), int(detr_phi), int(rho_range[0]), int(rho_range[1]), int(n_rho), float(p_range[0]), float(p_range[1]), int(n_p), int(n_nodes_min))]
+    qraft_data = [(None, float(d_phi), float(d_rho), int(XYCenter[0]), int(XYCenter[1]), float(rot_angle), float(phi_shift), int(smooth_xy), int(smooth_phi_rho[0]), int(smooth_phi_rho[1]), int(detr_phi), int(rho_range[0]), int(rho_range[1]), int(n_rho), float(p_range[0]), float(p_range[1]), int(n_p), int(n_nodes_min), float(intensity_removal_coefficient))]
 
-    cur.executemany("""INSERT OR IGNORE INTO qraft_input_variables VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", qraft_data)
+    cur.executemany("""INSERT OR IGNORE INTO qraft_input_variables VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", qraft_data)
     con.commit()
     query = """SELECT * from qraft_input_variables where 
             d_phi={} and 
@@ -555,11 +556,12 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
             p_range_lower={} and
             p_range_upper={} and
             n_p={} and
-            n_nodes_min={};""".format(float(d_phi), float(d_rho), int(XYCenter[0]), int(XYCenter[1]), float(rot_angle), float(phi_shift), int(smooth_xy), int(smooth_phi_rho[0]), int(smooth_phi_rho[1]), int(detr_phi), int(rho_range[0]), int(rho_range[1]), int(n_rho), float(p_range[0]), float(p_range[1]), int(n_p), int(n_nodes_min))
+            n_nodes_min={} and 
+            intensity_removal_coefficient={};""".format(float(d_phi), float(d_rho), int(XYCenter[0]), int(XYCenter[1]), float(rot_angle), float(phi_shift), int(smooth_xy), int(smooth_phi_rho[0]), int(smooth_phi_rho[1]), int(detr_phi), int(rho_range[0]), int(rho_range[1]), int(n_rho), float(p_range[0]), float(p_range[1]), int(n_p), int(n_nodes_min), float(intensity_removal_coefficient))
 
     cur.execute(query)
     row = cur.fetchone()
-    (qraft_parameters_id, d_phi_db, d_rho_db, XYCenter_x_db, XYCenter_y_db, rot_angle_db, phi_shift_db, smooth_xy_db, smooth_phi_rho_lower_db, smooth_phi_rho_upper_db, detr_phi_db, rho_range_lower_db, rho_range_upper_db, n_rho_db, p_range_lower_db, p_range_upper_db, n_p_db, n_nodes_min_db) = row
+    (qraft_parameters_id, d_phi_db, d_rho_db, XYCenter_x_db, XYCenter_y_db, rot_angle_db, phi_shift_db, smooth_xy_db, smooth_phi_rho_lower_db, smooth_phi_rho_upper_db, detr_phi_db, rho_range_lower_db, rho_range_upper_db, n_rho_db, p_range_lower_db, p_range_upper_db, n_p_db, n_nodes_min_db, intensity_removal_coefficient_db) = row
     foreign_key = qraft_parameters_id
     # img_enh = idl_save['img_enh']
     FEATURES = idl_save['features']

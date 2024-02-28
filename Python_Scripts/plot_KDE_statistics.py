@@ -17,6 +17,8 @@ import unittest
 from pathlib import Path
 from scipy.interpolate import interp1d
 import matplotlib
+from os.path import join, isfile
+from os import listdir
 matplotlib.use('TkAgg')
 mpl.use('TkAgg')
 
@@ -31,6 +33,9 @@ err_mlso_los = idl_save['ERR_ARR_LOS_MLSO']
 err_forward_central = idl_save['ERR_ARR_FORWARD']
 err_forward_los = idl_save['ERR_ARR_LOS_FORWARD']
 err_random = idl_save['ERR_ARR_RND']
+
+datapath = join(repo_path, 'Data/QRaFT/COR-1_Errors_New')
+datafiles = [join(datapath,f) for f in listdir(datapath) if isfile(join(datapath,f)) and f !='.DS_Store']
 
 # Generate plots for Central arrays
 mpl.rcParams.update(mpl.rcParamsDefault)
@@ -419,13 +424,67 @@ plt.close()
 
 
 data_dir_2 = os.path.join(repo_path,'Data/QRaFT/errors_cor1.sav')
+data_dir_new = os.path.join(repo_path,'Data/QRaFT/COR-1_Errors/errors_all.sav')
+
+
 idl_save_2 = readsav(data_dir_2)
+idl_save_new = readsav(data_dir_new)
+
 err_cor1_central = idl_save_2['ERR_ARR_COR1']
 err_cor1_los = idl_save_2['ERR_ARR_LOS_COR1']
 err_forward_cor1_central = idl_save_2['ERR_ARR_FORWARD']
 err_forward_cor1_los = idl_save_2['ERR_ARR_LOS_FORWARD']
 # err_random = idl_save_2['ERR_ARR_RND']
 
+err_cor1_central_new = idl_save_new['ERR_ARR_COR1']
+err_cor1_los_new = idl_save_new['ERR_ARR_LOS_COR1']
+err_forward_cor1_central_new = idl_save_new['ERR_ARR_FORWARD']
+err_forward_cor1_los_new = idl_save_new['ERR_ARR_LOS_FORWARD']
+err_random_new = idl_save_new['ERR_ARR_RND']
+
+# convert arrays from radians to degrees
+err_cor1_central_deg_new = err_cor1_central_new[np.where(err_cor1_central_new > 0)]*180/np.pi
+err_forward_cor1_central_deg_new = err_forward_cor1_central_new[np.where(err_forward_cor1_central_new > 0)]*180/np.pi
+err_random_deg_new = err_random_new[np.where(err_random_new > 0)]*180/np.pi
+
+def calculate_KDE(err_array):
+    # set minimum and maximum x values for gaussian kde calculation
+    xmin = min(err_array)
+    xmax = max(err_array)
+
+    # Calculate Gaussian KDE for cor1 pB vs central B field dataset
+    kde = gaussian_kde(err_array)
+    x_1 = np.linspace(xmin, xmax, 1000000)
+    kde0 = kde(x_1)
+    return kde0
+
+def calculate_KDE_statistics(KDE_1, KDE_2):
+
+    #compute JS Divergence
+    result_JSD = JS_Div(KDE_1, KDE_2)
+
+    #compute KL Divergence
+    result_KLD = KL_div(KDE_1, KDE_2)
+
+    return result_JSD, result_KLD
+
+KDE_cor1_central_deg_new = calculate_KDE(err_cor1_central_deg_new)
+KDE_forward_cor1_central_deg_new = calculate_KDE(err_forward_cor1_central_deg_new)
+KDE_random_deg_new = calculate_KDE(err_random_deg_new)
+
+JSD_cor1_forward_central_new, KLD_cor1_forward_central_new = calculate_KDE_statistics(KDE_cor1_central_deg_new, KDE_forward_cor1_central_deg_new)
+JSD_cor1_central_random_new, KLD_cor1_central_random_new = calculate_KDE_statistics(KDE_cor1_central_deg_new, KDE_random_deg_new)
+JSD_COR1_Forward_Central_Random_new, KLDcor1_forward_central_random_new = calculate_KDE_statistics(KDE_forward_cor1_central_deg_new, KDE_random_deg_new)
+
+combined_dict = dict(metric=['KL Divergence', 'JS Divergence'],
+                    cor1_v_psi=[KLD_cor1_forward_central_new, JSD_cor1_forward_central_new],
+                    cor1_v_random=[KLD_cor1_central_random_new, JSD_cor1_central_random_new],
+                    psi_v_random=[KLDcor1_forward_central_random_new, JSD_COR1_Forward_Central_Random_new])
+
+pd.set_option('display.float_format', '{:.3E}'.format)
+stats_df = pd.DataFrame(combined_dict)
+stats_df.columns = ['metric', 'cor1 vs psi pB', 'cor1 vs random', 'psi pB vs random']
+print(stats_df.to_latex(index=False))
 
 # Generate plots for Central arrays
 mpl.rcParams.update(mpl.rcParamsDefault)

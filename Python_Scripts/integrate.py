@@ -11,6 +11,7 @@ import git
 from scipy.io import readsav
 import unittest
 from pathlib import Path
+import sqlite3
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -21,6 +22,41 @@ crln_obs_print = idl_save['crln_obs_print']
 crlt_obs_print = idl_save['crlt_obs_print']
 occlt = idl_save['occlt']
 r_sun_range = idl_save['range']
+
+con = sqlite3.connect("tutorial.db")
+
+cur = con.cursor()
+
+# cur.execute("CREATE TABLE stats(comparison, data_source, date, JSD, KLD)")
+
+# cur.execute("CREATE TABLE stats2_new(data_type, data_source, date, mean, median, confidence interval, n)")
+
+# cur.execute("DROP TABLE IF EXISTS forward_input_variables")
+
+cur.execute("""CREATE TABLE IF NOT EXISTS forward_input_variables (
+            forward_parameters_id INTEGER PRIMARY KEY,
+            crln_obs,
+            crlt_obs,
+            occlt,
+            r_sun_range,
+            unique(crln_obs, crlt_obs, occlt, r_sun_range)
+            )
+            """
+            )
+forward_input_data = [(None, float(crln_obs), float(crlt_obs), float(occlt), float(r_sun_range))]
+
+cur.executemany("""INSERT OR IGNORE INTO forward_input_variables VALUES(?, ?, ?, ?, ?)""", forward_input_data)
+con.commit()
+
+query = """SELECT * from forward_input_variables where 
+            crln_obs={} and 
+            crlt_obs={} and 
+            occlt={} and 
+            r_sun_range={};""".format(float(crln_obs), float(crlt_obs), float(occlt), float(r_sun_range))
+
+cur.execute(query)
+row = cur.fetchone()
+forward_input_data_id, crln_obs_db, crlt_obs_db, occlt_db, r_sun_range_db = row
 
 params = str(crlt_obs_print,'utf-8') + '_' +  str(crln_obs_print,'utf-8')
 repo = git.Repo('.', search_parent_directories=True)

@@ -2,6 +2,7 @@ function image_coalignment, directory
   ;restore, '/Users/crura/Desktop/Research/Magnetic_Field/Forward_PB_data.sav',/v
   spawn, 'git rev-parse --show-toplevel', git_repo
   restore, git_repo + '/Data/model_parameters.sav',/v
+  restore, git_repo + '/Data/outstrings.sav', /v
   spawn, 'mkdir -p ' + git_repo + '/Output'
   spawn, 'mkdir -p ' + git_repo + '/Output/fits_images'
   ;.compile -v '/Users/crura/SSW/gen/idl/util/default.pro'
@@ -36,7 +37,7 @@ function image_coalignment, directory
   dens = read_csv(git_repo + '/Data/Integrated_Parameters/Integrated_Electron_Density.csv')
   len = fix(sqrt(n_elements(forward_pb_image)))
   dens_2d = reform(dens.field1,len,len)
-  out_string = date_print + '_PSI';strcompress(string(CRLT_OBS),/remove_all) + '_' + strcompress(string(CRLN_OBS),/remove_all)
+  out_string = '__' + date_print + '__' + detector + '__PSI';strcompress(string(CRLT_OBS),/remove_all) + '_' + strcompress(string(CRLN_OBS),/remove_all)
   rsun_range = range + range
   dx = rsun_range/len
   ; convert x,y arrays to rsun
@@ -367,6 +368,8 @@ function image_coalignment, directory
   BANG=crlt_obs
   output = git_repo + '/Output/fits_images/' + out_string + '_pB.fits'
   WRITE_PSI_IMAGE_AS_FITS,output,psi_forward_pb_coaligned,x_array_new,y_array_new,DATE,CMER,BANG,/ForceXyRs,/GetCoords,ObsDistanceAU=1
+  outstring_list = [outstring_list, output]
+  occlt_list = [occlt_list, occlt]
 
   writefits, output, psi_forward_pb_coaligned, head_fits_mlso
 
@@ -379,6 +382,7 @@ function image_coalignment, directory
 
 
   save,bx_central_coaligned,by_central_coaligned,bz_central_coaligned,bx_integrated_coaligned,by_integrated_coaligned,bz_integrated_coaligned,psi_central_dens_coaligned,psi_integrated_dens_coaligned,psi_forward_pb_coaligned,filename=save_path
-
+  save,crln_obs,crlt_obs,occlt,range,crlt_obs_print,crln_obs_print,forward_pb_image,date_obs,fits_directory, shape, rsun, date_print, detector, filename=git_repo + '/Data/model_parameters.sav'
+  save, outstring_list, directory_list, directory_list_2, occlt_list, filename = git_repo + '/Data/outstrings.sav'
   return, 0
 END

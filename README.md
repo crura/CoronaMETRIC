@@ -30,3 +30,6 @@ This package, given a PSI MAS model and a coronagraph input image generates coal
 
 - [SSW IDL](https://www.mssl.ucl.ac.uk/surf/sswdoc/solarsoft/ssw_install_howto.html)
   - Note: package FORWARD must be installed with SolarSoft Install script
+
+## Submodules Used
+- V. Uritsky. Quasi-Radial Field-line Tracing (QRaFT v2.0): an image analysis package for reconstructing the magnetic field geometry of the open-flux solar corona, GitHub / Zenode, 2022, URL: github.com/uritsky/QRaFT,  DOI:10.5281/zenodo.7410948.

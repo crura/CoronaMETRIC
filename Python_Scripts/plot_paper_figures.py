@@ -1759,3 +1759,98 @@ print("yay")
 # print("JS Divergence between MLSO LOS KDE to SNS.DISTPLOT",result_JSD_MLSO_FORWARD_LOS)
 # result_JSD_MLSO_FORWARD_Central= JS_Div(kde0_x_mlso_central_deg, dist_values_mlso_central)
 # print("JS Divergence between MLSO Central KDE to SNS.DISTPLOT",result_JSD_MLSO_FORWARD_Central)
+
+import sunpy
+from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+import git
+import numpy as np
+from scipy.interpolate import interp1d
+from sunpy.coordinates.ephemeris import *
+from sunpy.coordinates.frames import *
+from sunpy.coordinates.sun import L0
+from astropy.io import fits
+from sunpy.sun import constants
+import astropy.constants
+import astropy.units as u
+
+
+repo = git.Repo('.', search_parent_directories=True)
+repo_path = repo.working_tree_dir
+
+
+# carrington lat/lon in degrees
+files = ['Data/MLSO/20170820_180657_kcor_l2_avg.fts', 'Data/MLSO/20170825_185258_kcor_l2_avg.fts', 'Data/MLSO/20170829_200801_kcor_l2_avg.fts', 'Data/MLSO/20170903_025117_kcor_l2_avg.fts', 'Data/MLSO/20170906_213054_kcor_l2_avg.fts', 'Data/MLSO/20170911_202927_kcor_l2_avg.fts']
+longitudes = []
+latitudes = []
+small_angle_const = (3600 * 360)/(2 * np.pi)
+x_radius = []
+y_radius = []
+z_radius = []
+for i in files:
+    path = os.path.join(repo_path, i)
+    head = fits.getheader(path)
+    time = datetime.strptime(head['DATE-OBS'],'%Y-%m-%dT%H:%M:%S')
+    latitudes.append(head['CRLT_OBS'])
+    longitudes.append(head['CRLN_OBS'])
+    d_sun_obs = (constants.radius.to_value() * small_angle_const) / head['RSUN']
+    x_radius.append(d_sun_obs)
+    y_radius.append(d_sun_obs)
+    z_radius.append(d_sun_obs)
+
+files2 = ['Data/COR1/2017_08_20_rep_med.fts', 'Data/COR1/2017_08_25_rep_med.fts', 'Data/COR1/2017_08_29_rep_med.fts', 'Data/COR1/2017_09_03_rep_med.fts', 'Data/COR1/2017_09_06_rep_med.fts', 'Data/COR1/2017_09_11_rep_med.fts']
+longitudes2 = []
+latitudes2 = []
+x2_radius = []
+y2_radius = []
+z2_radius = []
+for i in files2:
+    path2 = os.path.join(repo_path, i)
+    head2 = fits.getheader(path2)
+    time2 = datetime.strptime(head['DATE-OBS'],'%Y-%m-%dT%H:%M:%S')
+    latitudes2.append(head2['CRLT_OBS'])
+    longitudes2.append(head2['CRLN_OBS'])
+    x2_radius.append(head2['DSUN_OBS'])
+    y2_radius.append(head2['DSUN_OBS'])
+    z2_radius.append(head2['DSUN_OBS'])
+
+
+theta = np.array(longitudes)
+phi = np.array(latitudes)
+
+theta2 = np.array(longitudes2)
+phi2 = np.array(latitudes2)
+
+x_radius = np.array(x_radius)
+y_radius = np.array(y_radius)
+z_radius = np.array(z_radius)
+
+x2_radius = np.array(x2_radius)
+y2_radius = np.array(y2_radius)
+z2_radius = np.array(z2_radius)
+
+# Calculate the x and y coordinates
+x = x_radius * np.cos(theta) * np.cos(phi)
+y = y_radius * np.sin(theta) * np.cos(phi)
+z = z_radius * np.sin(phi)
+
+x2 = x2_radius * np.cos(theta2) * np.cos(phi2)
+y2 = y2_radius * np.sin(theta2) * np.cos(phi2)
+z2 = z2_radius * np.sin(phi)
+
+
+fig, ax = plt.subplots(subplot_kw={'projection': 'polar'},figsize=(8, 8))
+circle = plt.Circle((0.0, 0.0), (10*u.Rsun).to_value(u.AU),
+                    transform=ax.transProjectionAffine + ax.transAxes, color="yellow",
+                    alpha=1, label="Sun")
+ax.add_artist(circle)
+ax.scatter(np.deg2rad(longitudes), x_radius/astropy.constants.au.to_value(u.m), color='red',label='MLSO K-COR Observations')
+ax.scatter(np.deg2rad(longitudes2), x2_radius/astropy.constants.au.to_value(u.m), color='blue',label='COR-1 Observations')
+ax.set_theta_zero_location("S")
+ax.legend(bbox_to_anchor=(1, 1.05), loc="upper right")
+ax.set_title('Locations of Each Observation in Dataset')
+ax.set_rlim(0, 1.3)
+plt.savefig(os.path.join(repo_path,'Output/Plots/Polar_Observations_Plot.png'))
+# plt.show()

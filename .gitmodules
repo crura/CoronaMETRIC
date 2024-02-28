@@ -1,0 +1,3 @@
+[submodule "STEREO_Data_Processing"]
+	path = STEREO_Data_Processing
+	url = https://github.com/crura/STEREO_Data_Processing

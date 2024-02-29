@@ -251,7 +251,8 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
     plt.plot(x_1_forward_cor1_central_deg_new, (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward, color='tab:orange', label='PSI/FORWARD pB')
     plt.plot(gaussian_fit_pB, label='gaussian fit', color='tab:blue')
     plt.yscale('log')
-    plt.show()
+    plt.savefig(os.path.join(repo_path,'Output/Plots/Test_Gaussian_Comparison_Plot.png'))
+    # plt.show()
 
     if masked:
         return combined_dict, data_dict, mask

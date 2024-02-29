@@ -512,7 +512,7 @@ plt.ylim(0,20)
 # Set x-axis ticks and labels
 plt.xticks(range(len(dates)), dates)
 plt.savefig(os.path.join(repo_path, 'Output/Plots', '{}_Angle_Discrepancy_By_Date.png'.format(data_type)))
-plt.show()
+# plt.show()
 
 # Combine data into a single array
 all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_cor1_signed_ravel_arr])
@@ -554,7 +554,7 @@ ax.set_ylabel("Data Type")
 ax.set_title('HSD Comparison of Data Types for PSI_COR1 Combined Results')
 tukey_result.plot_simultaneous(xlabel='Mean (Degrees)', ax=ax)
 plt.savefig(os.path.join(repo_path,'Output/Plots/testfig1.png'))
-plt.show()
+# plt.show()
 
 f_statistic, p_value = f_oneway(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr)
 # Check for statistical significance
@@ -572,7 +572,7 @@ ax.set_ylabel("Mean (Degrees)")
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.png'))
-plt.show()
+# plt.show()
 
 res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr)
 print(res)
@@ -894,7 +894,7 @@ plt.ylim(0,30)
 # Set x-axis ticks and labels
 plt.xticks(range(len(dates)), dates)
 plt.savefig(os.path.join(repo_path, 'Output/Plots', '{}_Angle_Discrepancy_By_Date.png'.format(data_type)))
-plt.show()
+# plt.show()
 
 
 # Combine data into a single array
@@ -937,7 +937,7 @@ ax.set_ylabel("Data Type")
 ax.set_title('HSD Comparison of Data Types for PSI_KCor Combined Results')
 tukey_result.plot_simultaneous(xlabel='Mean (Degrees)', ax=ax)
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig1_kcor.png'))
-plt.show()
+# plt.show()
 
 f_statistic, p_value = f_oneway(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_kcor_ravel_arr)
 # Check for statistical significance
@@ -955,7 +955,7 @@ ax.set_ylabel("Mean (Degrees)")
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_KCor Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2_kcor.png'))
-plt.show()
+# plt.show()
 
 res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_kcor_ravel_arr)
 print(res)

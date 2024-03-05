@@ -3,7 +3,7 @@ function get_2D_coord ;, Nxy, dx, dy, R_occult
 ;
 ; V. Uritsky 2021
 ;
-  spawn, 'git rev-parse --show-toplevel', git_repo
+  spawn, 'git rev-parse --show-superproject-working-tree', git_repo
   restore, git_repo + '/Data/model_parameters.sav'
 
   len = fix(sqrt(n_elements(forward_pb_image)))
@@ -58,7 +58,7 @@ function get_fordump
 
 
   ;spawn, 'cp /Users/crura/SSW/packages/forward/datadump /Users/crura/Desktop/Research/github/Image-Coalignment/Data'
-  spawn, 'git rev-parse --show-toplevel', git_repo
+  spawn, 'git rev-parse --show-superproject-working-tree', git_repo
   restore, git_repo + '/Data/model_parameters.sav'
   restore, '/Users/crura/Desktop/Research/Data/datadump_' + crlt_obs_print + '_' + crln_obs_print,/v
   print,git_repo

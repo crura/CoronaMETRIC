@@ -1,6 +1,6 @@
 [submodule "STEREO_Data_Processing"]
-	path = /Users/crura/Desktop/Research/github/Test_Suite/Image-Coalignment/QRaFT
+	path = QRaFT
 	url = https://github.com/crura/STEREO_Data_Processing
 [submodule "QRaFT"]
-	path = /Users/crura/Desktop/Research/github/Test_Suite/Image-Coalignment/STEREO_Data_Processing
+	path = STEREO_Data_Processing
 	url = https://github.com/crura/QRaFT

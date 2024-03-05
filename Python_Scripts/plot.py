@@ -32,7 +32,7 @@ occlt = idl_save['occlt']
 shape = idl_save['shape']
 detector = idl_save['detector']
 params = '__' + date_print + '__' + str(detector,'utf-8') + '__PSI'
-#  File "/Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Python_Scripts/plot.py", line 34, in <module>
+#  File "/Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Python_Scripts/plot.py", line 34, in <module>
 #     params = date_print + detector + '_PSI'
 # TypeError: can only concatenate str (not "bytes") to str
 

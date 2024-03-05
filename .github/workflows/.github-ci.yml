@@ -147,12 +147,12 @@ jobs:
       # - uses: actions/upload-artifact@v3
       #   with:
       #     name: output-fits-images
-      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output/fits_images
+      #     path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Output/fits_images
 
       - uses: actions/upload-artifact@v3
         with:
           name: Upload QRaFT Data
-          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output/QRaFT_Results
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Output/QRaFT_Results
 
       - name: Plot Figures for Paper
 
@@ -173,7 +173,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: output-plots
-          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output/Plots
+          path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Output/Plots
           retention-days: 30
 
   #
@@ -187,7 +187,7 @@ jobs:
   #     - uses: actions/download-artifact@v3
   #       with:
   #         name: my-artifact
-  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
+  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Data
   #
   #     - name: Integrate Data Slices and Generate LOS Data
   #
@@ -200,7 +200,7 @@ jobs:
   #     - uses: actions/upload-artifact@v3
   #       with:
   #         name: python-plots
-  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Integrated_Parameters
+  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Data/Integrated_Parameters
   #
   #
   # save-parameters:
@@ -216,12 +216,12 @@ jobs:
   #     - uses: actions/download-artifact@v3
   #       with:
   #         name: my-artifact
-  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
+  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Data
   #
   #     - uses: actions/download-artifact@v3
   #       with:
   #         name: python-plots
-  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data/Integrated_Parameters
+  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Data/Integrated_Parameters
   #
   #
   #
@@ -268,7 +268,7 @@ jobs:
   #     - uses: actions/upload-artifact@v3
   #       with:
   #         name: output-data
-  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
+  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Output
   #
   #
   # unit-test:
@@ -281,12 +281,12 @@ jobs:
   #     - uses: actions/download-artifact@v3
   #       with:
   #         name: output-data
-  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Output
+  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Output
   #
   #     - uses: actions/download-artifact@v3
   #       with:
   #         name: my-artifact
-  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Image-Coalignment/Data
+  #         path: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment/Data
   #
   #     - name: Perform Unit Tests
   #

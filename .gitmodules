@@ -1,6 +1,6 @@
 [submodule "STEREO_Data_Processing"]
-	path = QRaFT
+	path = STEREO_Data_Processing
 	url = https://github.com/crura/STEREO_Data_Processing
 [submodule "QRaFT"]
-	path = STEREO_Data_Processing
+	path = QRaFT
 	url = https://github.com/crura/QRaFT

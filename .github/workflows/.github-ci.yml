@@ -23,6 +23,9 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Set ENV Variables
+        run: |
+          echo "REPO_NAME=${GITHUB_REPOSITORY#GITHUB_REPOSITORY_OWNER/$}" >> $GITHUB_ENV
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 

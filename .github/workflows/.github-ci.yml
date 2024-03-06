@@ -37,6 +37,7 @@ jobs:
         env:
           ACTIONS_RUNNER_HOOK_JOB_STARTED: /Users/crura/Documents/bin/ssw
         run: |
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" >> $GITHUB_ENV
           source /Users/crura/miniconda3/etc/profile.d/conda.sh &&
           conda init bash &&
           conda activate test_env &&

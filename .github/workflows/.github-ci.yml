@@ -31,6 +31,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Generate forward model and data slices
+        working-directory: /Users/crura/Desktop/Research/github/actions-runner/_work/Image-Coalignment
         env:
           ACTIONS_RUNNER_HOOK_JOB_STARTED: /Users/crura/Documents/bin/ssw
         run: |

@@ -32,6 +32,7 @@ jobs:
         with:
           path: Image-Coalignment
           submodules: true
+          token: ${{ secrets.CI_TOKEN }}
 
 
 

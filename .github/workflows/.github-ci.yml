@@ -46,7 +46,7 @@ jobs:
           python3 -m venv env &&
           source env/bin/activate &&
           pip install -r requirements.txt &&
-          git_repo=${GITHUB_WORKSPACE}/Image-Coalignment &&
+          git_repo=$(git rev-parse --show-toplevel) &&
           echo $git_repo &&
           (echo "ssw_path" &&
           echo ".compile -v '/Users/crura/SSW/gen/idl/string/strjustify.pro'" &&

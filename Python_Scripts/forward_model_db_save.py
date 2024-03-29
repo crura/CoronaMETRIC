@@ -67,6 +67,13 @@ hdul = fits.open(fits_path)
 header = hdul[0].header
 # create a new keyword to header and set the value
 header.set('forward_input_data_id', forward_input_data_id, 'unique identifier in forward_input_variables table')
+
+try:
+    date_obs = header['date-obs']
+except:
+    date_obs = header['date_obs']
+    header.set('date-obs', date_obs, 'date of observation')
+
 # Save the changes to the FITS file
 hdul.writeto(fits_path, overwrite=True)
 # Close the FITS file

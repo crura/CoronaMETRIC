@@ -711,7 +711,10 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
     telescope = head['telescop']
     instrument = head['instrume']
 
-    date_obs = head['date-obs']
+    try:
+        date_obs = head['date-obs']
+    except:
+        date_obs = head['date_obs']
     str_strip = date_obs.split('T',1)[0]
     string_print = date_obs.split('T')[0].replace('-','_')
 
@@ -777,9 +780,12 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
 
 
 
-def get_files_from_pattern(directory, pattern):
+def get_files_from_pattern(directory, pattern, middle=False):
     # Use glob to get all files with the '.fits' extension in the specified directory
-    fits_files = glob.glob(f"{directory}/*{pattern}")
+    if middle:
+        fits_files = glob.glob(f"{directory}/*{pattern}*.fits")
+    else:
+        fits_files = glob.glob(f"{directory}/*{pattern}")
     return sorted(fits_files)
 
 
@@ -814,16 +820,21 @@ def determine_paths(fits_file, PSI=True):
                 file1_y = os.path.join(repo_path, 'Output/fits_images/' + filename.split('COR1')[0] + keyword_By)
                 file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('COR1')[0] + keyword_Bz)
     
-    date_obs = head['date-obs']
+    try:
+        date_obs = head['date-obs']
+    except:
+        date_obs = head['date_obs']
     date = date_obs.split('T',1)[0]
     string_print = date_obs.split('T')[0].replace('-','_')
     data_type = filename.split('_')[-1].strip('.fits')
     if data_type == 'LOS':
         data_type = 'ne_LOS'
-    if data_type == 'med':
+    elif data_type == 'med':
         data_type = 'COR1 median filtered'
-    if data_type == 'avg':
+    elif data_type == 'avg':
         data_type = 'KCor l2 avg'
+    elif not PSI:
+        data_type = detector
     if PSI:
         data_source = keyword
     else:

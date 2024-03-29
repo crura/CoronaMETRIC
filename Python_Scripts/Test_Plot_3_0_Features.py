@@ -172,7 +172,7 @@ for file_name in file_names:
 fits_files_pB = get_files_from_pattern(fits_path, 'COR1__PSI_pB.fits')
 fits_files_ne = get_files_from_pattern(fits_path, 'COR1__PSI_ne.fits')
 fits_files_ne_LOS = get_files_from_pattern(fits_path, 'COR1__PSI_ne_LOS.fits')
-fits_files_cor1 = get_files_from_pattern(fits_path, 'rep_med.fts')
+fits_files_cor1 = get_files_from_pattern(fits_path, '_bff_', middle=True)
 
 combined_pB = []
 combined_ne = []

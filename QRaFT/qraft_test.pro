@@ -163,7 +163,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
       features = features[w]
       ; do only for data
       ; removing features with low intensity
-      intensity_removal_coef = 0.4
+      intensity_removal_coef = 0.0
       w = where(features.intensity gt intensity_removal_coef*mean(abs(IMG_orig[where(IMG_orig gt 0)])))
 
       features = features[w]

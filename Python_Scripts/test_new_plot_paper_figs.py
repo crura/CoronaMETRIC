@@ -185,7 +185,7 @@ def display_fits_images(fits_files, qraft_files, outpath):
 
     plt.subplots_adjust(bottom=0.05, top=0.95)
     # plt.savefig(outpath)
-    plt.show()
+    #plt.show()
     plt.close()
 
 
@@ -321,7 +321,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, PSI=True
 
     plt.subplots_adjust(bottom=0.05, top=0.95)
     # plt.savefig(outpath)
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -429,7 +429,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, PSI=True
     else:
         axes.set_title('{} Observation {}'.format(detector, str_strip))
         plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)))
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -502,7 +502,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, PSI=True
     else:
         axes.set_title('{} Observation {}'.format(detector, str_strip))
         plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_Signed_{}_{}.png'.format(string_print, detector)))
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -586,7 +586,7 @@ def plot_model_data_comparison_with_features(data_fits_file, data_qraft_file, mo
     string_print = date_obs.split('T')[0].replace('-','_')
 
     plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Model_Comparison_{}_{}.png'.format(string_print, detector)))
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -698,7 +698,7 @@ ax.legend(bbox_to_anchor=(1, 1.05), loc="upper right")
 ax.set_title('Locations of Observations Chosen in CR 2194')
 ax.set_rlim(0, 1.3)
 plt.savefig(os.path.join(repo_path,'Output/Plots/Polar_Observations_Plot.png'))
-# plt.show()
+# #plt.show()
 
 # params = date_print + str(detector,'utf-8') + '_PSI'
 

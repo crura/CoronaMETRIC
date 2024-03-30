@@ -251,7 +251,7 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
     plt.plot(x_1_forward_cor1_central_deg_new, (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward, color='tab:orange', label='PSI/FORWARD pB')
     plt.plot(gaussian_fit_pB, label='gaussian fit', color='tab:blue')
     plt.yscale('log')
-    plt.show()
+    #plt.show()
 
     if masked:
         return combined_dict, data_dict, mask
@@ -437,7 +437,7 @@ def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
     # fig.set_constrained_layout_pads(w_pad=1 / 102, h_pad=1 / 102, hspace=0.0,
     #                                 wspace=0.0)
     plt.savefig(outpath)
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -648,7 +648,7 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
 
     plt.subplots_adjust(bottom=0.05, top=0.95)
     # plt.savefig(outpath)
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -772,7 +772,7 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
             plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}.png'.format(string_print, detector, data_type)))
         else:
             plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)))
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -868,4 +868,4 @@ def plot_sql_query(dbName, query, parameter_x, parameter_y, title=None, xlabel=N
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     # plt.savefig(outpath)
-    plt.show()
+    #plt.show()

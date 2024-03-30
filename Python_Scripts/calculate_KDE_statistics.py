@@ -287,7 +287,7 @@ ax[1].set_xlim(0,90)
 ax[1].set_ylim(0,0.07)
 ax[1].legend(fontsize=20)
 #plt.savefig(os.path.join(repo_path,'Output/Plots/COR1_vs_FORWARD_Feature_Tracing_Performance_Combined.png'))
-plt.show()
+#plt.show()
 plt.close()
 """
 
@@ -649,7 +649,7 @@ ax[1].set_xlim(0,90)
 ax[1].set_ylim(0,0.07)
 ax[1].legend(fontsize=20)
 #plt.savefig(os.path.join(repo_path,'Output/Plots/COR1_vs_FORWARD_Feature_Tracing_Performance_Combined.png'))
-plt.show()
+#plt.show()
 plt.close()
 """
 

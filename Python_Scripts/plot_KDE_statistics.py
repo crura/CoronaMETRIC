@@ -95,7 +95,7 @@ ax.legend()
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance.png'))
-# plt.show()
+# #plt.show()
 plt.close()
 print(np.min(err_forward_central_deg))
 # Generate plots for LOS arrays
@@ -138,7 +138,7 @@ plt.ylim(0,0.07)
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance_LOS.png'))
-# plt.show()
+# #plt.show()
 plt.close()
 
 
@@ -156,7 +156,7 @@ ax[0].legend()
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 # plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance.png'))
-# plt.show()
+# #plt.show()
 # plt.close()
 print(np.min(err_forward_central_deg))
 # Generate plots for LOS arrays
@@ -177,7 +177,7 @@ ax[1].set_ylim(0,0.07)
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 ax[1].legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance_Combined.png'))
-# plt.show()
+# #plt.show()
 plt.close()
 
 
@@ -373,7 +373,7 @@ def integrate_distribution(dist, x1, x2, x_min, x_max):
     plt.savefig(os.path.join(repo_path,'Output/Plots/integrate_normal_distribution.png'))
     # return res
 
-    # plt.show()
+    # #plt.show()
     plt.close()
 
     return res
@@ -412,7 +412,7 @@ handles, labels = ax.get_legend_handles_labels()
 lgd = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(1.04, 1))
 plt.legend(bbox_to_anchor=(1.04, 1))
 plt.savefig(os.path.join(repo_path,'Output/Plots/Ephemeris_Plot.png'),bbox_extra_artists=(lgd))
-# plt.show()
+# #plt.show()
 plt.close()
 
 
@@ -538,7 +538,7 @@ ax.legend()
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/COR1_vs_FORWARD_Feature_Tracing_Performance.png'))
-# plt.show()
+# #plt.show()
 plt.close()
 
 
@@ -570,7 +570,7 @@ ax[1].set_xlim(0,90)
 ax[1].set_ylim(0,0.07)
 ax[1].legend(fontsize=20)
 plt.savefig(os.path.join(repo_path,'Output/Plots/COR1_vs_FORWARD_Feature_Tracing_Performance_Combined.png'))
-# plt.show()
+# #plt.show()
 plt.close()
 
 

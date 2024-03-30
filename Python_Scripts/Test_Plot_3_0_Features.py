@@ -232,7 +232,7 @@ for i in range(len(fits_files_pB)):
     x_dist_values_pB = sns.distplot(angles_signed_arr_finite_pB).get_lines()[0].get_data()[0]
     xmin_pB = x_dist_values_pB.min()
     xmax_pB = x_dist_values_pB.max()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
     kde0_pB = gaussian_kde(angles_signed_arr_finite_pB)
@@ -243,7 +243,7 @@ for i in range(len(fits_files_pB)):
     x_dist_values_ne = sns.distplot(angles_signed_arr_finite_ne).get_lines()[0].get_data()[0]
     xmin_ne = x_dist_values_ne.min()
     xmax_ne = x_dist_values_ne.max()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
     kde0_ne = gaussian_kde(angles_signed_arr_finite_ne)
@@ -256,7 +256,7 @@ for i in range(len(fits_files_pB)):
     x_dist_values_ne_LOS = sns.distplot(angles_signed_arr_finite_ne_LOS).get_lines()[0].get_data()[0]
     xmin_ne_LOS = x_dist_values_ne_LOS.min()
     xmax_ne_LOS = x_dist_values_ne_LOS.max()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
     kde0_ne_LOS = gaussian_kde(angles_signed_arr_finite_ne_LOS)
@@ -267,7 +267,7 @@ for i in range(len(fits_files_pB)):
     plt.plot(x_1_ne, kde0_x_ne, color='b', label='ne KDE')
     plt.plot(x_1_pB, kde0_x_pB, color='r', label='pB KDE')
     plt.legend()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -432,7 +432,7 @@ ax.legend(fontsize=13)
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
-# plt.show()
+# #plt.show()
 #plt.close()
 
 x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new = calculate_KDE(combined_pB_signed_ravel_arr)
@@ -461,7 +461,7 @@ ax.text(25,0.006,"JSD: " + str(np.round(JSD_pB_gaussain,5)))
 ax.set_title('PSI/FORWARD pB Angle Discrepancy Probability Density vs Corresponding Gaussian Fit')
 ax.legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/Test_Comparison_Fig.png'))
-plt.show()
+#plt.show()
 
 query = "SELECT mean, median, date, data_type, data_source, n, confidence_interval FROM central_tendency_stats_cor1_new WHERE date!='combined' ORDER BY mean ASC;"
 cur.execute(query)
@@ -512,7 +512,7 @@ plt.ylim(0,20)
 # Set x-axis ticks and labels
 plt.xticks(range(len(dates)), dates)
 plt.savefig(os.path.join(repo_path, 'Output/Plots', '{}_Angle_Discrepancy_By_Date.png'.format(data_type)))
-plt.show()
+#plt.show()
 
 # Combine data into a single array
 all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_cor1_signed_ravel_arr])
@@ -554,7 +554,7 @@ ax.set_ylabel("Data Type")
 ax.set_title('HSD Comparison of Data Types for PSI_COR1 Combined Results')
 tukey_result.plot_simultaneous(xlabel='Mean (Degrees)', ax=ax)
 plt.savefig(os.path.join(repo_path,'Output/Plots/testfig1.png'))
-plt.show()
+#plt.show()
 
 f_statistic, p_value = f_oneway(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr)
 # Check for statistical significance
@@ -572,7 +572,7 @@ ax.set_ylabel("Mean (Degrees)")
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.png'))
-plt.show()
+#plt.show()
 
 res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr)
 print(res)
@@ -650,7 +650,7 @@ for i in range(len(fits_files_pB)):
     x_dist_values_pB = sns.distplot(angles_signed_arr_finite_pB).get_lines()[0].get_data()[0]
     xmin_pB = x_dist_values_pB.min()
     xmax_pB = x_dist_values_pB.max()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
     kde0_pB = gaussian_kde(angles_signed_arr_finite_pB)
@@ -661,7 +661,7 @@ for i in range(len(fits_files_pB)):
     x_dist_values_ne = sns.distplot(angles_signed_arr_finite_ne).get_lines()[0].get_data()[0]
     xmin_ne = x_dist_values_ne.min()
     xmax_ne = x_dist_values_ne.max()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
     kde0_ne = gaussian_kde(angles_signed_arr_finite_ne)
@@ -674,7 +674,7 @@ for i in range(len(fits_files_pB)):
     x_dist_values_ne_LOS = sns.distplot(angles_signed_arr_finite_ne_LOS).get_lines()[0].get_data()[0]
     xmin_ne_LOS = x_dist_values_ne_LOS.min()
     xmax_ne_LOS = x_dist_values_ne_LOS.max()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
     kde0_ne_LOS = gaussian_kde(angles_signed_arr_finite_ne_LOS)
@@ -685,7 +685,7 @@ for i in range(len(fits_files_pB)):
     plt.plot(x_1_ne, kde0_x_ne, color='b', label='ne KDE')
     plt.plot(x_1_pB, kde0_x_pB, color='r', label='pB KDE')
     plt.legend()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -842,7 +842,7 @@ ax.legend(fontsize=13)
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_kcor_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
-# plt.show()
+# #plt.show()
 #plt.close()
 
 query = "SELECT mean, median, date, data_type, data_source, n, confidence_interval FROM central_tendency_stats_kcor_new WHERE date!='combined' ORDER BY mean ASC;"
@@ -894,7 +894,7 @@ plt.ylim(0,30)
 # Set x-axis ticks and labels
 plt.xticks(range(len(dates)), dates)
 plt.savefig(os.path.join(repo_path, 'Output/Plots', '{}_Angle_Discrepancy_By_Date.png'.format(data_type)))
-plt.show()
+#plt.show()
 
 
 # Combine data into a single array
@@ -937,7 +937,7 @@ ax.set_ylabel("Data Type")
 ax.set_title('HSD Comparison of Data Types for PSI_KCor Combined Results')
 tukey_result.plot_simultaneous(xlabel='Mean (Degrees)', ax=ax)
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig1_kcor.png'))
-plt.show()
+#plt.show()
 
 f_statistic, p_value = f_oneway(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_kcor_ravel_arr)
 # Check for statistical significance
@@ -955,7 +955,7 @@ ax.set_ylabel("Mean (Degrees)")
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_KCor Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2_kcor.png'))
-plt.show()
+#plt.show()
 
 res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_kcor_ravel_arr)
 print(res)

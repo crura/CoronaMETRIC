@@ -2,7 +2,7 @@
 ; s = '5\' & fname = file_search(dr+s+'*ne.f*') & fname_B1 = file_search(dr+s+'\*By.f*') & fname_B2 = file_search(dr+s+'*Bz.f*')
 ; qraft_test,1, fname, fname_B1, fname_B2, 110
 
-PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
+PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_save_path_1, image_save_path_2, image_save_path_3, image_save_path_4
   
   if n_elements(key) eq 0 then key=1
     
@@ -187,8 +187,9 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
 
   ; --------------------------------------------
   ;window, 1, xsize=3000, ysize=1200
-  window, 1, xsize=1500, ysize=600
-  loadct, 0 & erase
+  window, 2, xsize=1500, ysize=600
+  loadct, 0
+  erase
   image_plot_1, IMG_d2_phi_enh, range=[0, adapt_thresh_prob(IMG_d2_phi_enh, p=0.95)]
   setcolors
   for i=0, n_elements(rho_min_arr)-1 do $
@@ -196,6 +197,8 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
     i1=blob_indices[0,k,i] & i2=blob_indices[1,k,i]
     plots, blob_stat.phi_fit[i1:i2,*], blob_stat.rho[i1:i2,*], psym=4, color=2
   endfor
+  
+  win_to_png, 2, image_save_path
   ; --------------------------------------------
   window, 2, xsize=1200, ysize=800, xpos = 1900
   loadct, 0
@@ -214,7 +217,8 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
     ;  title = 'IMG_d2_phi_enh_lbl', xtitle='phi (rad)'
 
   ; --------------------------------------------
-  window, 3, xsize=1200, ysize=800, xpos = 1900
+  win_to_png, 2, image_save_path_1
+  window, 2, xsize=1200, ysize=800, xpos = 1900
   loadct, 0
   erase
   pos = getpos(3,2,xy=[0.11, 0.05], region=[0.0,0.1,0.85,0.9])
@@ -226,19 +230,22 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
         
       endfor
   ; --------------------------------------------    
+  win_to_png, 2, image_save_path_2
 
-  window, 4, xsize=1000, ysize=1000 & loadct,0 & erase
+  window, 2, xsize=1000, ysize=1000 & loadct,0 & erase
   image_plot_1, IMG_d2_phi_r, X, Y, range=[0, adapt_thresh_prob(IMG_d2_phi_r, p=0.95)]
   setcolors
   for i=0, n_elements(blob_stat.length)-1 do begin & l=blob_stat.length[i] & phi= d_phi*blob_stat.phi_fit[i,0:l-1] & rho= d_rho*blob_stat.rho[i,0:l-1] + rho_min & xx_r = rho*cos(phi) &  yy_r = rho*sin(phi) & plots, [xx_r, yy_r], color=2, thick=2 & endfor
 
 
   ; --------------------------------------------
+  
+  win_to_png, 2, image_save_path_3
 
   ; B-field lines vs detected features; statistics of discrepancy angles:
   if key le 1 then begin ; PSI model only
     
-    window, 5, xsize=1200, ysize=600 & loadct,0 & erase
+    window, 2, xsize=1200, ysize=600 & loadct,0 & erase
     !P.noerase=0
     !P.multi = [0,2,1]
     setcolors
@@ -263,6 +270,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
   ; --------------------------------------------
 
   !P.noerase=0
+  win_to_png, 2, image_save_path_4
 
   return
 

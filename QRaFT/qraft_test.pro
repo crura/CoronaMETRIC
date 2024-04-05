@@ -245,9 +245,9 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
   ; B-field lines vs detected features; statistics of discrepancy angles:
   if key le 1 then begin ; PSI model only
     
-    window, 2, xsize=1200, ysize=600 & loadct,0 & erase
+    window, 2, xsize=600, ysize=600 & loadct,0 & erase
     !P.noerase=0
-    !P.multi = [0,2,1]
+    !P.multi = 0
     setcolors
     plot_B_lines, B1, B2, XYCenter=XYCenter, rho_min=rho_min
     oplot_features, features, XYCenter
@@ -258,9 +258,9 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
     
     hy = histogram(angle_err[w]*180/!Pi, nbins=100, loc=hx)/float(n_elements(w))
     hy_signed = histogram(angle_err_signed[w_]*180/!Pi, nbins=200, loc=hx_signed)/float(n_elements(w_))
-    plot, hx, hy, title = 'Mean='+str(mean(angle_err[w]*180/!Pi))+' Median='+str(median(angle_err[w]*180/!Pi)), thick=4, /xstyle, xrange=[-45,45]
-    oplot, hx_signed, hy_signed, thick=2
-    oplot, [0,0], !y.crange, lines=2
+    ; plot, hx, hy, title = 'Mean='+str(mean(angle_err[w]*180/!Pi))+' Median='+str(median(angle_err[w]*180/!Pi)), thick=4, /xstyle, xrange=[-45,45]
+    ; oplot, hx_signed, hy_signed, thick=2
+    ; oplot, [0,0], !y.crange, lines=2
     
 
 

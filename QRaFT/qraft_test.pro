@@ -2,7 +2,7 @@
 ; s = '5\' & fname = file_search(dr+s+'*ne.f*') & fname_B1 = file_search(dr+s+'\*By.f*') & fname_B2 = file_search(dr+s+'*Bz.f*')
 ; qraft_test,1, fname, fname_B1, fname_B2, 110
 
-PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_save_path_1, image_save_path_2, image_save_path_3, image_save_path_4
+PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_save_path_1, image_save_path_2, image_save_path_3, image_save_path_4, color_flip
   
   if n_elements(key) eq 0 then key=1
     
@@ -192,6 +192,9 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
   erase
   image_plot_1, IMG_d2_phi_enh, range=[0, adapt_thresh_prob(IMG_d2_phi_enh, p=0.95)]
   setcolors
+  if color_flip then begin
+  flipcolors
+  endif
   for i=0, n_elements(rho_min_arr)-1 do $
     for k = 0, n_elements(p_arr)-1 do begin
     i1=blob_indices[0,k,i] & i2=blob_indices[1,k,i]
@@ -235,6 +238,9 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
   window, 2, xsize=1000, ysize=1000 & loadct,0 & erase
   image_plot_1, IMG_d2_phi_r, X, Y, range=[0, adapt_thresh_prob(IMG_d2_phi_r, p=0.95)]
   setcolors
+  if color_flip then begin
+  flipcolors
+  endif
   for i=0, n_elements(blob_stat.length)-1 do begin & l=blob_stat.length[i] & phi= d_phi*blob_stat.phi_fit[i,0:l-1] & rho= d_rho*blob_stat.rho[i,0:l-1] + rho_min & xx_r = rho*cos(phi) &  yy_r = rho*sin(phi) & plots, [xx_r, yy_r], color=2, thick=2 & endfor
 
 
@@ -249,6 +255,9 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
     !P.noerase=0
     !P.multi = 0
     setcolors
+    if color_flip then begin
+    flipcolors
+    endif
     plot_B_lines, B1, B2, XYCenter=XYCenter, rho_min=rho_min
     oplot_features, features, XYCenter
     plots, [0], [0], psym=4, thick=2

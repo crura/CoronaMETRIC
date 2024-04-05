@@ -504,7 +504,7 @@ for i, date in enumerate(dates):
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
-plt.ylabel('Mean Value (Degrees)')
+plt.ylabel('Mean Angle Discrepancy (Degrees)')
 plt.title('PSI COR-1 Projection Angle Discrepancy by Date')
 plt.legend()
 plt.ylim(0,20)
@@ -886,7 +886,7 @@ for i, date in enumerate(dates):
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
-plt.ylabel('Mean Value (Degrees)')
+plt.ylabel('Mean Angle Discrepancy (Degrees)')
 plt.title('PSI K-COR Projection Angle Discrepancy by Date')
 plt.legend()
 plt.ylim(0,30)

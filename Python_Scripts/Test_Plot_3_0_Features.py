@@ -567,8 +567,22 @@ else:
 fig, ax = plt.subplots(1, 1)
 ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr], showfliers=False)
 ax.set_xticklabels(["ne", "ne_LOS", "pB", "COR1 median filtered"]) 
+
+# Calculate the first (Q1) and third quartile (Q3)
+Q1 = np.percentile(combined_cor1_ravel_arr, 25)
+Q3 = np.percentile(combined_cor1_ravel_arr, 75)
+
+# Calculate the interquartile range (IQR)
+IQR = Q3 - Q1
+
+# Calculate the upper tail limit
+upper_tail_limit = Q3 + 1.5 * IQR
+
+# Find the maximum value within the upper tail limit
+max_upper_tail = max(x for x in combined_cor1_ravel_arr if x <= upper_tail_limit)
+
 upper_quartile_cor1 = np.percentile(combined_cor1_ravel_arr, 75)
-ax.set_ylim(0, upper_quartile_cor1 + 10)
+ax.set_ylim(0, max_upper_tail + 10)
 ax.set_ylabel("Mean Angle Discrepancy (Degrees)") 
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')

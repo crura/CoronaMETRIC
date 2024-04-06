@@ -569,7 +569,7 @@ ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_
 ax.set_xticklabels(["ne", "ne_LOS", "pB", "COR1 median filtered"]) 
 upper_quartile_cor1 = np.percentile(combined_cor1_ravel_arr, 75)
 ax.set_ylim(0, upper_quartile_cor1 + 10)
-ax.set_ylabel("Mean (Degrees)") 
+ax.set_ylabel("Mean Angle Discrepancy (Degrees)") 
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.png'))

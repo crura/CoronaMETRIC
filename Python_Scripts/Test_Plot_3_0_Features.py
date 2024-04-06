@@ -425,7 +425,7 @@ detector = 'COR1_PSI'
 ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
 ax.set_xlim(-95,95)
 #ax.set_ylim(0,0.07)
-ax.set_yscale('log')
+# ax.set_yscale('log')
 ax.legend(fontsize=13)
 
 # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
@@ -567,7 +567,8 @@ else:
 fig, ax = plt.subplots(1, 1)
 ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr], showfliers=False)
 ax.set_xticklabels(["ne", "ne_LOS", "pB", "COR1 median filtered"]) 
-ax.set_ylim(0, 40)
+upper_quartile_cor1 = np.percentile(combined_cor1_ravel_arr, 75)
+ax.set_ylim(0, upper_quartile_cor1 + 10)
 ax.set_ylabel("Mean (Degrees)") 
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
@@ -835,7 +836,7 @@ detector = 'KCor_PSI'
 ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
 ax.set_xlim(-95,95)
 #ax.set_ylim(0,0.07)
-ax.set_yscale('log')
+# ax.set_yscale('log')
 ax.legend(fontsize=13)
 
 # plt.text(20,0.045,"kcor average discrepancy: " + str(np.round(np.average(err_kcor_central_deg),5)))

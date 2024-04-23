@@ -29,8 +29,14 @@ print_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo
 query = "SELECT date, data_type, data_source, mean, median, standard_deviation, intensity_removal_coefficient from central_tendency_stats_cor1_new inner join qraft_input_variables on qraft_input_variables.qraft_parameters_id = central_tendency_stats_cor1_new.qraft_parameters_id where intensity_removal_coefficient=0.0 and data_source='COR1' order by mean ASC;"
 print_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
-query = "SELECT date, data_type, data_source, mean, median, standard_deviation, intensity_removal_coefficient from central_tendency_stats_cor1_all_naty_original inner join qraft_input_variables on qraft_input_variables.qraft_parameters_id = central_tendency_stats_cor1_all_naty_original.qraft_parameters_id where intensity_removal_coefficient=0.0 and data_source='COR1' order by mean ASC;"
+query = "SELECT * from central_tendency_stats_cor1_new order by mean asc;"
 print_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
+
+query = "SELECT * from central_tendency_stats_kcor_new order by mean asc;"
+print_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
+
+# query = "SELECT date, data_type, data_source, mean, median, standard_deviation, intensity_removal_coefficient from central_tendency_stats_cor1_all_naty_original inner join qraft_input_variables on qraft_input_variables.qraft_parameters_id = central_tendency_stats_cor1_all_naty_original.qraft_parameters_id where intensity_removal_coefficient=0.0 and data_source='COR1' order by mean ASC;"
+# print_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
 # query = "CREATE TABLE central_tendency_stats_cor1_all_naty_original AS SELECT * FROM central_tendency_stats_cor1_all WHERE 0;"
 # print_sql_query(dbName, query)

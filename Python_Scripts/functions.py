@@ -844,7 +844,7 @@ def determine_paths(fits_file, PSI=True):
 
 
 
-def print_sql_query(dbName, query):
+def print_sql_query(dbName, query, print_to_file=False, output_file=None):
     con = sqlite3.connect(dbName)
     cur = con.cursor()
     cur.execute(query)
@@ -855,7 +855,12 @@ def print_sql_query(dbName, query):
     table.field_names = column_names
     for row in rows:
         table.add_row(row)
-    print(table)
+    if print_to_file:
+        with open(output_file, 'a') as f:
+            f.write(str(table))
+            f.write("\n")
+    else:
+        print(table)
     con.close()
 
 
@@ -869,3 +874,25 @@ def plot_sql_query(dbName, query, parameter_x, parameter_y, title=None, xlabel=N
     ax.set_ylabel(ylabel)
     # plt.savefig(outpath)
     #plt.show()
+
+
+def plot_histograms(arrays, labels, repo_path, detector='COR1_PSI'):
+    if len(arrays) != len(labels):
+        raise ValueError("arrays and labels must have the same length")
+
+    fig = plt.figure(figsize=(10,10))
+    ax = fig.subplots(1,1)
+    
+    colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan']
+    
+    for i in range(len(arrays)):
+        sns.histplot(arrays[i], kde=True, label=labels[i], bins=30, ax=ax, color=colors[i % len(colors)])
+
+    ax.set_xlabel('Angle Discrepancy (Degrees)', fontsize=14)
+    ax.set_ylabel('Pixel Count', fontsize=14)
+    ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector), fontsize=15)
+    ax.set_xlim(-95,95)
+    ax.set_yscale('log')
+    ax.legend(fontsize=13)
+    # plt.savefig(os.path.join(repo_path, 'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
+    plt.show()

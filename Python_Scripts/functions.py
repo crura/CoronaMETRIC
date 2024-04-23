@@ -857,9 +857,12 @@ def print_sql_query(dbName, query, print_to_file=False, output_file=None):
         table.add_row(row)
     if print_to_file:
         with open(output_file, 'a') as f:
+            f.write(str(query))
+            f.write("\n")
             f.write(str(table))
             f.write("\n")
     else:
+        print(query)
         print(table)
     con.close()
 

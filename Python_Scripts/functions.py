@@ -909,6 +909,9 @@ def rescale_kcor_file_to_512x512(kcor_fits_file):
 
     hdu1 = fits.open(kcor_fits_file)[0]
     data = hdu1.data
+    header = hdu1.header
+    old_shape = header['NAXIS1']
+    scale_factor = old_shape / 512
 
     # Calculate the zoom factors
     zoom_factors = (512 / data.shape[0], 512 / data.shape[1])
@@ -919,10 +922,23 @@ def rescale_kcor_file_to_512x512(kcor_fits_file):
     # Update the header
     hdu1.header['NAXIS1'] = 512
     hdu1.header['NAXIS2'] = 512
-    hdu1.header['CRPIX1'] = hdu1.header['CRPIX1'] / 2  # Assuming the reference pixel should also be scaled
-    hdu1.header['CRPIX2'] = hdu1.header['CRPIX2'] / 2
-    hdu1.header['CDELT1'] = hdu1.header['CDELT1'] * 2  # Double the pixel size in the X direction
-    hdu1.header['CDELT2'] = hdu1.header['CDELT2'] * 2  # Double the pixel size in the Y direction
+    hdu1.header['CRPIX1'] = hdu1.header['CRPIX1'] / scale_factor  # Assuming the reference pixel should also be scaled
+    hdu1.header['CRPIX2'] = hdu1.header['CRPIX2'] / scale_factor
+    hdu1.header['CDELT1'] = hdu1.header['CDELT1'] * scale_factor  # Double the pixel size in the X direction (since arcsec/pixel)
+    hdu1.header['CDELT2'] = hdu1.header['CDELT2'] * scale_factor  # Double the pixel size in the Y direction (since arcsec/pixel)
+    hdu1.header['RCAMXCEN'] = hdu1.header['RCAMXCEN'] / scale_factor
+    hdu1.header['RCAMYCEN'] = hdu1.header['RCAMYCEN'] / scale_factor
+    hdu1.header['RCAM_RAD'] = hdu1.header['RCAM_RAD'] / scale_factor
+    hdu1.header['RCAM_DCX'] = hdu1.header['RCAM_DCX'] / scale_factor
+    hdu1.header['RCAM_DCY'] = hdu1.header['RCAM_DCY'] / scale_factor
+    hdu1.header['RCAM_DCR'] = hdu1.header['RCAM_DCR'] / scale_factor
+    hdu1.header['TCAMXCEN'] = hdu1.header['TCAMXCEN'] / scale_factor
+    hdu1.header['TCAMYCEN'] = hdu1.header['TCAMYCEN'] / scale_factor
+    hdu1.header['TCAM_RAD'] = hdu1.header['TCAM_RAD'] / scale_factor
+    hdu1.header['TCAM_DCX'] = hdu1.header['TCAM_DCX'] / scale_factor
+    hdu1.header['TCAM_DCY'] = hdu1.header['TCAM_DCY'] / scale_factor
+    hdu1.header['TCAM_DCR'] = hdu1.header['TCAM_DCR'] / scale_factor
+    hdu1.header['R_SUN'] = hdu1.header['R_SUN'] / scale_factor
 
     # Create a new FITS HDU with the interpolated data and the original header
     new_hdu = fits.PrimaryHDU(interpolated_data, header=hdu1.header)

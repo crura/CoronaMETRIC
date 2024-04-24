@@ -25,6 +25,7 @@ import glob
 import sqlite3
 import astropy.units as u
 from prettytable import PrettyTable
+from scipy.ndimage import zoom
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -899,3 +900,31 @@ def plot_histograms(arrays, labels, repo_path, detector='COR1_PSI'):
     ax.legend(fontsize=13)
     # plt.savefig(os.path.join(repo_path, 'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
     plt.show()
+
+
+def rescale_kcor_file_to_512x512(kcor_fits_file):
+    """
+    Rescales the KCOR fits file to 512x512 pixels from 1024x1024 pixels.
+    """
+
+    hdu1 = fits.open(kcor_fits_file)[0]
+    data = hdu1.data
+
+    # Calculate the zoom factors
+    zoom_factors = (512 / data.shape[0], 512 / data.shape[1])
+
+    # Interpolate the data to the new shape
+    interpolated_data = zoom(data, zoom_factors)
+
+    # Update the header
+    hdu1.header['NAXIS1'] = 512
+    hdu1.header['NAXIS2'] = 512
+    hdu1.header['CRPIX1'] = hdu1.header['CRPIX1'] / 2  # Assuming the reference pixel should also be scaled
+    hdu1.header['CRPIX2'] = hdu1.header['CRPIX2'] / 2
+    hdu1.header['CDELT1'] = hdu1.header['CDELT1'] * 2  # Double the pixel size in the X direction
+    hdu1.header['CDELT2'] = hdu1.header['CDELT2'] * 2  # Double the pixel size in the Y direction
+
+    # Create a new FITS HDU with the interpolated data and the original header
+    new_hdu = fits.PrimaryHDU(interpolated_data, header=hdu1.header)
+    print(new_hdu.data.shape)
+    new_hdu.writeto(kcor_fits_file, overwrite=True)

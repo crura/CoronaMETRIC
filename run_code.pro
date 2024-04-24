@@ -8,6 +8,7 @@ pro run_code
   spawn, 'git rev-parse --show-toplevel', git_repo
   spawn, 'mkdir -p ' + git_repo + '/Output/fits_images'
   save,outstring_list, directory_list, directory_list_2, occlt_list, filename=git_repo + '/Data/outstrings.sav'
+  spawn, 'python Python_Scripts/prelim_tasks.py'
 
   FOREACH element, directory_list DO BEGIN
     spawn, 'cp ' + element + ' ' + git_repo + '/Output/fits_images'

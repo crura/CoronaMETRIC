@@ -289,7 +289,7 @@ def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
     dz = np.linspace(0, int(nz), nz)
     R_SUN = rsun
     # rsun = (head['rsun'] / head['cdelt1']) * occlt_list[i]
-    widths = np.linspace(0,1024,by_los_coaligned_map.data.size)
+    widths = np.linspace(0,512,by_los_coaligned_map.data.size)
     skip_val = int(by_los_coaligned_map.data.shape[0]/73.14285714285714)
     skip = (slice(None, None, skip_val), slice(None, None, skip_val))
     skip1 = slice(None, None, skip_val)
@@ -628,7 +628,7 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
     X, Y = np.meshgrid(np.linspace(0, 2 * np.pi, ny), np.linspace(0, 2 * np.pi, nz))
     # R_SUN = rsun
     # rsun = (head['rsun'] / head['cdelt1']) * occlt_list[i]
-    widths = np.linspace(0,1024,by_los_coaligned_map.data.size)
+    widths = np.linspace(0,512,by_los_coaligned_map.data.size)
     skip_val = int(by_los_coaligned_map.data.shape[0]/233.14285714285714) #73.14285714285714
     skip = (slice(None, None, skip_val), slice(None, None, skip_val))
     skip1 = slice(None, None, skip_val)

@@ -66,7 +66,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
   rho_range = [rho_min, min([Nx/2, Ny/2])]/d_rho ; play with this
   n_rho = 20 ; number of rho_min levels used for tracing, number of virtual occulting disks used to ask 
   
-  p_range = [0.90, 0.99] ;** range of the probabilities onf which calculating percentile thresholds, important parameter
+  p_range = [0.30, 0.39] ;** range of the probabilities onf which calculating percentile thresholds, important parameter
   n_p = 10  ;* number of probability levels, these many sets of thresholds are applies within p_range
 
   n_nodes_min = 10 ; minor parameter, minimum number of pixels in the features to be inlcuded in final output

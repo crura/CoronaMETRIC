@@ -48,9 +48,11 @@ crln_obs_print = strcompress(string(CRLN_OBS),/remove_all)
 ; read, occlt, 'enter occulting disk radius (R_Sun): '
 ; read, range, 'enter model axes range (R_Sun): '
 
+; Set this path to path of PSI mas cube after following instructions in README
+psi_mas_cube_path = '/Users/crura/Desktop/Research/Magnetic_Field/eclipse2017_mhd_final_copy/2194_WTD_local_cube_MAS.dat'
 
 ;for_drive,'PSIMAS',instrument='WL',line='PB',gridtype='PLANEOFSKY',pos=0.0000000,CMER=183.44300,BANG=7.1530000,OCCULT=1.0600000,XXMIN=-6.0799999,XXMAX=6.0799999,YYMIN=-6.0799999,YYMAX=6.0799999,CUBENAME='/Users/crura/Desktop/Research/Magnetic_Field/eclipse2017_mhd_final_copy/2194_WTD_local_cube_MAS.dat',DATE='2017-08-30T02:23:16.968',/verbose
-for_drive,'PSIMAS',instrument='WL',line='PB',gridtype='PLANEOFSKY',pos=0.0000000,CMER=crln_obs,BANG=crlt_obs,OCCULT=occlt,XXMIN=-range,XXMAX=range,YYMIN=-range,YYMAX=range,CUBENAME='/Users/crura/Desktop/Research/Magnetic_Field/eclipse2017_mhd_final_copy/2194_WTD_local_cube_MAS.dat',DATE=date_obs,SAVEPRAMS='output',SAVEMAP=1,MAPNAME='output',/verbose
+for_drive,'PSIMAS',instrument='WL',line='PB',gridtype='PLANEOFSKY',pos=0.0000000,CMER=crln_obs,BANG=crlt_obs,OCCULT=occlt,XXMIN=-range,XXMAX=range,YYMIN=-range,YYMAX=range,CUBENAME=psi_mas_cube_path,DATE=date_obs,SAVEPRAMS='output',SAVEMAP=1,MAPNAME='output',/verbose
 restore,'/Users/crura/SSW/packages/forward/output.sav',/v
 write_csv, git_repo + '/Data/Forward_PB_data.csv',quantmap.data
 forward_pb_image = quantmap.data

@@ -968,3 +968,38 @@ def rescale_kcor_file_to_512x512(kcor_fits_file):
     new_hdu = fits.PrimaryHDU(interpolated_data, header=hdu1.header)
     print(new_hdu.data.shape)
     new_hdu.writeto(kcor_fits_file, overwrite=True)
+
+
+
+
+def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, date):
+    x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new = calculate_KDE(array)
+    gaussian_fit = np.random.normal(np.mean(array), np.std(abs(array)), 1000)
+    hi = sci.stats.norm(np.mean(array), np.std(abs(array)))
+    label = data_type
+    min_height = min(array)
+    max_height = max(array)
+    height_values = np.linspace(min_height, max_height, num=1000)
+    probabilities = hi.pdf(x=height_values)
+
+    JSD_gaussain, KLD_gaussian = calculate_KDE_statistics(KDE_forward_cor1_central_deg_new, probabilities)
+
+    fig = plt.figure(figsize=(10,10))
+    ax = fig.subplots(1,1)
+    ax.plot(x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new, color='tab:orange', label='{} Probability Density'.format(label))
+    ax.plot(height_values, probabilities, label='Corresponding Gaussian Fit', color='tab:blue')
+    # plt.plot(x_1_forward_cor1_central_deg_new, gaussian_fit_pB*norm_max_pB, label='gaussian fit', color='tab:blue')
+    # plt.yscale('log')
+    ax.set_xlabel('Angle Discrepancy (Degrees)')
+    ax.set_ylabel('Probability Density')
+    ax.text(25,0.008,"average discrepancy: " + str(np.round(np.average(array),5)))
+    ax.text(25,0.007,"standard deviation: " + str(np.round(np.std(abs(array)),5)))
+    ax.text(25,0.006,"JSD: " + str(np.round(JSD_gaussain,5)))
+    # ax.set_yscale('log')
+    ax.set_title('{} {} vs Corresponding Gaussian Fit {}'.format(data_type, data_source, date))
+    ax.legend()
+    outpath = os.path.join(repo_path, 'Output/Plots/{}_{}_{}_JSD_Gaussian_Analysis.png'.format(data_type, data_source, date))
+    plt.savefig(outpath)
+    plt.close()
+
+    return JSD_gaussain, KLD_gaussian

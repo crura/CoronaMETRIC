@@ -26,6 +26,8 @@ import sqlite3
 import astropy.units as u
 from prettytable import PrettyTable
 from scipy.ndimage import zoom
+from tabulate import tabulate
+import re
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -845,17 +847,39 @@ def determine_paths(fits_file, PSI=True):
 
 
 
-def print_sql_query(dbName, query, print_to_file=False, output_file=None):
+def print_sql_query(dbName, query, print_to_file=False, output_file=None, latex=False, caption=False, caption_text=None):
     con = sqlite3.connect(dbName)
     cur = con.cursor()
     cur.execute(query)
     rows = cur.fetchall()
     column_names = [description[0] for description in cur.description]
 
-    table = PrettyTable()
-    table.field_names = column_names
-    for row in rows:
-        table.add_row(row)
+    if latex:
+        # Replace underscores in data
+        rows = [[str(item).replace('_', ' ') for item in row] for row in rows]
+        # replace ne with $n_e$ in data
+        rows = [[re.sub(r'\bne\b', "\\\\acrshort{ne central}", str(item)) for item in row] for row in rows]
+        # replace ne LOS with $n_e$ in data
+        rows = [[re.sub("\\\\acrshort{ne central} LOS", "\\\\acrshort{ne los}", str(item)) for item in row] for row in rows]
+        # replace pB with $pB$ in data
+        rows = [[re.sub(r'\bpB\b', "\\\\acrshort{pB}", str(item)) for item in row] for row in rows]
+
+        # replace pB with $pB$ in data
+        rows = [[re.sub(r'\bKCor\b', "\\\\acrshort{k-cor}", str(item)) for item in row] for row in rows]
+        # Replace underscores in column names
+        column_names = [name.replace('_', ' ') for name in column_names]
+        table = tabulate(rows, headers=column_names, tablefmt='latex_raw')
+
+        if caption:
+            # Add caption to the table
+            caption = "\\caption{" + caption_text + "}"
+            table = table.replace("\\begin{tabular}", "\\begin{table}[ht]\n\\centering\n" + caption + "\n\\begin{tabular}")
+            table = table.replace("\\end{tabular}", "\\end{tabular}\n\\end{table}")
+    else:
+        table = PrettyTable()
+        table.field_names = column_names
+        for row in rows:
+            table.add_row(row)
     if print_to_file:
         with open(output_file, 'a') as f:
             f.write(str(query))

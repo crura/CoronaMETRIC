@@ -169,6 +169,46 @@ cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_all(
             unique(data_type, data_source, date, mean, median, confidence_interval, n, qraft_parameters_id, forward_input_data_id))
 """)
 
+cur.execute("DROP TABLE IF EXISTS tukey_hsd_stats_cor1")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS tukey_hsd_stats_cor1(
+    id INTEGER PRIMARY KEY, 
+    group1,
+    group2,
+    mean_diff,
+    p_adj,
+    lower_bound_ci,
+    upper_bound_ci,
+    reject boolean,
+    group_1_central_tendency_stats_cor1_id INTEGER,
+    group_2_central_tendency_stats_cor1_id INTEGER,
+    FOREIGN KEY(group_1_central_tendency_stats_cor1_id) REFERENCES central_tendency_stats_cor1_new(id),
+    FOREIGN KEY(group_2_central_tendency_stats_cor1_id) REFERENCES central_tendency_stats_cor1_new(id)
+)
+""")
+
+
+cur.execute("DROP TABLE IF EXISTS tukey_hsd_stats_kcor")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS tukey_hsd_stats_kcor(
+    id INTEGER PRIMARY KEY, 
+    group1,
+    group2,
+    mean_diff,
+    p_adj,
+    lower_bound_ci,
+    upper_bound_ci,
+    reject boolean,
+    group_1_central_tendency_stats_kcor_id INTEGER,
+    group_2_central_tendency_stats_kcor_id INTEGER,
+    FOREIGN KEY(group_1_central_tendency_stats_kcor_id) REFERENCES central_tendency_stats_kcor_new(id),
+    FOREIGN KEY(group_2_central_tendency_stats_kcor_id) REFERENCES central_tendency_stats_kcor_new(id)
+)
+""")
+
+
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -250,6 +290,36 @@ for i in range(len(fits_files_pB)):
     cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
+
+
+    # Combine data into a single array
+    all_data = np.concatenate([angles_arr_finite_ne, angles_arr_finite_ne_LOS, angles_arr_finite_pB, angles_arr_finite_cor1])
+
+    # Create labels for the data types
+    labels = ['ne'] * len(angles_arr_finite_ne) + ['ne_LOS'] * len(angles_arr_finite_ne_LOS) + ['pB'] * len(angles_arr_finite_pB) + ['COR1 median filtered'] * len(angles_arr_finite_cor1)
+
+    # Perform Tukey's HSD post-hoc test
+    tukey_result = pairwise_tukeyhsd(all_data, labels)
+
+    # Convert SimpleTable to DataFrame
+    tukey_df = pd.DataFrame(tukey_result.summary().data[1:], columns=tukey_result.summary().data[0])
+
+    for i, row in tukey_df.iterrows():
+        group1 = row['group1']
+        if group1 == 'COR1 median filtered':
+            group1 = 'COR1'
+        group2 = row['group2']
+        if group2 == 'COR1 median filtered':
+            group2 = 'COR1'
+        mean_diff = row['meandiff']
+        p_adj = row['p-adj']
+        lower_bound_ci = row['lower']
+        upper_bound_ci = row['upper']
+        reject = row['reject']
+        group_1_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group1, date)).fetchone()[0]
+        group_2_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group2, date)).fetchone()[0]
+        cur.execute("INSERT INTO tukey_hsd_stats_cor1 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (None, group1, group2, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, reject, group_1_id, group_2_id))
+        con.commit()
 
     # retrieve probability density data from seaborne distplots
     x_dist_values_pB = sns.distplot(angles_signed_arr_finite_pB).get_lines()[0].get_data()[0]
@@ -578,6 +648,25 @@ labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
+
+
+# Convert SimpleTable to DataFrame
+tukey_df = pd.DataFrame(tukey_result.summary().data[1:], columns=tukey_result.summary().data[0])
+
+for i, row in tukey_df.iterrows():
+    group1 = row['group1']
+    group2 = row['group2']
+    mean_diff = row['meandiff']
+    p_adj = row['p-adj']
+    lower_bound_ci = row['lower']
+    upper_bound_ci = row['upper']
+    reject = row['reject']
+    group_1_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group1, date_combined)).fetchone()[0]
+    group_2_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group2, date_combined)).fetchone()[0]
+    cur.execute("INSERT INTO tukey_hsd_stats_cor1 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (None, group1, group2, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, reject, group_1_id, group_2_id))
+    con.commit()
+
+
 print(tukey_result)
 fig, ax = plt.subplots(1, 1)
 # ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr], showfliers=False)
@@ -700,6 +789,32 @@ for i in range(len(fits_files_pB)):
     cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
+
+
+    # Combine data into a single array
+    all_data = np.concatenate([angles_arr_finite_ne, angles_arr_finite_ne_LOS, angles_arr_finite_pB, angles_arr_finite_kcor])
+
+    # Create labels for the data types
+    labels = ['ne'] * len(angles_arr_finite_ne) + ['ne_LOS'] * len(angles_arr_finite_ne_LOS) + ['pB'] * len(angles_arr_finite_pB) + ['KCor l2 avg'] * len(angles_arr_finite_kcor)
+
+    # Perform Tukey's HSD post-hoc test
+    tukey_result = pairwise_tukeyhsd(all_data, labels)
+
+    # Convert SimpleTable to DataFrame
+    tukey_df = pd.DataFrame(tukey_result.summary().data[1:], columns=tukey_result.summary().data[0])
+
+    for i, row in tukey_df.iterrows():
+        group1 = row['group1']
+        group2 = row['group2']
+        mean_diff = row['meandiff']
+        p_adj = row['p-adj']
+        lower_bound_ci = row['lower']
+        upper_bound_ci = row['upper']
+        reject = row['reject']
+        group_1_id = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (group1, date)).fetchone()[0]
+        group_2_id = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (group2, date)).fetchone()[0]
+        cur.execute("INSERT INTO tukey_hsd_stats_kcor VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (None, group1, group2, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, reject, group_1_id, group_2_id))
+        con.commit()
 
     # retrieve probability density data from seaborne distplots
     x_dist_values_pB = sns.distplot(angles_signed_arr_finite_pB).get_lines()[0].get_data()[0]
@@ -990,6 +1105,24 @@ labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
+
+
+# Convert SimpleTable to DataFrame
+tukey_df = pd.DataFrame(tukey_result.summary().data[1:], columns=tukey_result.summary().data[0])
+
+for i, row in tukey_df.iterrows():
+    group1 = row['group1']
+    group2 = row['group2']
+    mean_diff = row['meandiff']
+    p_adj = row['p-adj']
+    lower_bound_ci = row['lower']
+    upper_bound_ci = row['upper']
+    reject = row['reject']
+    group_1_id = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (group1, date_combined)).fetchone()[0]
+    group_2_id = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (group2, date_combined)).fetchone()[0]
+    cur.execute("INSERT INTO tukey_hsd_stats_kcor VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (None, group1, group2, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, reject, group_1_id, group_2_id))
+    con.commit()
+
 print(tukey_result)
 fig, ax = plt.subplots(1, 1)
 # ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr], showfliers=False)

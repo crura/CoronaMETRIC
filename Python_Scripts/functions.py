@@ -984,6 +984,9 @@ def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, dat
 
     JSD_gaussain, KLD_gaussian = calculate_KDE_statistics(KDE_forward_cor1_central_deg_new, probabilities)
 
+    kurtosis = sci.stats.kurtosis(array)
+    skew = sci.stats.skew(array)
+
     fig = plt.figure(figsize=(10,10))
     ax = fig.subplots(1,1)
     ax.plot(x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new, color='tab:orange', label='{} Probability Density'.format(label))
@@ -993,8 +996,10 @@ def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, dat
     ax.set_xlabel('Angle Discrepancy (Degrees)')
     ax.set_ylabel('Probability Density')
     ax.text(0.7,0.8,"average discrepancy: " + str(np.round(np.average(array),5)), transform=ax.transAxes)
-    ax.text(0.7,0.7,"standard deviation: " + str(np.round(np.std(abs(array)),5)), transform=ax.transAxes)
-    ax.text(0.7,0.6,"JSD: " + str(np.round(JSD_gaussain,5)), transform=ax.transAxes)
+    ax.text(0.7,0.75,"standard deviation: " + str(np.round(np.std(abs(array)),5)), transform=ax.transAxes)
+    ax.text(0.7,0.7,"JSD: " + str(np.round(JSD_gaussain,5)), transform=ax.transAxes)
+    ax.text(0.7,0.65,"kurtosis: " + str(np.round(kurtosis,5)), transform=ax.transAxes)
+    ax.text(0.7,0.6,"skewness: " + str(np.round(skew,5)), transform=ax.transAxes)
     # ax.set_yscale('log')
     ax.set_title('{} {} vs Corresponding Gaussian Fit {}'.format(data_type, data_source, date))
     ax.legend()
@@ -1002,4 +1007,4 @@ def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, dat
     plt.savefig(outpath)
     plt.close()
 
-    return JSD_gaussain, KLD_gaussian
+    return JSD_gaussain, KLD_gaussian, kurtosis, skew

@@ -330,6 +330,16 @@ combined_ne_ravel = [item for sublist in combined_ne for item in sublist]
 combined_ne_LOS_ravel = [item for sublist in combined_ne_LOS for item in sublist]
 combined_cor1_ravel = [item for sublist in combined_cor1 for item in sublist]
 
+combined_pB_signed_ravel = [item for sublist in combined_pB_signed for item in sublist]
+combined_ne_signed_ravel = [item for sublist in combined_ne_signed for item in sublist]
+combined_ne_signed_LOS_ravel = [item for sublist in combined_ne_signed_LOS for item in sublist]
+combined_cor1_signed_ravel = [item for sublist in combined_cor1_signed for item in sublist]
+
+combined_pB_signed_ravel_arr = np.array(combined_pB_signed_ravel)
+combined_ne_signed_ravel_arr = np.array(combined_ne_signed_ravel)
+combined_ne_signed_LOS_ravel_arr = np.array(combined_ne_signed_LOS_ravel)
+combined_cor1_signed_ravel_arr = np.array(combined_cor1_signed_ravel)
+
 combined_pB_ravel_arr = np.array(combined_pB_ravel)
 angles_arr_mean_pB_combined = np.round(np.mean(combined_pB_ravel_arr), 5)
 angles_arr_median_pB_combined = np.round(np.median(combined_pB_ravel_arr), 5)
@@ -339,7 +349,7 @@ confidence_interval_pB_combined = np.round(1.96 * (std_pB_combined / np.sqrt(len
 data_type_pB_combined = 'pB'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-JSD_pB_combined, KLD_pB_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_pB_ravel_arr, data_type_pB_combined, data_source, date_combined)
+JSD_pB_combined, KLD_pB_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_pB_signed_ravel_arr, data_type_pB_combined, data_source, date_combined)
 data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, std_pB_combined, confidence_interval_pB_combined, n_pB_combined, JSD_pB_combined, KLD_pB_combined, foreign_key_pB, ''))
 
 combined_ne_ravel_arr = np.array(combined_ne_ravel)
@@ -351,7 +361,7 @@ confidence_interval_ne_combined = np.round(1.96 * (std_ne_combined / np.sqrt(len
 data_type_ne_combined = 'ne'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-JSD_ne_combined, KLD_ne_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_ne_ravel_arr, data_type_ne_combined, data_source, date_combined)
+JSD_ne_combined, KLD_ne_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_ne_signed_ravel_arr, data_type_pB_combined, data_source, date_combined)
 data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, std_ne_combined, confidence_interval_ne_combined, n_ne_combined, JSD_ne_combined, KLD_ne_combined, foreign_key_ne, ''))
 
 combined_ne_LOS_ravel_arr = np.array(combined_ne_LOS_ravel)
@@ -363,8 +373,8 @@ confidence_interval_ne_LOS_combined = np.round(1.96 * (std_ne_LOS_combined / np.
 data_type_ne_LOS_combined = 'ne_LOS'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-JSD_ne_LOS_combined, KLD_ne_los_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_ne_LOS_ravel_arr, data_type_ne_LOS_combined, data_source, date_combined)
-data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, std_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, JSD_ne_LOS_combined, KLD_ne_los_combined, foreign_key_ne_LOS, ''))
+JSD_ne_LOS_combined, KLD_ne_LOS_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_ne_signed_LOS_ravel_arr, data_type_pB_combined, data_source, date_combined)
+data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, std_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, JSD_ne_LOS_combined, KLD_ne_LOS_combined, foreign_key_ne_LOS, ''))
 
 combined_cor1_ravel_arr = np.array(combined_cor1_ravel)
 angles_arr_mean_cor1_combined = np.round(np.mean(combined_cor1_ravel_arr), 5)
@@ -375,7 +385,7 @@ confidence_interval_cor1_combined = np.round(1.96 * (std_cor1_combined / np.sqrt
 data_type_cor1_combined = 'COR1 median filtered'
 date_combined = 'combined'
 data_source = 'COR1'
-JSD_cor1_combined, KLD_cor1_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_cor1_ravel_arr, data_type_cor1_combined, data_source, date_combined)
+JSD_cor1_combined, KLD_cor1_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_cor1_signed_ravel_arr, data_type_pB_combined, data_source, date_combined)
 data_stats_2_combined.append((None, data_type_cor1_combined, data_source, date_combined, angles_arr_mean_cor1_combined, angles_arr_median_cor1_combined, std_cor1_combined, confidence_interval_cor1_combined, n_cor1_combined, JSD_cor1_combined, KLD_cor1_combined, foreign_key_cor1, ''))
 
 
@@ -385,15 +395,7 @@ cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_all VALUES(?,
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
-combined_pB_signed_ravel = [item for sublist in combined_pB_signed for item in sublist]
-combined_ne_signed_ravel = [item for sublist in combined_ne_signed for item in sublist]
-combined_ne_signed_LOS_ravel = [item for sublist in combined_ne_signed_LOS for item in sublist]
-combined_cor1_signed_ravel = [item for sublist in combined_cor1_signed for item in sublist]
 
-combined_pB_signed_ravel_arr = np.array(combined_pB_signed_ravel)
-combined_ne_signed_ravel_arr = np.array(combined_ne_signed_ravel)
-combined_ne_signed_LOS_ravel_arr = np.array(combined_ne_signed_LOS_ravel)
-combined_cor1_signed_ravel_arr = np.array(combined_cor1_signed_ravel)
 
 print(combined_ne_signed_ravel_arr)
 
@@ -770,6 +772,16 @@ combined_ne_ravel = [item for sublist in combined_ne for item in sublist]
 combined_ne_LOS_ravel = [item for sublist in combined_ne_LOS for item in sublist]
 combined_kcor_ravel = [item for sublist in combined_kcor for item in sublist]
 
+combined_pB_signed_ravel = [item for sublist in combined_pB_signed for item in sublist]
+combined_ne_signed_ravel = [item for sublist in combined_ne_signed for item in sublist]
+combined_ne_signed_LOS_ravel = [item for sublist in combined_ne_signed_LOS for item in sublist]
+combined_kcor_signed_ravel = [item for sublist in combined_kcor_signed for item in sublist]
+
+combined_pB_signed_ravel_arr = np.array(combined_pB_signed_ravel)
+combined_ne_signed_ravel_arr = np.array(combined_ne_signed_ravel)
+combined_ne_signed_LOS_ravel_arr = np.array(combined_ne_signed_LOS_ravel)
+combined_kcor_signed_ravel_arr = np.array(combined_kcor_signed_ravel)
+
 combined_pB_ravel_arr = np.array(combined_pB_ravel)
 angles_arr_mean_pB_combined = np.round(np.mean(combined_pB_ravel_arr), 5)
 angles_arr_median_pB_combined = np.round(np.median(combined_pB_ravel_arr), 5)
@@ -779,7 +791,7 @@ confidence_interval_pB_combined = np.round(1.96 * (std_pB_combined / np.sqrt(len
 data_type_pB_combined = 'pB'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-JSD_pB_combined, KLD_pB_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_pB_ravel_arr, data_type_pB_combined, data_source, date_combined)
+JSD_pB_combined, KLD_pB_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_pB_signed_ravel_arr, data_type_pB_combined, data_source, date_combined)
 data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, std_pB_combined, confidence_interval_pB_combined, n_pB_combined, JSD_pB_combined, KLD_pB_combined, foreign_key_pB, ''))
 
 combined_ne_ravel_arr = np.array(combined_ne_ravel)
@@ -791,7 +803,7 @@ confidence_interval_ne_combined = np.round(1.96 * (std_ne_combined / np.sqrt(len
 data_type_ne_combined = 'ne'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-JSD_ne_combined, KLD_ne_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_ne_ravel_arr, data_type_ne_combined, data_source, date_combined)
+JSD_ne_combined, KLD_ne_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_ne_signed_ravel_arr, data_type_ne_combined, data_source, date_combined)
 data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, std_ne_combined, confidence_interval_ne_combined, n_ne_combined, JSD_ne_combined, KLD_ne_combined, foreign_key_ne, ''))
 
 combined_ne_LOS_ravel_arr = np.array(combined_ne_LOS_ravel)
@@ -803,7 +815,7 @@ confidence_interval_ne_LOS_combined = np.round(1.96 * (std_ne_LOS_combined / np.
 data_type_ne_LOS_combined = 'ne_LOS'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-JSD_ne_LOS_combined, KLD_ne_LOS_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_ne_LOS_ravel_arr, data_type_ne_LOS_combined, data_source, date_combined)
+JSD_ne_LOS_combined, KLD_ne_LOS_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_ne_signed_LOS_ravel_arr, data_type_ne_LOS_combined, data_source, date_combined)
 data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, std_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, JSD_ne_LOS_combined, KLD_ne_LOS_combined, foreign_key_ne_LOS, ''))
 
 combined_kcor_ravel_arr = np.array(combined_kcor_ravel)
@@ -815,7 +827,7 @@ confidence_interval_kcor_combined = np.round(1.96 * (std_kcor_combined / np.sqrt
 data_type_kcor_combined = 'KCor l2 avg'
 date_combined = 'combined'
 data_source = 'KCor'
-JSD_kcor_combined, KLD_kcor_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_kcor_ravel_arr, data_type_kcor_combined, data_source, date_combined)
+JSD_kcor_combined, KLD_kcor_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_kcor_signed_ravel_arr, data_type_kcor_combined, data_source, date_combined)
 data_stats_2_combined.append((None, data_type_kcor_combined, data_source, date_combined, angles_arr_mean_kcor_combined, angles_arr_median_kcor_combined, std_kcor_combined, confidence_interval_kcor_combined, n_kcor_combined, JSD_kcor_combined, KLD_kcor_combined, foreign_key_kcor, ''))
 
 
@@ -823,17 +835,6 @@ data_stats_2_combined.append((None, data_type_kcor_combined, data_source, date_c
 cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
-
-
-combined_pB_signed_ravel = [item for sublist in combined_pB_signed for item in sublist]
-combined_ne_signed_ravel = [item for sublist in combined_ne_signed for item in sublist]
-combined_ne_signed_LOS_ravel = [item for sublist in combined_ne_signed_LOS for item in sublist]
-combined_kcor_signed_ravel = [item for sublist in combined_kcor_signed for item in sublist]
-
-combined_pB_signed_ravel_arr = np.array(combined_pB_signed_ravel)
-combined_ne_signed_ravel_arr = np.array(combined_ne_signed_ravel)
-combined_ne_signed_LOS_ravel_arr = np.array(combined_ne_signed_LOS_ravel)
-combined_kcor_signed_ravel_arr = np.array(combined_kcor_signed_ravel)
 
 
 what = sns.histplot(combined_ne_signed_ravel_arr,kde=True, bins=30)

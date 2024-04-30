@@ -54,6 +54,16 @@ print_sql_query(dbName, query, latex=True, print_to_file=True, output_file=os.pa
 query = "SELECT data_type, mean, median, standard_deviation, confidence_interval, n, qraft_parameters_id from central_tendency_stats_kcor_all where date='combined' order by mean asc;"
 print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Central Tendency Statistics for K-COR Data Combined',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
+
+
+query = "SELECT group1, group2, date, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id;"
+print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Tukey HSD Statistics for COR-1 Data',
+                 output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
+
+query = "SELECT group1, group2, date, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, reject from tukey_hsd_stats_kcor inner join central_tendency_stats_kcor_new on central_tendency_stats_kcor_new.id = tukey_hsd_stats_kcor.group_1_central_tendency_stats_kcor_id;"
+print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Tukey HSD Statistics for K-COR Data',
+                 output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
+
 # query = "SELECT date, data_type, data_source, mean, median, standard_deviation, intensity_removal_coefficient from central_tendency_stats_cor1_all_naty_original inner join qraft_input_variables on qraft_input_variables.qraft_parameters_id = central_tendency_stats_cor1_all_naty_original.qraft_parameters_id where intensity_removal_coefficient=0.0 and data_source='COR1' order by mean ASC;"
 # print_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 

@@ -64,6 +64,18 @@ query = "SELECT group1, group2, date, mean_diff, p_adj, lower_bound_ci, upper_bo
 print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Tukey HSD Statistics for K-COR Data',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
+query = "SELECT * from central_tendency_stats_cor1_new where date!='combined' order by mean asc;"
+print_sql_query(dbName, query, print_to_file=True, latex=True, caption=True, caption_text='Central Tendency Statistics for COR-1 Data By Date',
+                 output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
+
+query = "SELECT * from central_tendency_stats_kcor_all where date!='combined' order by mean asc;"
+print_sql_query(dbName, query, print_to_file=True, latex=True, caption=True, caption_text='Central Tendency Statistics for K-COR Data By Date',
+                 output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
+
+
+query = "SELECT * from central_tendency_stats_cor1_all where date='combined' order by mean asc;"
+print_sql_query(dbName, query, latex=True, print_to_file=True, latex=True, caption=True, caption_text='Central Tendency Statistics for COR-1 Data Combined',
+                 output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 # query = "SELECT date, data_type, data_source, mean, median, standard_deviation, intensity_removal_coefficient from central_tendency_stats_cor1_all_naty_original inner join qraft_input_variables on qraft_input_variables.qraft_parameters_id = central_tendency_stats_cor1_all_naty_original.qraft_parameters_id where intensity_removal_coefficient=0.0 and data_source='COR1' order by mean ASC;"
 # print_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 

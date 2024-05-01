@@ -866,6 +866,8 @@ def print_sql_query(dbName, query, print_to_file=False, output_file=None, latex=
 
         # replace pB with $pB$ in data
         rows = [[re.sub(r'\bKCor\b', "\\\\acrshort{k-cor}", str(item)) for item in row] for row in rows]
+        # replace pB with $pB$ in data
+        rows = [[re.sub(r'\bCOR1\b', "\\\\acrshort{cor-1}", str(item)) for item in row] for row in rows]
         # Replace underscores in column names
         column_names = [name.replace('_', ' ') for name in column_names]
         table = tabulate(rows, headers=column_names, tablefmt='latex_raw')

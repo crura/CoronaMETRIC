@@ -870,6 +870,11 @@ def print_sql_query(dbName, query, print_to_file=False, output_file=None, latex=
         rows = [[re.sub(r'\bCOR1\b', "\\\\acrshort{cor-1}", str(item)) for item in row] for row in rows]
         # Replace underscores in column names
         column_names = [name.replace('_', ' ') for name in column_names]
+        # Replace underscores in column names
+        column_names = [name.replace('standard deviation', 'std') for name in column_names]
+        # Replace underscores in column names
+        column_names = [name.replace('confidence interval', '$95\%$ CI') for name in column_names]
+
         table = tabulate(rows, headers=column_names, tablefmt='latex_raw')
 
         if caption:
@@ -884,9 +889,11 @@ def print_sql_query(dbName, query, print_to_file=False, output_file=None, latex=
             table.add_row(row)
     if print_to_file:
         with open(output_file, 'a') as f:
-            f.write(str(query))
-            f.write("\n")
+            if not latex:
+                f.write(str(query))
+                f.write("\n")
             f.write(str(table))
+            f.write("\n")
             f.write("\n")
     else:
         print(query)

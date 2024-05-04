@@ -144,6 +144,7 @@ jobs:
           # cp $git_repo/Output/fits_images/*COR1__PSI*.fits $git_repo/Output/QRaFT_Results
           # cp $git_repo/Output/fits_images/*KCor__PSI*.fits $git_repo/Output/QRaFT_Results
           cp $git_repo/Output/fits_images/*.fits $git_repo/Output/QRaFT_Results
+          cp $git_repo/Output/fits_images/*.fts $git_repo/Output/QRaFT_Results
           deactivate
 
       # - uses: actions/upload-artifact@v3

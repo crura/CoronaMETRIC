@@ -2,17 +2,23 @@ pro run_code
 
   ; set path variable for rest of idl code defined by git
   spawn, 'git rev-parse --show-toplevel', git_repo
-  directory_search_cor1_1 = git_repo + '/Data/COR1_Original/*.fts'
-  directory_search_cor1_2 = git_repo + '/Data/COR1_Original/*.fits'
-  directory_list_cor1_1 = file_search(directory_search_cor1_1)
-  directory_list_cor1_2 = file_search(directory_search_cor1_2)
-  directory_list = [directory_list_cor1_1, directory_list_cor1_2]
+  ; directory_search_cor1_1 = git_repo + '/Data/COR1_Original/*.fts'
+  ; directory_search_cor1_2 = git_repo + '/Data/COR1_Original/*.fits'
+  ; directory_list_cor1_1 = file_search(directory_search_cor1_1)
+  ; directory_list_cor1_2 = file_search(directory_search_cor1_2)
+  ; directory_list = [directory_list_cor1_1, directory_list_cor1_2]
 
-  directory_search_kcor_1 = git_repo + '/Data/MLSO/*.fts'
-  directory_search_kcor_2 = git_repo + '/Data/MLSO/*.fits'
-  directory_list_kcor_1 = file_search(directory_search_kcor_1)
-  directory_list_kcor_2 = file_search(directory_search_kcor_2)
-  directory_list_2 = [directory_list_kcor_1, directory_list_kcor_2]
+  ; directory_search_kcor_1 = git_repo + '/Data/MLSO/*.fts'
+  ; directory_search_kcor_2 = git_repo + '/Data/MLSO/*.fits'
+  ; directory_list_kcor_1 = file_search(directory_search_kcor_1)
+  ; directory_list_kcor_2 = file_search(directory_search_kcor_2)
+  ; directory_list_2 = [directory_list_kcor_1, directory_list_kcor_2]
+  
+  directory_list = ['Data/COR1_Original/2017_08_20_rep_med.fts', 'Data/COR1_Original/2017_08_25_rep_med.fts', 'Data/COR1_Original/2017_08_29_rep_med.fts', 'Data/COR1_Original/2017_09_03_rep_med.fts', 'Data/COR1_Original/2017_09_06_rep_med.fts', 'Data/COR1_Original/2017_09_11_rep_med.fts']
+  directory_list_2 = ['Data/MLSO/20170820_180657_kcor_l2_avg.fts', 'Data/MLSO/20170825_185258_kcor_l2_avg.fts', 'Data/MLSO/20170829_200801_kcor_l2_avg.fts', 'Data/MLSO/20170903_025117_kcor_l2_avg.fts', 'Data/MLSO/20170906_213054_kcor_l2_avg.fts', 'Data/MLSO/20170911_202927_kcor_l2_avg.fts']
+  outstring_list = ['']
+  occlt_list = ['']
+  
 
   ; directory_list = ['Data/COR1/cor1a_bff_20170820001000.fits', 'Data/COR1/cor1a_bff_20170824233500.fits', 'Data/COR1/cor1a_bff_20170829000500.fits', 'Data/COR1/cor1a_bff_20170903000500.fits', 'Data/COR1/cor1a_bff_20170906000500.fits', 'Data/COR1/cor1a_bff_20170911000500.fits']
   ; directory_list_2 = ['Data/MLSO/20170820_180657_kcor_l2_avg.fts', 'Data/MLSO/20170825_185258_kcor_l2_avg.fts', 'Data/MLSO/20170829_200801_kcor_l2_avg.fts', 'Data/MLSO/20170903_025117_kcor_l2_avg.fts', 'Data/MLSO/20170906_213054_kcor_l2_avg.fts', 'Data/MLSO/20170911_202927_kcor_l2_avg.fts']

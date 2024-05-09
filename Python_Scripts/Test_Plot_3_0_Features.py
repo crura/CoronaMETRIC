@@ -35,7 +35,7 @@ from functions import display_fits_image_with_3_0_features_and_B_field
 from scipy.stats import norm
 from matplotlib import pyplot as plt
 import seaborn as sns
-from functions import calculate_KDE_statistics, determine_paths, get_files_from_pattern, calculate_KDE, plot_histogram_with_JSD_Gaussian_Analysis
+from functions import calculate_KDE_statistics, determine_paths, get_files_from_pattern, calculate_KDE, plot_histogram_with_JSD_Gaussian_Analysis, correct_fits_header
 import sqlite3
 from scipy.stats import f_oneway
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
@@ -274,6 +274,7 @@ for i in range(len(fits_files_pB)):
     head_cor1 = fits.getheader(file_cor1)
     # search fits headers of all files in directory for header that matches head
     for file in fits_files_pB:
+        correct_fits_header(file)
         head = fits.getheader(file)
         if head['date-obs'] == head_cor1['date-obs']:
             corresponding_file_pB = file
@@ -773,6 +774,7 @@ for i in range(len(fits_files_pB)):
     head_kcor = fits.getheader(file_kcor)
     # search fits headers of all files in directory for header that matches head
     for file in fits_files_pB:
+        correct_fits_header(file)
         head = fits.getheader(file)
         if head['date-obs'] == head_kcor['date-obs']:
             corresponding_file_pB = file

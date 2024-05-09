@@ -979,6 +979,16 @@ def rescale_kcor_file_to_512x512(kcor_fits_file):
     new_hdu.writeto(kcor_fits_file, overwrite=True)
 
 
+def correct_fits_header(filepath):
+    # from astropy.io import fits
+    hdul = fits.open(filepath)
+    head = hdul[0].header
+    try: 
+        head['date-obs']
+    except KeyError:
+        # Rename the key in the header of the first HDU and overwrite header
+        hdul[0].header.rename_keyword('DATE_OBS', 'DATE-OBS')
+        hdul.writeto(filepath, overwrite=True)
 
 
 def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, date):

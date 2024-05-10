@@ -192,7 +192,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
 
   ; --------------------------------------------
   ;window, 1, xsize=3000, ysize=1200
-  window, 2, xsize=1500, ysize=600
+  window, 2, xsize=1500, ysize=600 & erase
   loadct, 0
   erase
   image_plot_1, IMG_d2_phi_enh, range=[0, adapt_thresh_prob(IMG_d2_phi_enh, p=0.95)]
@@ -208,7 +208,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
   
   win_to_png, 2, image_save_path
   ; --------------------------------------------
-  window, 2, xsize=1200, ysize=800, xpos = 1900
+  window, 2, xsize=1200, ysize=800, xpos = 1900 & erase
   loadct, 0
   erase
   pos = getpos(2,2,xy=[0.15, 0.06], region=[0.03,0.03,0.9,0.97])
@@ -226,7 +226,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
 
   ; --------------------------------------------
   win_to_png, 2, image_save_path_1
-  window, 2, xsize=1200, ysize=800, xpos = 1900
+  window, 2, xsize=1200, ysize=800, xpos = 1900 & erase
   loadct, 0
   erase
   pos = getpos(3,2,xy=[0.11, 0.05], region=[0.0,0.1,0.85,0.9])
@@ -249,7 +249,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
     endif
   for i=0, n_elements(blob_stat.length)-1 do begin & l=blob_stat.length[i] & phi= d_phi*blob_stat.phi_fit[i,0:l-1] & rho= d_rho*blob_stat.rho[i,0:l-1] + rho_min & xx_r = rho*cos(phi) &  yy_r = rho*sin(phi) & plots, [xx_r, yy_r], color=2, thick=2 & endfor
 
-  window, 5, xsize=1000, ysize=1000 & erase
+  window, 2, xsize=1000, ysize=1000 & erase
   loadct,0, /silent
   image_plot_1, IMG_d2_phi_r, X, Y, range=[0, adapt_thresh_prob(IMG_d2_phi_r, p=0.95)], ctable=0
   setcolors
@@ -268,7 +268,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
   ; B-field lines vs detected features; statistics of discrepancy angles:
   if key le 1 then begin ; PSI model only
     
-    window, 2, xsize=600, ysize=600 & loadct,0, /silent & erase
+    window, 2, xsize=600, ysize=600 & erase
     !P.noerase=0
     !P.multi = 0
     setcolors
@@ -287,6 +287,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
     ; plot, hx, hy, title = 'Mean='+str(mean(angle_err[w]*180/!Pi))+'   Median='+str(median(angle_err[w]*180/!Pi)), thick=4, /xstyle, xrange=[-45,45]
     ; oplot, hx_signed, hy_signed, thick=2
     ; oplot, [0,0], !y.crange, lines=2
+    win_to_png, 2, image_save_path_4
     print, fname
     print, 'Mean / median: '+string(mean(angle_err[w]*180/!Pi),format='(F5.1)')+' / '+string(median(angle_err[w]*180/!Pi),format='(F5.1)')
 

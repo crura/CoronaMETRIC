@@ -317,8 +317,14 @@ for i in range(len(fits_files_pB)):
         lower_bound_ci = row['lower']
         upper_bound_ci = row['upper']
         reject = row['reject']
+        group1 = row['group1']
+        group2 = row['group2']
         group_1_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group1, date)).fetchone()[0]
         group_2_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group2, date)).fetchone()[0]
+        if group1 == 'COR1 median filtered':
+            group1 = 'COR1'
+        if group2 == 'COR1 median filtered':
+            group2 = 'COR1'
         cur.execute("INSERT INTO tukey_hsd_stats_cor1 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (None, group1, group2, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, reject, group_1_id, group_2_id))
         con.commit()
 

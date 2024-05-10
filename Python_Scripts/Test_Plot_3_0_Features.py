@@ -217,7 +217,7 @@ repo_path = repo.working_tree_dir
 
 
 fits_path = os.path.join(repo_path, 'Output/QRaFT_Results')
-fits_input_path = os.path.join(repo_path, 'Data/COR1')
+fits_input_path = os.path.join(repo_path, 'Data/COR1_Original')
 # copy all fits input files to the output directory
 source_dir = fits_input_path
 target_dir = fits_path

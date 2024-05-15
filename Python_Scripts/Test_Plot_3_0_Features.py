@@ -224,7 +224,7 @@ with open(config_file) as f:
 
 
 fits_path = os.path.join(repo_path, 'Output/QRaFT_Results')
-fits_input_path = os.path.join(repo_path, 'Data/COR1_Original')
+fits_input_path = os.path.join(repo_path, config['cor1_data_path'])
 # copy all fits input files to the output directory
 source_dir = fits_input_path
 target_dir = fits_path
@@ -957,7 +957,7 @@ print(res)
 
 
 fits_path = os.path.join(repo_path, 'Output/QRaFT_Results')
-fits_input_path = os.path.join(repo_path, 'Data/MLSO')
+fits_input_path = os.path.join(repo_path, config['kcor_data_path'])
 # copy all fits input files to the output directory
 source_dir = fits_input_path
 target_dir = fits_path

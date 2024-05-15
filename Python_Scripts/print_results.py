@@ -64,27 +64,27 @@ query = "SELECT group1, group2, date, mean_diff, p_adj, lower_bound_ci, upper_bo
 print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Tukey HSD Statistics for K-COR Data',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
-query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, Gaussian JSD, Gaussian KLD, kurtosis, skewness from central_tendency_stats_cor1_new where date!='combined' order by mean asc;"
+query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, Gaussian_JSD, Gaussian_KLD, kurtosis, skewness from central_tendency_stats_cor1_new where date!='combined' order by mean asc;"
 print_sql_query(dbName, query, print_to_file=True, latex=True, caption=True, caption_text='Central Tendency Statistics for COR-1 Data By Date',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
-query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, Gaussian JSD, Gaussian KLD, kurtosis, skewness from central_tendency_stats_cor1_new where date='combined' order by mean asc;"
+query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, Gaussian_JSD, Gaussian_KLD, kurtosis, skewness from central_tendency_stats_cor1_new where date='combined' order by mean asc;"
 print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Central Tendency Statistics for COR-1 Data Combined',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
-# query = "SELECT Gaussian JSD, Gaussian KLD, kurtosis, skewness from central_tendency_stats_cor1_new where date!='combined' order by mean asc;"
+# query = "SELECT Gaussian_JSD, Gaussian_KLD, kurtosis, skewness from central_tendency_stats_cor1_new where date!='combined' order by mean asc;"
 # print_sql_query(dbName, query, print_to_file=True, latex=True, caption=True, caption_text='Advanced Central Tendency Statistics for COR-1 Data By Date',
 #                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
-query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, Gaussian JSD, Gaussian KLD, kurtosis, skewness from central_tendency_stats_kcor_new where date!='combined' order by mean asc;"
+query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, Gaussian_JSD, Gaussian_KLD, kurtosis, skewness from central_tendency_stats_kcor_new where date!='combined' order by mean asc;"
 print_sql_query(dbName, query, print_to_file=True, latex=True, caption=True, caption_text='Central Tendency Statistics for K-COR Data By Date',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
-query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, Gaussian JSD, Gaussian KLD, kurtosis, skewness from central_tendency_stats_kcor_all where date='combined' order by mean asc;"
+query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, Gaussian_JSD, Gaussian_KLD, kurtosis, skewness from central_tendency_stats_kcor_all where date='combined' order by mean asc;"
 print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Central Tendency Statistics for K-COR Data Combined',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
-# query = "SELECT Gaussian JSD, Gaussian KLD, kurtosis, skewness from central_tendency_stats_kcor_all where date!='combined' order by mean asc;"
+# query = "SELECT Gaussian_JSD, Gaussian_KLD, kurtosis, skewness from central_tendency_stats_kcor_all where date!='combined' order by mean asc;"
 # print_sql_query(dbName, query, print_to_file=True, latex=True, caption=True, caption_text='Advanced Central Tendency Statistics for K-COR Data By Date',
 #                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 

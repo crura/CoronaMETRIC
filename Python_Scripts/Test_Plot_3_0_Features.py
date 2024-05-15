@@ -88,8 +88,8 @@ CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_new(
     standard_deviation,
     confidence_interval, 
     n,
-    JSD,
-    KLD,
+    Gaussian JSD,
+    Gaussian KLD,
     kurtosis,
     skewness,
     qraft_parameters_id INTEGER,
@@ -112,8 +112,8 @@ CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_all(
     standard_deviation,
     confidence_interval, 
     n,
-    JSD,
-    KLD,
+    Gaussian JSD,
+    Gaussian KLD,
     kurtosis,
     skewness,
     qraft_parameters_id INTEGER,
@@ -135,8 +135,8 @@ cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_new(
             standard_deviation,
             confidence_interval,  
             n,
-            JSD,
-            KLD,
+            Gaussian JSD,
+            Gaussian KLD,
             kurtosis,
             skewness,
             qraft_parameters_id INTEGER,  
@@ -158,8 +158,8 @@ cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_all(
             standard_deviation,
             confidence_interval,  
             n,
-            JSD,
-            KLD,
+            Gaussian JSD,
+            Gaussian KLD,
             kurtosis,
             skewness,
             qraft_parameters_id INTEGER,  
@@ -680,7 +680,7 @@ ax.set_xlabel('Angle Discrepancy (Degrees)')
 ax.set_ylabel('Probability Density')
 ax.text(25,0.008,"average discrepancy: " + str(np.round(np.average(combined_pB_signed_ravel_arr),5)))
 ax.text(25,0.007,"standard deviation: " + str(np.round(np.std(abs(combined_pB_signed_ravel_arr)),5)))
-ax.text(25,0.006,"JSD: " + str(np.round(JSD_pB_gaussain,5)))
+ax.text(25,0.006,"Gaussian JSD: " + str(np.round(JSD_pB_gaussain,5)))
 # ax.set_yscale('log')
 ax.set_title('PSI/FORWARD pB Angle Discrepancy Probability Density vs Corresponding Gaussian Fit')
 ax.legend()

@@ -783,12 +783,12 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
 
 
 
-def get_files_from_pattern(directory, pattern, middle=False):
+def get_files_from_pattern(directory, pattern, extension, middle=False):
     # Use glob to get all files with the '.fits' extension in the specified directory
     if middle:
-        fits_files = glob.glob(f"{directory}/*{pattern}*.fits")
+        fits_files = glob.glob(f"{directory}/*{pattern}*{extension}")
     else:
-        fits_files = glob.glob(f"{directory}/*{pattern}")
+        fits_files = glob.glob(f"{directory}/*{pattern}{extension}")
     return sorted(fits_files)
 
 

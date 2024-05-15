@@ -10,7 +10,7 @@ repo_path = repo.working_tree_dir
 
 fits_path = os.path.join(repo_path, 'Data/MLSO')
 
-fits_files_kcor = get_files_from_pattern(fits_path, 'kcor_l2_avg.fts')
+fits_files_kcor = get_files_from_pattern(fits_path, 'kcor_l2_avg', '.fts')
 
 for fits_file in fits_files_kcor:
     rescale_kcor_file_to_512x512(fits_file)

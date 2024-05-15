@@ -1,4 +1,5 @@
 
+import json
 import os
 import shutil
 from scipy.io import readsav
@@ -217,7 +218,9 @@ CREATE TABLE IF NOT EXISTS tukey_hsd_stats_kcor(
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
 
-
+config_file = os.path.join(repo_path, 'config.json')
+with open(config_file) as f:
+    config = json.load(f)
 
 
 fits_path = os.path.join(repo_path, 'Output/QRaFT_Results')
@@ -229,10 +232,14 @@ file_names = os.listdir(source_dir)
 for file_name in file_names:
     shutil.copy(os.path.join(source_dir, file_name), target_dir)
 
-fits_files_pB = get_files_from_pattern(fits_path, 'COR1__PSI_pB.fits')
-fits_files_ne = get_files_from_pattern(fits_path, 'COR1__PSI_ne.fits')
-fits_files_ne_LOS = get_files_from_pattern(fits_path, 'COR1__PSI_ne_LOS.fits')
-fits_files_cor1 = get_files_from_pattern(fits_path, 'rep_med.fts')
+fits_files_pB = get_files_from_pattern(fits_path, 'COR1__PSI_pB', '.fits')
+fits_files_ne = get_files_from_pattern(fits_path, 'COR1__PSI_ne', '.fits')
+fits_files_ne_LOS = get_files_from_pattern(fits_path, 'COR1__PSI_ne_LOS', '.fits')
+cor1_search_string = config['cor1_pattern_search'] + config['cor1_data_extension']
+if config['cor1_pattern_middle']:
+    fits_files_cor1 = get_files_from_pattern(fits_path, config['cor1_pattern_search'], config['cor1_data_extension'], middle=True)
+else:
+    fits_files_cor1 = get_files_from_pattern(fits_path, config['cor1_pattern_search'], config['cor1_data_extension'])
 
 combined_pB = []
 combined_ne = []
@@ -958,10 +965,13 @@ file_names = os.listdir(source_dir)
 for file_name in file_names:
     shutil.copy(os.path.join(source_dir, file_name), target_dir)
 
-fits_files_pB = get_files_from_pattern(fits_path, 'KCor__PSI_pB.fits')
-fits_files_ne = get_files_from_pattern(fits_path, 'KCor__PSI_ne.fits')
-fits_files_ne_LOS = get_files_from_pattern(fits_path, 'KCor__PSI_ne_LOS.fits')
-fits_files_kcor = get_files_from_pattern(fits_path, 'kcor_l2_avg.fts')
+fits_files_pB = get_files_from_pattern(fits_path, 'KCor__PSI_pB', '.fits')
+fits_files_ne = get_files_from_pattern(fits_path, 'KCor__PSI_ne', '.fits')
+fits_files_ne_LOS = get_files_from_pattern(fits_path, 'KCor__PSI_ne_LOS', '.fits')
+if config['kcor_pattern_middle']:
+    fits_files_kcor = get_files_from_pattern(fits_path, 'kcor_l2_avg', '.fts', middle=True)
+else:
+    fits_files_kcor = get_files_from_pattern(fits_path, 'kcor_l2_avg', '.fts')
 
 combined_pB = []
 combined_ne = []

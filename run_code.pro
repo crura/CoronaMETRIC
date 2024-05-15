@@ -14,8 +14,31 @@ pro run_code
   ; directory_list_kcor_2 = file_search(directory_search_kcor_2)
   ; directory_list_2 = [directory_list_kcor_1, directory_list_kcor_2]
   
-  directory_list = ['Data/COR1_Original/2017_08_20_rep_med.fts', 'Data/COR1_Original/2017_08_25_rep_med.fts', 'Data/COR1_Original/2017_08_29_rep_med.fts', 'Data/COR1_Original/2017_09_03_rep_med.fts', 'Data/COR1_Original/2017_09_06_rep_med.fts', 'Data/COR1_Original/2017_09_11_rep_med.fts']
-  directory_list_2 = ['Data/MLSO/20170820_180657_kcor_l2_avg.fts', 'Data/MLSO/20170825_185258_kcor_l2_avg.fts', 'Data/MLSO/20170829_200801_kcor_l2_avg.fts', 'Data/MLSO/20170903_025117_kcor_l2_avg.fts', 'Data/MLSO/20170906_213054_kcor_l2_avg.fts', 'Data/MLSO/20170911_202927_kcor_l2_avg.fts']
+  config = JSON_PARSE('/Users/crura/Desktop/Research/Test_Space/Naty_Images_Experiments/Vadim_QRaFT_Experiments/Start_From_Scrap_2/Image-Coalignment/config.json')
+  cor1_data_path = string(config['cor1_data_path'])
+  cor1_data_extension = string(config['cor1_data_extension'])
+  cor1_pattern_search = string(config['cor1_pattern_search'])
+  cor1_pattern_middle = config['cor1_pattern_middle']
+
+  kcor_data_path = string(config['kcor_data_path'])
+  kcor_data_extension = string(config['kcor_data_extension'])
+  kcor_pattern_search = string(config['kcor_pattern_search'])
+  kcor_pattern_middle = config['kcor_pattern_middle']
+  
+  if (cor1_pattern_middle) then begin
+    cor1_search_string = cor1_data_path + '/*' + cor1_data_extension + cor1_data_extension
+  endif else begin
+    cor1_search_string = cor1_data_path + '/*' + cor1_pattern_search + '*' + cor1_data_extension
+  endelse
+
+  if (kcor_pattern_middle) then begin
+    kcor_search_string = kcor_data_path + '/*' + kcor_data_extension + kcor_data_extension
+  endif else begin
+    kcor_search_string = kcor_data_path + '/*' + kcor_pattern_search + '*' + kcor_data_extension
+  endelse
+  
+  directory_list = FILE_SEARCH(cor1_search_string)
+  directory_list_2 = FILE_SEARCH(kcor_search_string)
   outstring_list = ['']
   occlt_list = ['']
   

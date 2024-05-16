@@ -1,8 +1,8 @@
 {
-    "cor1_data_path": "Data/COR1_Original",
-    "cor1_data_extension": ".fts",
-    "cor1_pattern_search": "rep_med",
-    "cor1_pattern_middle": false,
+    "cor1_data_path": "Data/COR1",
+    "cor1_data_extension": ".fits",
+    "cor1_pattern_search": "bff",
+    "cor1_pattern_middle": true,
     "kcor_data_path": "Data/MLSO",
     "kcor_data_extension": ".fts",
     "kcor_pattern_search": "",

@@ -5,7 +5,7 @@
     "cor1_pattern_middle": false,
     "kcor_data_path": "Data/MLSO",
     "kcor_data_extension": ".fts",
-    "kcor_pattern_search": "rep_med",
+    "kcor_pattern_search": "",
     "kcor_pattern_middle": false
 
 }

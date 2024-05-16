@@ -26,15 +26,15 @@ pro run_code
   kcor_pattern_middle = config['kcor_pattern_middle']
   
   if (cor1_pattern_middle) then begin
-    cor1_search_string = cor1_data_path + '/*' + cor1_data_extension + cor1_data_extension
-  endif else begin
     cor1_search_string = cor1_data_path + '/*' + cor1_pattern_search + '*' + cor1_data_extension
+  endif else begin
+    cor1_search_string = cor1_data_path + '/*' + cor1_pattern_search + cor1_data_extension
   endelse
 
   if (kcor_pattern_middle) then begin
-    kcor_search_string = kcor_data_path + '/*' + kcor_data_extension + kcor_data_extension
-  endif else begin
     kcor_search_string = kcor_data_path + '/*' + kcor_pattern_search + '*' + kcor_data_extension
+  endif else begin
+    kcor_search_string = kcor_data_path + '/*' + kcor_pattern_search + kcor_data_extension
   endelse
   
   directory_list = FILE_SEARCH(cor1_search_string)

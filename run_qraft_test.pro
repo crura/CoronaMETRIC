@@ -1,8 +1,32 @@
 PRO run_qraft_test, input_file_path
 
   dir = input_file_path + '/Output/fits_images'
+
+  config = JSON_PARSE('/Users/crura/Desktop/Research/Test_Space/Naty_Images_Experiments/Vadim_QRaFT_Experiments/Start_From_Scrap_2/Image-Coalignment/config.json')
+  ; cor1_data_path = string(config['cor1_data_path'])
+  cor1_data_extension = string(config['cor1_data_extension'])
+  cor1_pattern_search = string(config['cor1_pattern_search'])
+  cor1_pattern_middle = config['cor1_pattern_middle']
+
+  ; kcor_data_path = string(config['kcor_data_path'])
+  kcor_data_extension = string(config['kcor_data_extension'])
+  kcor_pattern_search = string(config['kcor_pattern_search'])
+  kcor_pattern_middle = config['kcor_pattern_middle']
+  
+  if (cor1_pattern_middle) then begin
+    cor1_search_string = '/*' + cor1_pattern_search + '*' + cor1_data_extension
+  endif else begin
+    cor1_search_string = '/*' + cor1_pattern_search + cor1_data_extension
+  endelse
+
+  if (kcor_pattern_middle) then begin
+    kcor_search_string = '/*' + kcor_pattern_search + '*' + kcor_data_extension
+  endif else begin
+    kcor_search_string = '/*' + kcor_pattern_search + kcor_data_extension
+  endelse
+
   ; print, dir
-  f_COR1 = file_search(dir+'/*_med*')
+  f_COR1 = file_search(dir+cor1_search_string)
   f_pB = file_search(dir+'/*COR1__PSI_pB.fits')
   f_ne = file_search(dir+'/*COR1__PSI_ne.fits')
   f_ne_LOS = file_search(dir+'/*COR1__PSI_ne_LOS.fits')
@@ -28,7 +52,7 @@ PRO run_qraft_test, input_file_path
     
   endfor
   
-  f_KCor = file_search(dir+'/*kcor*')
+  f_KCor = file_search(dir+kcor_search_string)
   f_pB = file_search(dir+'/*KCor__PSI_pB.fits')
   f_ne = file_search(dir+'/*KCor__PSI_ne.fits')
   f_ne_LOS = file_search(dir+'/*KCor__PSI_ne_LOS.fits')

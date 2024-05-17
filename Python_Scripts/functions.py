@@ -989,6 +989,7 @@ def correct_fits_header(filepath):
         # Rename the key in the header of the first HDU and overwrite header
         hdul[0].header.rename_keyword('DATE_OBS', 'DATE-OBS')
         hdul.writeto(filepath, overwrite=True)
+    return hdul[0].header
 
 
 def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, date):

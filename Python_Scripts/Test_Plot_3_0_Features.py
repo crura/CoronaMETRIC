@@ -285,8 +285,8 @@ for i in range(len(fits_files_pB)):
     head_cor1 = fits.getheader(file_cor1)
     # search fits headers of all files in directory for header that matches head
     for file in fits_files_pB:
-        correct_fits_header(file)
-        head = fits.getheader(file)
+        head = correct_fits_header(file)
+        # head = fits.getheader(file)
         if head['date-obs'] == head_cor1['date-obs']:
             corresponding_file_pB = file
             corresponding_file_By = file.replace('pB', 'By')
@@ -1017,8 +1017,8 @@ for i in range(len(fits_files_pB)):
     head_kcor = fits.getheader(file_kcor)
     # search fits headers of all files in directory for header that matches head
     for file in fits_files_pB:
-        correct_fits_header(file)
-        head = fits.getheader(file)
+        head = correct_fits_header(file)
+        # head = fits.getheader(file)
         if head['date-obs'] == head_kcor['date-obs']:
             corresponding_file_pB = file
             corresponding_file_By = file.replace('pB', 'By')

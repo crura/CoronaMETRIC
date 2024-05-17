@@ -308,7 +308,7 @@ for i in range(len(fits_files_pB)):
     all_data = np.concatenate([angles_arr_finite_ne, angles_arr_finite_ne_LOS, angles_arr_finite_pB, angles_arr_finite_cor1])
 
     # Create labels for the data types
-    labels = ['ne'] * len(angles_arr_finite_ne) + ['ne_LOS'] * len(angles_arr_finite_ne_LOS) + ['pB'] * len(angles_arr_finite_pB) + ['COR1 median filtered'] * len(angles_arr_finite_cor1)
+    labels = ['ne'] * len(angles_arr_finite_ne) + ['ne_LOS'] * len(angles_arr_finite_ne_LOS) + ['pB'] * len(angles_arr_finite_pB) + ['COR1'] * len(angles_arr_finite_cor1)
 
     # Perform Tukey's HSD post-hoc test
     tukey_result = pairwise_tukeyhsd(all_data, labels)
@@ -427,10 +427,10 @@ for i in range(len(fits_files_pB)):
 
     for i, row in tukey_df.iterrows():
         group1 = row['group1']
-        if group1 == 'COR1 median filtered':
+        if group1 == 'COR1':
             group1 = 'COR1'
         group2 = row['group2']
-        if group2 == 'COR1 median filtered':
+        if group2 == 'COR1':
             group2 = 'COR1'
         mean_diff = row['meandiff']
         p_adj = row['p-adj']
@@ -442,9 +442,9 @@ for i in range(len(fits_files_pB)):
         group_1_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group1, date)).fetchone()[0]
         group_2_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group2, date)).fetchone()[0]
         KLD, JSD = cur.execute("SELECT KLD, JSD FROM KLD_JSD WHERE (group_1_central_tendency_stats_cor1_id = ? AND group_2_central_tendency_stats_cor1_id = ?) OR (group_2_central_tendency_stats_cor1_id = ? AND group_1_central_tendency_stats_cor1_id = ?)", (group_1_id, group_2_id, group_1_id, group_2_id)).fetchone()
-        if group1 == 'COR1 median filtered':
+        if group1 == 'COR1':
             group1 = 'COR1'
-        if group2 == 'COR1 median filtered':
+        if group2 == 'COR1':
             group2 = 'COR1'
         cur.execute("INSERT INTO tukey_hsd_stats_cor1 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (None, group1, group2, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, reject, KLD, JSD, group_1_id, group_2_id))
         con.commit()
@@ -595,7 +595,7 @@ angles_arr_median_cor1_combined = np.round(np.median(combined_cor1_ravel_arr), 5
 n_cor1_combined = len(combined_cor1_ravel_arr)
 std_cor1_combined = np.round(np.std(abs(combined_cor1_ravel_arr)),5)
 confidence_interval_cor1_combined = np.round(1.96 * (std_cor1_combined / np.sqrt(len(combined_cor1_ravel_arr))),5)
-data_type_cor1_combined = 'COR1 median filtered'
+data_type_cor1_combined = 'COR1'
 date_combined = 'combined'
 data_source = 'COR1'
 JSD_cor1_combined, KLD_cor1_combined, kurtosis_cor1_combined, skewness_cor1_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_cor1_signed_ravel_arr, data_type_pB_combined, data_source, date_combined)
@@ -637,7 +637,7 @@ ax = fig.subplots(1,1)
 sns.histplot(combined_ne_signed_ravel_arr,kde=True,label='ne',bins=30,ax=ax,color='tab:blue')
 sns.histplot(combined_pB_signed_ravel,kde=True,label='pB',bins=30,ax=ax,color='tab:orange')
 sns.histplot(combined_ne_signed_LOS_ravel,kde=True, bins=30, label='ne_LOS',ax=ax, color='tab:green')
-sns.histplot(combined_cor1_signed_ravel, kde=True, bins=30, label='COR1 median filtered',ax=ax, color='tab:red')
+sns.histplot(combined_cor1_signed_ravel, kde=True, bins=30, label='COR1',ax=ax, color='tab:red')
 #x_axis = np.linspace(-90, 90, len(KDE_cor1_central_deg_new))
 
 
@@ -749,7 +749,7 @@ plt.savefig(os.path.join(repo_path, 'Output/Plots', '{}_Angle_Discrepancy_By_Dat
 all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_cor1_signed_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr) + ['COR1 median filtered'] * len(combined_cor1_signed_ravel_arr)
+labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr) + ['COR1'] * len(combined_cor1_signed_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
@@ -772,7 +772,7 @@ print(res)
 all_data = np.concatenate([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr) + ['COR1 median filtered'] * len(combined_cor1_ravel_arr)
+labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr) + ['COR1'] * len(combined_cor1_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
@@ -900,9 +900,9 @@ for i, row in tukey_df.iterrows():
     group_1_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group1, date_combined)).fetchone()[0]
     group_2_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group2, date_combined)).fetchone()[0]
     KLD, JSD = cur.execute("SELECT KLD, JSD FROM KLD_JSD WHERE (group_1_central_tendency_stats_cor1_id = ? AND group_2_central_tendency_stats_cor1_id = ?) OR (group_2_central_tendency_stats_cor1_id = ? AND group_1_central_tendency_stats_cor1_id = ?)", (group_1_id, group_2_id, group_1_id, group_2_id)).fetchone()
-    if group1 == 'COR1 median filtered':
+    if group1 == 'COR1':
         group1 = 'COR1'
-    if group2 == 'COR1 median filtered':
+    if group2 == 'COR1':
         group2 = 'COR1'
     cur.execute("INSERT INTO tukey_hsd_stats_cor1 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (None, group1, group2, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, reject, KLD, JSD, group_1_id, group_2_id))
     con.commit()
@@ -929,7 +929,7 @@ else:
 
 fig, ax = plt.subplots(1, 1)
 ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr], showfliers=False)
-ax.set_xticklabels(["ne", "ne_LOS", "pB", "COR1 median filtered"]) 
+ax.set_xticklabels(["ne", "ne_LOS", "pB", "COR1"]) 
 
 # Calculate the first (Q1) and third quartile (Q3)
 Q1 = np.percentile(combined_cor1_ravel_arr, 25)

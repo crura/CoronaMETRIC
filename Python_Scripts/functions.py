@@ -833,7 +833,7 @@ def determine_paths(fits_file, PSI=True):
     if data_type == 'LOS':
         data_type = 'ne_LOS'
     elif data_type == 'med':
-        data_type = 'COR1 median filtered'
+        data_type = 'COR1'
     elif data_type == 'avg':
         data_type = 'KCor l2 avg'
     elif not PSI:

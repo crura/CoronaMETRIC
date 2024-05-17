@@ -1,8 +1,8 @@
 PRO run_qraft_test, input_file_path
 
   dir = input_file_path + '/Output/fits_images'
-
-  config = JSON_PARSE('/Users/crura/Desktop/Research/Test_Space/Naty_Images_Experiments/Vadim_QRaFT_Experiments/Start_From_Scrap_2/Image-Coalignment/config.json')
+  json_config = input_file_path + '/config.json'
+  config = JSON_PARSE(json_config)
   ; cor1_data_path = string(config['cor1_data_path'])
   cor1_data_extension = string(config['cor1_data_extension'])
   cor1_pattern_search = string(config['cor1_pattern_search'])

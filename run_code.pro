@@ -14,7 +14,7 @@ pro run_code
   ; directory_list_kcor_2 = file_search(directory_search_kcor_2)
   ; directory_list_2 = [directory_list_kcor_1, directory_list_kcor_2]
   
-  config = JSON_PARSE('/Users/crura/Desktop/Research/Test_Space/Naty_Images_Experiments/Vadim_QRaFT_Experiments/Start_From_Scrap_2/Image-Coalignment/config.json')
+  config = JSON_PARSE('config.json')
   cor1_data_path = string(config['cor1_data_path'])
   cor1_data_extension = string(config['cor1_data_extension'])
   cor1_pattern_search = string(config['cor1_pattern_search'])

@@ -1,5 +1,5 @@
 {
-    "cor1_data_path": "Data/COR1",
+    "cor1_data_path": "Data/COR1_30_min_median",
     "cor1_data_extension": ".fits",
     "cor1_pattern_search": "bff",
     "cor1_pattern_middle": true,

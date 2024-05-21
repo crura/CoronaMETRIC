@@ -112,13 +112,13 @@ function compare_angles,  f_corona,  f_By, f_Bz, f_By_LOS, f_Bz_LOS, isplot=ispl
 
 
   if data_source eq 'MLSO2016' or data_source eq 'PSI_MLSO' then begin
-    By = congrid(By_2D,1024,1024)
-    Bz = congrid(Bz_2D,1024,1024)
-    By_LOS = congrid(LOS_integrated_By_2D,1024,1024)
-    Bz_LOS = congrid(LOS_integrated_Bz_2D,1024,1024)
+    By = congrid(By_2D,512,512)
+    Bz = congrid(Bz_2D,512,512)
+    By_LOS = congrid(LOS_integrated_By_2D,512,512)
+    Bz_LOS = congrid(LOS_integrated_Bz_2D,512,512)
 
-    By_rnd = randomu(seed1, 1024, 1024)
-    Bz_rnd = randomu(seed2, 1024, 1024)
+    By_rnd = randomu(seed1, 512, 512)
+    Bz_rnd = randomu(seed2, 512, 512)
 
   endif else begin
     By = congrid(By_2D,512,512)

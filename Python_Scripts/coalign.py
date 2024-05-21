@@ -46,7 +46,7 @@ ax1 = fig.add_subplot(1, 2, 1, projection=psimap)
 psimap.plot(axes=ax1,norm=matplotlib.colors.LogNorm())
 ax2 = fig.add_subplot(1, 2, 2, projection=mlsomap)
 mlsomap.plot(axes=ax2)
-plt.show()
+#plt.show()
 
 
 
@@ -76,7 +76,7 @@ mlsomap.plot(axes=ax2)
 ax2.title.set_text('MLSO K-COR Observation {}'.format(str(date_obs,'utf-8') + 'Z'))
 ax1.title.set_text('PSI/FORWARD Polarized Brightness Eclipse Model ' + params)
 plt.savefig(pathnew.parent.parent.joinpath('Data/Output/FORWARD_MLSO_Rotated_Data/Plots/Model_Comparison_{}.png'.format(params)))
-plt.show()
+#plt.show()
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -127,7 +127,7 @@ cax = divider.append_axes('right', size='5%', pad=0.35)
 f.colorbar(im2, cax=cax, orientation='vertical');
 ax1.set_title('Integrated Electron Density Original')
 ax2.set_title('Integrated Electron Density Reshaped')
-plt.show()
+#plt.show()
 plt.close()
 
 
@@ -153,7 +153,7 @@ cax = divider.append_axes('right', size='5%', pad=0.35)
 f.colorbar(im2, cax=cax, orientation='vertical');
 ax1.set_title('Central Electron Density Original')
 ax2.set_title('Central Electron Density Reshaped')
-plt.show()
+#plt.show()
 plt.close()
 
 
@@ -180,7 +180,7 @@ cax = divider.append_axes('right', size='5%', pad=0.35)
 f.colorbar(im2, cax=cax, orientation='vertical');
 ax1.set_title('Forward PB Original')
 ax2.set_title('Forward PB Reshaped')
-plt.show()
+#plt.show()
 plt.close()
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -202,7 +202,7 @@ cax = divider.append_axes('right', size='5%', pad=0.35)
 f.colorbar(im2, cax=cax, orientation='vertical');
 ax1.set_title('B_x Central Original')
 ax2.set_title('B_x Central Reshaped')
-plt.show()
+#plt.show()
 plt.close()
 
 
@@ -224,7 +224,7 @@ cax = divider.append_axes('right', size='5%', pad=0.35)
 f.colorbar(im2, cax=cax, orientation='vertical');
 ax1.set_title('B_y Central Original')
 ax2.set_title('B_y Central Reshaped')
-plt.show()
+#plt.show()
 plt.close()
 
 
@@ -246,7 +246,7 @@ cax = divider.append_axes('right', size='5%', pad=0.35)
 f.colorbar(im2, cax=cax, orientation='vertical');
 ax1.set_title('B_z Central Original')
 ax2.set_title('B_z Central Reshaped')
-plt.show()
+#plt.show()
 plt.close()
 
 
@@ -269,7 +269,7 @@ cax = divider.append_axes('right', size='5%', pad=0.35)
 f.colorbar(im2, cax=cax, orientation='vertical');
 ax1.set_title('B_x LOS Integrated Original')
 ax2.set_title('B_x LOS Integrated Reshaped')
-plt.show()
+#plt.show()
 plt.close()
 
 f = plt.figure()
@@ -290,7 +290,7 @@ cax = divider.append_axes('right', size='5%', pad=0.35)
 f.colorbar(im2, cax=cax, orientation='vertical');
 ax1.set_title('B_y LOS Integrated Original')
 ax2.set_title('B_y LOS Integrated Reshaped')
-plt.show()
+#plt.show()
 plt.close()
 
 
@@ -312,5 +312,5 @@ cax = divider.append_axes('right', size='5%', pad=0.35)
 f.colorbar(im2, cax=cax, orientation='vertical');
 ax1.set_title('B_z LOS Integrated Original')
 ax2.set_title('B_z LOS Integrated Reshaped')
-plt.show()
+#plt.show()
 plt.close()

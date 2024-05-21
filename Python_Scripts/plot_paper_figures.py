@@ -99,7 +99,7 @@ ax.legend()
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance.png'))
-# plt.show()
+# #plt.show()
 plt.close()
 print(np.min(err_forward_central_deg))
 # Generate plots for LOS arrays
@@ -142,7 +142,7 @@ plt.ylim(0,0.07)
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance_LOS.png'))
-# plt.show()
+# #plt.show()
 plt.close()
 
 
@@ -160,7 +160,7 @@ ax[0].legend()
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 # plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance.png'))
-# plt.show()
+# #plt.show()
 # plt.close()
 print(np.min(err_forward_central_deg))
 # Generate plots for LOS arrays
@@ -181,7 +181,7 @@ ax[1].set_ylim(0,0.07)
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 ax[1].legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_vs_FORWARD_Feature_Tracing_Performance_Combined.png'))
-# plt.show()
+# #plt.show()
 plt.close()
 
 from sklearn.neighbors import KernelDensity
@@ -279,7 +279,7 @@ R_SUN = head6['R_SUN']
 ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 plt.subplots_adjust(bottom=0.05, top=0.95)
 plt.savefig(os.path.join(repo_path,'Output/Plots/MLSO_Plots.png'))
-# plt.show()
+# #plt.show()
 
 
 Bz1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
@@ -376,7 +376,7 @@ R_SUN = head6['R_SUN']
 ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 plt.subplots_adjust(bottom=0.05, top=0.95)
 plt.savefig(os.path.join(repo_path,'Output/Plots/PSI_Plots.png'))
-# plt.show()
+# #plt.show()
 
 
 
@@ -568,7 +568,7 @@ def create_six_fig_plot_dens(files_z, outpath):
     #                                 wspace=0.0)
     plt.savefig(outpath)
 
-    plt.show()
+    #plt.show()
     plt.close()
 
     return fig
@@ -581,7 +581,7 @@ def create_six_fig_plot_dens(files_z, outpath):
 # X = np.concatenate((Y,x_vals))[:, np.newaxis]
 # kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(X)
 # plt.plot(kde.score_samples(X))
-# plt.show()
+# #plt.show()
 
 def create_six_fig_plot(files_z, files_y, outpath):
     file1_z, file2_z, file3_z, file4_z, file5_z, file6_z = files_z
@@ -758,7 +758,7 @@ def create_six_fig_plot(files_z, files_y, outpath):
     # fig.set_constrained_layout_pads(w_pad=1 / 102, h_pad=1 / 102, hspace=0.0,
     #                                 wspace=0.0)
     plt.savefig(outpath)
-    # plt.show()
+    # #plt.show()
     plt.close()
 
     return fig
@@ -864,7 +864,7 @@ fig.subplots_adjust(0, 0, 1, 1)
 ax.set_axis_off()
 ax.matshow(a)
 plt.subplots_adjust(bottom=0.05, top=1.25)
-# plt.show()
+# #plt.show()
 plt.close()
 
 """
@@ -1027,7 +1027,7 @@ ax5.set_ylabel('Helioprojective Latitude (Solar-Y)')
 mpl.rcParams.update(mpl.rcParamsDefault)
 plt.tight_layout()
 plt.savefig(os.path.join(repo_path,'Output/Plots/Central_B_Field_Vector_Plots.png'))
-plt.show()
+#plt.show()
 plt.close()
 """
 
@@ -1212,7 +1212,7 @@ plt.xlabel('x')
 plt.ylabel('Normal Distribution')
 
 plt.savefig("integrate_normal_distribution.png")
-plt.show()
+#plt.show()
 plt.close()
 """
 
@@ -1268,7 +1268,7 @@ def integrate_distribution(dist, x1, x2, x_min, x_max):
     plt.savefig(os.path.join(repo_path,'Output/Plots/integrate_normal_distribution.png'))
     # return res
 
-    # plt.show()
+    # #plt.show()
     plt.close()
 
     return res
@@ -1362,10 +1362,10 @@ mlsomap.plot(axes=ax6,title=False,norm=matplotlib.colors.LogNorm())
 R_SUN = head6['R_SUN']
 ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 plt.subplots_adjust(bottom=0.05, top=0.95)
-# plt.show()
+# #plt.show()
 plt.savefig(os.path.join(repo_path,'Output/Plots/Combined_Plots_1.png'))
 plt.close()
-# plt.show()
+# #plt.show()
 
 By1 = os.path.join(repo_path,'Data/MLSO/20170820_180657_kcor_l2_avg.fts')
 # By1 = os.path.join(repo_path,'Output/fits_images/6.89000_303.470_pB.fits')
@@ -1472,10 +1472,10 @@ psimap.plot(axes=ax6,title=False,norm=matplotlib.colors.LogNorm())
 R_SUN = head6['R_SUN']
 ax6.add_patch(Circle((512,512), R_SUN, color='black',zorder=100))
 plt.subplots_adjust(bottom=0.05, top=0.95)
-# plt.show()
+# #plt.show()
 plt.savefig(os.path.join(repo_path,'Output/Plots/Combined_Plots_2.png'))
 plt.close()
-# plt.show()
+# #plt.show()
 
 
 # import matplotlib as mpl
@@ -1502,7 +1502,7 @@ ax.set_axis_off()
 ax.matshow(a)
 plt.subplots_adjust(bottom=0.05, top=1.25)
 plt.savefig(os.path.join(repo_path,'Output/Plots/Combined_Plot.png'))
-# plt.show()
+# #plt.show()
 plt.close()
 
 from datetime import datetime, timedelta
@@ -1535,7 +1535,7 @@ handles, labels = ax.get_legend_handles_labels()
 lgd = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(1.04, 1))
 plt.legend(bbox_to_anchor=(1.04, 1))
 plt.savefig(os.path.join(repo_path,'Output/Plots/Ephemeris_Plot.png'),bbox_extra_artists=(lgd))
-# plt.show()
+# #plt.show()
 
 #
 # # new bandwith STUFF
@@ -1547,7 +1547,7 @@ plt.savefig(os.path.join(repo_path,'Output/Plots/Ephemeris_Plot.png'),bbox_extra
 # plt.plot(x_1,kde0_x_norm,label='scipy')
 # plt.plot(x_1, dist_values_mlso_los_norm, label='seaborne')
 # plt.legend()
-# plt.show()
+# #plt.show()
 
 
 
@@ -1612,7 +1612,7 @@ ax.legend()
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/COR1_vs_FORWARD_Feature_Tracing_Performance.png'))
-# plt.show()
+# #plt.show()
 plt.close()
 
 
@@ -1644,7 +1644,7 @@ ax[1].set_xlim(0,90)
 ax[1].set_ylim(0,0.07)
 ax[1].legend(fontsize=20)
 plt.savefig(os.path.join(repo_path,'Output/Plots/COR1_vs_FORWARD_Feature_Tracing_Performance_Combined.png'))
-# plt.show()
+# #plt.show()
 plt.close()
 
 
@@ -1853,4 +1853,4 @@ ax.legend(bbox_to_anchor=(1, 1.05), loc="upper right")
 ax.set_title('Locations of Each Observation in Dataset')
 ax.set_rlim(0, 1.3)
 plt.savefig(os.path.join(repo_path,'Output/Plots/Polar_Observations_Plot.png'))
-# plt.show()
+# #plt.show()

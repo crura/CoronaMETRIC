@@ -2,7 +2,7 @@
 ; s = '5\' & fname = file_search(dr+s+'*ne.f*') & fname_B1 = file_search(dr+s+'\*By.f*') & fname_B2 = file_search(dr+s+'*Bz.f*')
 ; qraft_test,1, fname, fname_B1, fname_B2, 110
 
-PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
+PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_save_path_1, image_save_path_2, image_save_path_3, image_save_path_4, color_flip, save=save, features=features, standard_size=standard_size, IMG_orig_p_=IMG_orig_p_
   
   if n_elements(key) eq 0 then key=1
     
@@ -20,34 +20,31 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
   endif
   
   if key eq 2 then begin
-    ; COR1
-    if n_elements(fname) eq 0 then begin
-      dir = "/Users/crura/Desktop/Research/github/Test_Suite/Image-Coalignment/QRaFT/3.0_PSI_Tests"
-      fname = dir + "/COR1/2017_09_11_rep_med.fts" 
-      fname_B1 = dir + "/__2017_09_11__COR1__PSI_By.fits"  
-      fname_B2 = dir + "/__2017_09_11__COR1__PSI_Bz.fits"
-      rho_min = 110.0
+    rho_min = 100
+  endif
+
+
+  ;-------- opening file -------------
+  ;print, 'Processed file: ', file_basename(fname)  
+  IMG_orig = readfits(fname, header, exten_no=exten_no, /silent)
+
+  if keyword_set(standard_size) then begin
+    Nx_stand = 512 & Ny_stand = 512
+    IMG_orig = congrid(IMG_orig, Nx_stand, Ny_stand)
+  endif
+    
+  if key le 1  then begin ; PSI model only
+    B1 = readfits(fname_B1, /silent) & B2 = readfits(fname_B2, /silent)
+    if keyword_set(standard_size) then begin
+      Nx_stand = 512 & Ny_stand = 512
+      B1 = congrid(B1, Nx_stand, Ny_stand)
+      B2 = congrid(B2, Nx_stand, Ny_stand)
     endif
   endif
   
-  if key eq 3 then begin
-    ; PSI ne
-    ;fname = "c:\Users\vadim\Documents\SCIENCE PROJECTS\N Arge\PSI\PSI_central_plane\__2017_08_29__COR1__PSI_ne.fits"
-    if n_elements(fname) eq 0 then begin
-      dir = "/Users/crura/Desktop/Research/github/Test_Suite/Image-Coalignment/QRaFT/3.0_PSI_Tests"
-      fname = dir + "/__2017_09_11__KCor__PSI_ne_LOS.fits"
-      fname_B1 = dir + "/__2017_09_11__KCor__PSI_By.fits"
-      fname_B2 = dir + "/__2017_09_11__KCor__PSI__PSI_Bz.fits"
-      rho_min = 220.0
-    endif
-    ;rho_min = 90.0
-  endif
-
-  ;-------- opening file -------------
-    
-  IMG_orig = readfits(fname, header, exten_no=exten_no)
+  
   sz = size(IMG_orig, /dim) & Nx = sz[0] & Ny = sz[1]
-  IMG_orig = congrid(IMG_orig, 512, 512) & IMG_orig = congrid(IMG_orig, Nx, Ny)
+  ;IMG_orig = congrid(IMG_orig, 512, 512) & IMG_orig = congrid(IMG_orig, Nx, Ny)
 
   ;-------- image processing constants ----------------
 
@@ -56,20 +53,24 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
   XYCenter = [Nx, Ny] / 2.0
   d_phi = 2*0.00872665 ;  bin aize in azimuthal coordinate
   d_rho = 2*1.0 ; 2*1.0 ;  bin size in radial coordindate
-  rot_angle = 2.5 ; 
+  rot_angle = 2.5
   phi_shift = 2.0 ;* (in units of d_phi bins) can definitely play with this
 
-  smooth_xy = 10 ;*[5,5] important, noise reduction (greate the number greater the mask code uses to redue the noise) (trade off between noise reduction and sharpness)
-  smooth_phi_rho = [5,8] ;[3,3] different bin sizes for noise reduction smoothing along phi bins and rho bins (number of bins in each directions)
-  detr_phi = 10 ;*can play arpnd with this detrended phi, detrends the image in the azimuthal direction to stabilize brightness (such as coronl hole vs active region), this parameter controls the bin size for this detrending
+  smooth_xy = 12 ;*[5,5] important, noise reduction (greate the number greater the mask code uses to redue the noise) (trade off between noise reduction and sharpness)
+  smooth_phi_rho = [3,15] ;[3,3] different bin sizes for noise reduction smoothing along phi bins and rho bins (number of bins in each directions)
+  detr_phi = 5 ;*can play arpnd with this detrended phi, detrends the image in the azimuthal direction to stabilize brightness (such as coronl hole vs active region), this parameter controls the bin size for this detrending
 
   rho_range = [rho_min, min([Nx/2, Ny/2])]/d_rho ; play with this
-  n_rho = 20 ; number of rho_min levels used for tracing, number of virtual occulting disks used to ask 
+  n_rho = 10 ; number of rho_min levels used for tracing, number of virtual occulting disks used to ask 
   
   p_range = [0.90, 0.99] ;** range of the probabilities onf which calculating percentile thresholds, important parameter
+  
   n_p = 10  ;* number of probability levels, these many sets of thresholds are applies within p_range
 
-  n_nodes_min = 10 ; minor parameter, minimum number of pixels in the features to be inlcuded in final output
+  n_nodes_min = 10
+  
+  inten_thresh = 0.3 ; minor parameter, minimum number of pixels in the features to be inlcuded in final output
+  intensity_removal_coef = inten_thresh
 
   ;-------- IMAGE PREPROCESSING -------------
 
@@ -89,7 +90,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
   IMG_d2_phi_r = abs(rot(IMG_orig,  +rot_angle,  1, XYCenter[0], XYCenter[1], /interp, /pivot) + rot(IMG_orig,  -rot_angle,  1, XYCenter[0], XYCenter[1], /interp, /pivot) - 2*IMG_orig)
   X = findgen(Nx) - XYCenter[0]
   Y = findgen(Ny) - XYCenter[1]
-  
+   
   ; -------------------------------------------
   ; 2. Main processing in polar coordinates
   ; -------------------------------------------
@@ -106,17 +107,21 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
   IMG_orig_p_ = patch_image_holes(IMG_orig_p, count=count) ; help, count
   
   ; Smoothing
-  IMG_orig_p_ = smooth(IMG_orig_p_, smooth_phi_rho)
+  IMG_orig_p_ = smooth_polar(IMG_orig_p_, smooth_phi_rho)
   
   ; 2-step 2nd order differentiation with smoothing after 1st derivative
   
-  ;IMG_d1_phi_ = shift(IMG_orig_p_, [phi_shift,0]) - IMG_orig_p_
-  ;IMG_d1_phi_ = smooth(IMG_d1_phi_, smooth_phi_rho)
+  IMG_d1_phi_ = shift(IMG_orig_p_, [phi_shift,0]) - IMG_orig_p_
+  IMG_d1_phi_ = smooth(IMG_d1_phi_, smooth_phi_rho)
   ;IMG_d2_phi_ = shift(IMG_d1_phi_, [phi_shift,0]) - IMG_d1_phi_
+  
+  
+  
+  ;IMG_d2_phi_ = IMG_d1_phi_ ;******
+  ;IMG_d2_phi_ = sobel(IMG_orig_p_)
   
   ; 2nd phi-derivative in polar coordinates
   IMG_d2_phi_ = shift(IMG_orig_p_, [phi_shift,0]) + shift(IMG_orig_p_, [-phi_shift,0]) - 2*IMG_orig_p_
-  
   
   ; absolute value:
   IMG_d2_phi_enh = abs(IMG_d2_phi_)
@@ -125,8 +130,10 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
   avr_d2_phi_ = mean(IMG_d2_phi_enh, dim=2)
   smooth_d2_phi_ = IMG_d2_phi_
   for i=0, n_elements(smooth_d2_phi_[*,0])-1 do smooth_d2_phi_[i,*] = avr_d2_phi_[i]
-  smooth_d2_phi_ = smooth(smooth_d2_phi_, [detr_phi,1])    
+  smooth_d2_phi_ = smooth_polar(smooth_d2_phi_, [detr_phi,1])    
   IMG_d2_phi_enh = abs(IMG_d2_phi_/smooth_d2_phi_)
+  
+  ;stop
 
   ; -------------------------------------------
   ; 3. Blob detection and interpolation
@@ -139,13 +146,17 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
   ; Array of min. rho levels:
 
   rho_min_arr = 1 + fix(n_elements(IMG_d2_phi_enh[0,*])*(4.0/5.0)*findgen(n_rho)/float(n_rho) )  
-  ;rho_min_arr = [1, 2, 5, 10, 15, 20, 25]
   ;rho_min_arr = [2,4,6,8,10,12,14,16,18,20,22,24,26,28,30]
 
   ; blob detection
   IMG_lbl_arr = detect_blobs(IMG_d2_phi_enh, p_arr, rho_min_arr, 5, blob_stat=blob_stat, blob_indices=blob_indices)
   
-  
+  features = blob_stat_to_features(blob_stat, d_phi, d_rho, rho_min, XYCenter, abs(IMG_orig))
+
+  ; removing short features
+  w = where(features[*].n_nodes gt n_nodes_min)
+  features = features[w]
+    
     ; TESTING SHAPES OF FEATURES IN RECTANG COORD:
     ;window,1, xsize=1000, ysize=1000 & loadct,0 & erase & image_plot_1, IMG_orig, X, Y
     ; *** IMG_d2_phi_r = abs(rot(IMG_orig,  +rot_angle,  1, XYCenter[0], XYCenter[1], /interp, /pivot) + rot(IMG_orig,  -rot_angle,  1, XYCenter[0], XYCenter[1], /interp, /pivot) - 2*IMG_orig)        
@@ -154,19 +165,6 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
     
     if key le 1  then begin ; PSI model only
       
-      B1 = readfits(fname_B1) & B2 = readfits(fname_B2)
-      
-      features = blob_stat_to_features(blob_stat, d_phi, d_rho, rho_min, XYCenter, abs(IMG_orig))
-       
-      ; removing short features
-      w = where(features[*].n_nodes gt n_nodes_min)
-      features = features[w]
-      ; do only for data
-      ; removing features with low intensity
-      intensity_removal_coef = 0.4
-      w = where(features.intensity gt intensity_removal_coef*mean(abs(IMG_orig[where(IMG_orig gt 0)])))
-
-      features = features[w]
       angle_err = features_vs_B(features, B1, B2, angle_err_avr=angle_err_avr, angle_err_sd=angle_err_sd, angle_err_signed=angle_err_signed)
 
       ;-------------------------------------
@@ -174,47 +172,61 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
       fname_save = fname+'.sav'      
       ;w = where((angle_err ne 0) and finite(angle_err) )
       ;w_ = where((angle_err_signed ne 0) and finite(angle_err_signed))            
-      save, filename = fname_save, features, angle_err, angle_err_signed, IMG_d2_phi_r, XYCenter, d_phi, d_rho, rot_angle, phi_shift, smooth_xy, smooth_phi_rho, detr_phi, rho_range, n_rho, p_range, n_p, n_nodes_min, intensity_removal_coef
+      save, filename = fname_save, features, angle_err, angle_err_signed, IMG_d2_phi_r, blob_stat, blob_indices, XYCenter, d_phi, d_rho, rot_angle, phi_shift, smooth_xy, smooth_phi_rho, detr_phi, rho_range, n_rho, p_range, n_p, n_nodes_min, intensity_removal_coef
       ;-------------------------------------
       
     endif
-   
+
+    if keyword_set(save) then begin
+      IMG_enh = IMG_d2_phi_r
+      IMG_p_enh = IMG_d2_phi_enh
+      save, filename=fname +'.sav', features , IMG_orig, IMG_enh, IMG_p_enh, header, fname
+
+    endif
   
   ; ------- GRAPHICS ---------------------------
   ;     
+  device, dec=0
   !P.charsize=1.3
   !P.noerase=1
 
   ; --------------------------------------------
   ;window, 1, xsize=3000, ysize=1200
-  window, 1, xsize=1500, ysize=600
-  loadct, 0 & erase
+  window, 2, xsize=1500, ysize=600 & erase
+  loadct, 0
+  erase
   image_plot_1, IMG_d2_phi_enh, range=[0, adapt_thresh_prob(IMG_d2_phi_enh, p=0.95)]
   setcolors
+  ; if color_flip then begin
+  ; flipcolors
+  ; endif
   for i=0, n_elements(rho_min_arr)-1 do $
     for k = 0, n_elements(p_arr)-1 do begin
     i1=blob_indices[0,k,i] & i2=blob_indices[1,k,i]
     plots, blob_stat.phi_fit[i1:i2,*], blob_stat.rho[i1:i2,*], psym=4, color=2
   endfor
+  
+  win_to_png, 2, image_save_path
   ; --------------------------------------------
-  window, 2, xsize=1200, ysize=800, xpos = 1900
+  window, 2, xsize=1200, ysize=800, xpos = 1900 & erase
   loadct, 0
   erase
   pos = getpos(2,2,xy=[0.15, 0.06], region=[0.03,0.03,0.9,0.97])
     ;image_plot_1, IMG_d2_phi_r, X, Y, pos=pos[0,0,*], range=[0, adapt_thresh_prob(IMG_d2_phi_r, p=0.97)]
-    image_plot_1, IMG_orig, X, Y, pos=pos[0,0,*], range=[0, adapt_thresh_prob(IMG_orig, p=0.95)]
+    image_plot_1, IMG_orig, X, Y, pos=pos[0,0,*], range=[0, adapt_thresh_prob(IMG_orig, p=0.95)], ctable=0
     image_plot_1, IMG_orig_p_, Xp, Yp, pos=pos[0,1,*], $
-      title='IMG_orig_p_', xtitle='phi (rad)', ytitle='rho (pix)'
+      title='IMG_orig_p_', xtitle='phi (rad)', ytitle='rho (pix)', ctable=0
     image_plot_1, abs(IMG_d2_phi_), Xp, Yp, range=[0,1]*adapt_thresh_prob(abs(IMG_d2_phi_), p_arr=0.95), pos=pos[1,0,*], $
-      title = 'abs(IMG_d2_phi_)';, xtitle='phi (rad)'
+      title = 'abs(IMG_d2_phi_)', ctable=0;, xtitle='phi (rad)'
     image_plot_1, IMG_d2_phi_enh, range = [0,1]*adapt_thresh_prob(IMG_d2_phi_enh, p=0.95), Xp, Yp, pos=pos[1,1,*], $
-      title = 'IMG_d2_phi_enh', xtitle='phi (rad)', ytitle='rho (pix)'
+      title = 'IMG_d2_phi_enh', xtitle='phi (rad)', ytitle='rho (pix)', ctable=0
           
     ;image_plot_1, IMG_d2_phi_enh_lbl, Xp, Yp, pos=pos[1,1,*], ctable=13, $
     ;  title = 'IMG_d2_phi_enh_lbl', xtitle='phi (rad)'
 
   ; --------------------------------------------
-  window, 3, xsize=1200, ysize=800, xpos = 1900
+  win_to_png, 2, image_save_path_1
+  window, 2, xsize=1200, ysize=800, xpos = 1900 & erase
   loadct, 0
   erase
   pos = getpos(3,2,xy=[0.11, 0.05], region=[0.0,0.1,0.85,0.9])
@@ -226,23 +238,44 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
         
       endfor
   ; --------------------------------------------    
+  win_to_png, 2, image_save_path_2
 
-  window, 4, xsize=1000, ysize=1000 & loadct,0 & erase
-  image_plot_1, IMG_d2_phi_r, X, Y, range=[0, adapt_thresh_prob(IMG_d2_phi_r, p=0.95)]
+  window, 2, xsize=1000, ysize=1000  & erase
+  loadct,0 , /silent
+  image_plot_1, IMG_orig, X, Y, range=[0, adapt_thresh_prob(IMG_orig, p=0.95)], ctable=0
+  setcolors
+  if color_flip then begin
+    flipcolors
+    endif
+  for i=0, n_elements(blob_stat.length)-1 do begin & l=blob_stat.length[i] & phi= d_phi*blob_stat.phi_fit[i,0:l-1] & rho= d_rho*blob_stat.rho[i,0:l-1] + rho_min & xx_r = rho*cos(phi) &  yy_r = rho*sin(phi) & plots, [xx_r, yy_r], color=2, thick=2 & endfor
+
+  window, 2, xsize=1000, ysize=1000 & erase
+  loadct,0, /silent
+  image_plot_1, IMG_d2_phi_r, X, Y, range=[0, adapt_thresh_prob(IMG_d2_phi_r, p=0.95)], ctable=0
   setcolors
   for i=0, n_elements(blob_stat.length)-1 do begin & l=blob_stat.length[i] & phi= d_phi*blob_stat.phi_fit[i,0:l-1] & rho= d_rho*blob_stat.rho[i,0:l-1] + rho_min & xx_r = rho*cos(phi) &  yy_r = rho*sin(phi) & plots, [xx_r, yy_r], color=2, thick=2 & endfor
 
 
+  mean_IMG_orig = mean(abs(IMG_orig[where(IMG_orig gt 0)]))
+  w = where(features.intensity gt inten_thresh*mean_IMG_orig) 
+  
+  for i=0, n_elements(features[w])-1 do begin & n=features[w[i]].n_nodes & xx_r = features[w[i]].xx_r[0:n-1]-XYCenter[0] & yy_r = features[w[i]].yy_r[0:n-1]-XYCenter[1] & plots, xx_r, yy_r, color=4, thick=2 & endfor
+
   ; --------------------------------------------
+  
+  win_to_png, 2, image_save_path_3
 
   ; B-field lines vs detected features; statistics of discrepancy angles:
   if key le 1 then begin ; PSI model only
     
-    window, 5, xsize=1200, ysize=600 & loadct,0 & erase
+    window, 2, xsize=600, ysize=600 & erase
     !P.noerase=0
-    !P.multi = [0,2,1]
+    !P.multi = 0
     setcolors
-    plot_B_lines, B1, B2, XYCenter=XYCenter, rho_min=rho_min
+    if color_flip then begin
+    flipcolors
+    endif
+    plot_B_lines, B1, B2, XYCenter=XYCenter, rho_min=rho_min;, title=file_basename(fname)
     oplot_features, features, XYCenter
     plots, [0], [0], psym=4, thick=2
     
@@ -251,11 +284,12 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
     
     hy = histogram(angle_err[w]*180/!Pi, nbins=100, loc=hx)/float(n_elements(w))
     hy_signed = histogram(angle_err_signed[w_]*180/!Pi, nbins=200, loc=hx_signed)/float(n_elements(w_))
-    plot, hx, hy, title = 'Mean='+str(mean(angle_err[w]*180/!Pi))+' Median='+str(median(angle_err[w]*180/!Pi)), thick=4, /xstyle, xrange=[-45,45]
-    oplot, hx_signed, hy_signed, thick=2
-    oplot, [0,0], !y.crange, lines=2
-    
-
+    ; plot, hx, hy, title = 'Mean='+str(mean(angle_err[w]*180/!Pi))+'   Median='+str(median(angle_err[w]*180/!Pi)), thick=4, /xstyle, xrange=[-45,45]
+    ; oplot, hx_signed, hy_signed, thick=2
+    ; oplot, [0,0], !y.crange, lines=2
+    win_to_png, 2, image_save_path_4
+    print, fname
+    print, 'Mean / median: '+string(mean(angle_err[w]*180/!Pi),format='(F5.1)')+' / '+string(median(angle_err[w]*180/!Pi),format='(F5.1)')
 
     !P.multi = 0
   endif
@@ -263,6 +297,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min
   ; --------------------------------------------
 
   !P.noerase=0
+  
 
   return
 

@@ -1,0 +1,11 @@
+{
+    "cor1_data_path": "Data/COR1_Original",
+    "cor1_data_extension": ".fts",
+    "cor1_pattern_search": "rep_med",
+    "cor1_pattern_middle": false,
+    "kcor_data_path": "Data/MLSO",
+    "kcor_data_extension": ".fts",
+    "kcor_pattern_search": "",
+    "kcor_pattern_middle": false
+
+}

@@ -70,7 +70,7 @@ for i, feature in enumerate(features):
     color = i * 255.0 / len(features)
     plt.plot(feature.xx_r[:feature.n_nodes], feature.yy_r[:feature.n_nodes], color=(color/255.0, 0, 0), linewidth=3)
 
-plt.show()
+#plt.show()
 plt.close()
 
 
@@ -79,7 +79,7 @@ for i, feature in enumerate(features):
     color = i * 255.0 / len(features)
     plt.plot(feature.xx_p[:feature.n_nodes], feature.yy_p[:feature.n_nodes]/idl_save['P'].RS[0], color=(color/255.0, 0, 0), linewidth=2)
 
-plt.show()
+#plt.show()
 plt.close()
 
 
@@ -137,7 +137,7 @@ def plot_features(datapath, range=None, old_win=False, title='', save=False, **k
     plt.colorbar()
     if save:
         plt.savefig(spath)
-    plt.show()
+    #plt.show()
     plt.close()
     
 #plot_features(idl_save['img_orig'], features, idl_save['P'],save=True)

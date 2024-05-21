@@ -33,3 +33,6 @@ This package, given a PSI MAS model and a coronagraph input image generates coal
 
 ## Submodules Used
 - V. Uritsky. Quasi-Radial Field-line Tracing (QRaFT v2.0): an image analysis package for reconstructing the magnetic field geometry of the open-flux solar corona, GitHub / Zenode, 2022, URL: github.com/uritsky/QRaFT,  DOI:10.5281/zenodo.7410948.
+
+## Data Used 
+- Predictive Science Inc. 2017 solar eclipse prediction raw simulation data. Data is available at [this link](https://www.predsci.com/corona/aug2017eclipse/data/eclipse2017_mhd_final.zip). Follow the instructions in ExampleCommands_FORWARD.txt to generate data cube used in this analysis. Citation: Mikić, Z., Downs, C., Linker, J.A. et al. Predicting the corona for the 21 August 2017 total solar eclipse. Nat Astron 2, 913–921 (2018). https://doi.org/10.1038/s41550-018-0562-5

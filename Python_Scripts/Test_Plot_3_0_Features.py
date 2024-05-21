@@ -1,4 +1,5 @@
 
+import json
 import os
 import shutil
 from scipy.io import readsav
@@ -35,7 +36,7 @@ from functions import display_fits_image_with_3_0_features_and_B_field
 from scipy.stats import norm
 from matplotlib import pyplot as plt
 import seaborn as sns
-from functions import calculate_KDE_statistics, determine_paths, get_files_from_pattern, calculate_KDE
+from functions import calculate_KDE_statistics, determine_paths, get_files_from_pattern, calculate_KDE, plot_histogram_with_JSD_Gaussian_Analysis, correct_fits_header
 import sqlite3
 from scipy.stats import f_oneway
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
@@ -88,6 +89,10 @@ CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_new(
     standard_deviation,
     confidence_interval, 
     n,
+    Gaussian_JSD,
+    Gaussian_KLD,
+    kurtosis,
+    skewness,
     qraft_parameters_id INTEGER,
     forward_input_data_id INTEGER,  
     FOREIGN KEY(qraft_parameters_id) REFERENCES qraft_input_variables(qraft_parameters_id),
@@ -108,6 +113,10 @@ CREATE TABLE IF NOT EXISTS central_tendency_stats_cor1_all(
     standard_deviation,
     confidence_interval, 
     n,
+    Gaussian_JSD,
+    Gaussian_KLD,
+    kurtosis,
+    skewness,
     qraft_parameters_id INTEGER,
     forward_input_data_id INTEGER,  
     FOREIGN KEY(qraft_parameters_id) REFERENCES qraft_input_variables(qraft_parameters_id),
@@ -126,7 +135,11 @@ cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_new(
             median,
             standard_deviation,
             confidence_interval,  
-            n,   
+            n,
+            Gaussian_JSD,
+            Gaussian_KLD,
+            kurtosis,
+            skewness,
             qraft_parameters_id INTEGER,  
             forward_input_data_id INTEGER,  
             FOREIGN KEY(qraft_parameters_id) REFERENCES qraft_input_variables(qraft_parameters_id),
@@ -145,7 +158,11 @@ cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_all(
             median,
             standard_deviation,
             confidence_interval,  
-            n,   
+            n,
+            Gaussian_JSD,
+            Gaussian_KLD,
+            kurtosis,
+            skewness,
             qraft_parameters_id INTEGER,  
             forward_input_data_id INTEGER,  
             FOREIGN KEY(qraft_parameters_id) REFERENCES qraft_input_variables(qraft_parameters_id),
@@ -153,15 +170,61 @@ cur.execute("""CREATE TABLE IF NOT EXISTS central_tendency_stats_kcor_all(
             unique(data_type, data_source, date, mean, median, confidence_interval, n, qraft_parameters_id, forward_input_data_id))
 """)
 
+cur.execute("DROP TABLE IF EXISTS tukey_hsd_stats_cor1")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS tukey_hsd_stats_cor1(
+    id INTEGER PRIMARY KEY, 
+    group1,
+    group2,
+    mean_diff,
+    p_adj,
+    lower_bound_ci,
+    upper_bound_ci,
+    reject boolean,
+    JSD,
+    KLD,
+    group_1_central_tendency_stats_cor1_id INTEGER,
+    group_2_central_tendency_stats_cor1_id INTEGER,
+    FOREIGN KEY(group_1_central_tendency_stats_cor1_id) REFERENCES central_tendency_stats_cor1_new(id),
+    FOREIGN KEY(group_2_central_tendency_stats_cor1_id) REFERENCES central_tendency_stats_cor1_new(id)
+)
+""")
+
+
+cur.execute("DROP TABLE IF EXISTS tukey_hsd_stats_kcor")
+
+cur.execute("""
+CREATE TABLE IF NOT EXISTS tukey_hsd_stats_kcor(
+    id INTEGER PRIMARY KEY, 
+    group1,
+    group2,
+    mean_diff,
+    p_adj,
+    lower_bound_ci,
+    upper_bound_ci,
+    reject boolean,
+    JSD,
+    KLD,
+    group_1_central_tendency_stats_kcor_id INTEGER,
+    group_2_central_tendency_stats_kcor_id INTEGER,
+    FOREIGN KEY(group_1_central_tendency_stats_kcor_id) REFERENCES central_tendency_stats_kcor_new(id),
+    FOREIGN KEY(group_2_central_tendency_stats_kcor_id) REFERENCES central_tendency_stats_kcor_new(id)
+)
+""")
+
+
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
 
-
+config_file = os.path.join(repo_path, 'config.json')
+with open(config_file) as f:
+    config = json.load(f)
 
 
 fits_path = os.path.join(repo_path, 'Output/QRaFT_Results')
-fits_input_path = os.path.join(repo_path, 'Data/COR1')
+fits_input_path = os.path.join(repo_path, config['cor1_data_path'])
 # copy all fits input files to the output directory
 source_dir = fits_input_path
 target_dir = fits_path
@@ -169,10 +232,14 @@ file_names = os.listdir(source_dir)
 for file_name in file_names:
     shutil.copy(os.path.join(source_dir, file_name), target_dir)
 
-fits_files_pB = get_files_from_pattern(fits_path, 'COR1__PSI_pB.fits')
-fits_files_ne = get_files_from_pattern(fits_path, 'COR1__PSI_ne.fits')
-fits_files_ne_LOS = get_files_from_pattern(fits_path, 'COR1__PSI_ne_LOS.fits')
-fits_files_cor1 = get_files_from_pattern(fits_path, 'rep_med.fts')
+fits_files_pB = get_files_from_pattern(fits_path, 'COR1__PSI_pB', '.fits')
+fits_files_ne = get_files_from_pattern(fits_path, 'COR1__PSI_ne', '.fits')
+fits_files_ne_LOS = get_files_from_pattern(fits_path, 'COR1__PSI_ne_LOS', '.fits')
+cor1_search_string = config['cor1_pattern_search'] + config['cor1_data_extension']
+if config['cor1_pattern_middle']:
+    fits_files_cor1 = get_files_from_pattern(fits_path, config['cor1_pattern_search'], config['cor1_data_extension'], middle=True)
+else:
+    fits_files_cor1 = get_files_from_pattern(fits_path, config['cor1_pattern_search'], config['cor1_data_extension'])
 
 combined_pB = []
 combined_ne = []
@@ -190,29 +257,36 @@ for i in range(len(fits_files_pB)):
     file_pB = fits_files_pB[i]
     data_source, date, data_type = determine_paths(file_pB)
     angles_signed_arr_finite_pB, angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, standard_dev_pB, confidence_interval_pB, n_pB, foreign_key_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type, data_source=data_source, date=date)
+    JSD_pB, KLD_pB, kurtosis_pB, skewness_pB = plot_histogram_with_JSD_Gaussian_Analysis(angles_signed_arr_finite_pB, data_type, data_source, date)
     head_pB = fits.getheader(file_pB)
     forward_input_data_id_pB = head_pB['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, standard_dev_pB, confidence_interval_pB, n_pB, foreign_key_pB, forward_input_data_id_pB))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, standard_dev_pB, confidence_interval_pB,
+                          n_pB, JSD_pB, KLD_pB, kurtosis_pB, skewness_pB, foreign_key_pB, forward_input_data_id_pB))
 
     file_ne = fits_files_ne[i]
     data_source, date, data_type = determine_paths(file_ne)
     angles_signed_arr_finite_ne, angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, standard_dev_ne, confidence_interval_ne, n_ne, foreign_key_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type, data_source=data_source, date=date)
+    JSD_ne, KLD_ne, kurtosis_ne, skewness_ne = plot_histogram_with_JSD_Gaussian_Analysis(angles_signed_arr_finite_ne, data_type, data_source, date)
     head_ne = fits.getheader(file_ne)
     forward_input_data_id_ne = head_ne['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, standard_dev_ne, confidence_interval_ne, n_ne, foreign_key_ne, forward_input_data_id_ne))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, standard_dev_ne, confidence_interval_ne,
+                          n_ne, JSD_ne, KLD_ne, kurtosis_ne, skewness_ne, foreign_key_ne, forward_input_data_id_ne))
 
     file_ne_LOS = fits_files_ne_LOS[i]
     data_source, date, data_type = determine_paths(file_ne_LOS)
     angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, standard_dev_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type, data_source=data_source, date=date)
+    JSD_ne_LOS, KLD_ne_LOS, kurtosis_ne_LOS, skewness_ne_LOS = plot_histogram_with_JSD_Gaussian_Analysis(angles_signed_arr_finite_ne_LOS, data_type, data_source, date)
     head_ne_LOS = fits.getheader(file_ne_LOS)
     forward_input_data_id_ne_LOS = head_ne_LOS['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, standard_dev_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS, forward_input_data_id_ne_LOS))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, standard_dev_ne_LOS, confidence_interval_ne_LOS,
+                          n_ne_LOS, JSD_ne_LOS, KLD_ne_LOS, kurtosis_ne_LOS, skewness_ne_LOS, foreign_key_ne_LOS, forward_input_data_id_ne_LOS))
 
     file_cor1 = fits_files_cor1[i]
     head_cor1 = fits.getheader(file_cor1)
     # search fits headers of all files in directory for header that matches head
     for file in fits_files_pB:
-        head = fits.getheader(file)
+        head = correct_fits_header(file)
+        # head = fits.getheader(file)
         if head['date-obs'] == head_cor1['date-obs']:
             corresponding_file_pB = file
             corresponding_file_By = file.replace('pB', 'By')
@@ -220,19 +294,30 @@ for i in range(len(fits_files_pB)):
             break
     data_source, date, data_type = determine_paths(file_cor1, PSI=False)
     angles_signed_arr_finite_cor1, angles_arr_finite_cor1, angles_arr_mean_cor1, angles_arr_median_cor1, standard_dev_cor1, confidence_interval_cor1, n_cor1, foreign_key_cor1 = display_fits_image_with_3_0_features_and_B_field(file_cor1, file_cor1+'.sav', data_type=data_type, data_source=data_source, date=date, PSI=False, corresponding_By_file=corresponding_file_By, corresponding_Bz_file=corresponding_file_Bz)
-
+    JSD_cor1, KLD_cor1, kurtosis_cor1, skewness_cor1 = plot_histogram_with_JSD_Gaussian_Analysis(angles_signed_arr_finite_cor1, data_type, data_source, date)
     forward_input_data_id_cor1 = head_cor1['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_cor1, angles_arr_median_cor1, standard_dev_cor1, confidence_interval_cor1, n_cor1, foreign_key_cor1, forward_input_data_id_cor1))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_cor1, angles_arr_median_cor1, standard_dev_cor1, confidence_interval_cor1,
+                          n_cor1, JSD_cor1, KLD_cor1, kurtosis_cor1, skewness_cor1, foreign_key_cor1, forward_input_data_id_cor1))
 
-    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
-    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
+
+
+    # Combine data into a single array
+    all_data = np.concatenate([angles_arr_finite_ne, angles_arr_finite_ne_LOS, angles_arr_finite_pB, angles_arr_finite_cor1])
+
+    # Create labels for the data types
+    labels = ['ne'] * len(angles_arr_finite_ne) + ['ne_LOS'] * len(angles_arr_finite_ne_LOS) + ['pB'] * len(angles_arr_finite_pB) + ['COR1'] * len(angles_arr_finite_cor1)
+
+    # Perform Tukey's HSD post-hoc test
+    tukey_result = pairwise_tukeyhsd(all_data, labels)
 
     # retrieve probability density data from seaborne distplots
     x_dist_values_pB = sns.distplot(angles_signed_arr_finite_pB).get_lines()[0].get_data()[0]
     xmin_pB = x_dist_values_pB.min()
     xmax_pB = x_dist_values_pB.max()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
     kde0_pB = gaussian_kde(angles_signed_arr_finite_pB)
@@ -243,7 +328,7 @@ for i in range(len(fits_files_pB)):
     x_dist_values_ne = sns.distplot(angles_signed_arr_finite_ne).get_lines()[0].get_data()[0]
     xmin_ne = x_dist_values_ne.min()
     xmax_ne = x_dist_values_ne.max()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
     kde0_ne = gaussian_kde(angles_signed_arr_finite_ne)
@@ -256,7 +341,143 @@ for i in range(len(fits_files_pB)):
     x_dist_values_ne_LOS = sns.distplot(angles_signed_arr_finite_ne_LOS).get_lines()[0].get_data()[0]
     xmin_ne_LOS = x_dist_values_ne_LOS.min()
     xmax_ne_LOS = x_dist_values_ne_LOS.max()
-    # plt.show()
+    # #plt.show()
+    plt.close()
+
+    kde0_ne_LOS = gaussian_kde(angles_signed_arr_finite_ne_LOS)
+    x_1_ne_LOS = np.linspace(xmin_ne_LOS, xmax_ne_LOS, 200)
+    kde0_x_ne_LOS = kde0_ne_LOS(x_1_ne_LOS)
+
+    x_dist_values_cor1 = sns.distplot(angles_signed_arr_finite_cor1).get_lines()[0].get_data()[0]
+    xmin_cor1 = x_dist_values_cor1.min()
+    xmax_cor1 = x_dist_values_cor1.max()
+
+
+    kde0_cor1 = gaussian_kde(angles_signed_arr_finite_cor1)
+    x_1_cor1 = np.linspace(xmin_cor1, xmax_cor1, 200)
+    kde0_x_cor1 = kde0_cor1(x_1_cor1)
+
+    # plt.plot(x_1_ne_LOS, kde0_x_ne_LOS, color='g', label='ne LOS KDE')
+    # plt.plot(x_1_ne, kde0_x_ne, color='b', label='ne KDE')
+    # plt.plot(x_1_pB, kde0_x_pB, color='r', label='pB KDE')
+    # plt.legend()
+    # # #plt.show()
+    plt.close()
+
+
+    #compute JS Divergence
+
+    data_source_pB, date_pB, data_type_pB = determine_paths(file_pB)
+    data_source_ne, date_ne, data_type_ne = determine_paths(file_ne)
+    data_source_ne_LOS, date_ne_LOS, data_type_ne_LOS = determine_paths(file_ne_LOS)
+    data_source_cor1, date_cor1, data_type_cor1 = determine_paths(file_cor1, PSI=False)
+
+    cur.execute("DROP TABLE IF EXISTS KLD_JSD")
+    cur.execute("""CREATE TABLE KLD_JSD (
+            KLD_JSD_id INTEGER PRIMARY KEY,
+            KLD,
+            JSD,
+            group_1_central_tendency_stats_cor1_id INTEGER,
+            group_2_central_tendency_stats_cor1_id INTEGER,
+            FOREIGN KEY(group_1_central_tendency_stats_cor1_id) REFERENCES central_tendency_stats_cor1_new(id),
+            FOREIGN KEY(group_2_central_tendency_stats_cor1_id) REFERENCES central_tendency_stats_cor1_new(id)
+            )
+            """
+            )
+
+
+    JSD_cor1_psi_pB_ne, KLD_cor1_psi_pB_ne = calculate_KDE_statistics(kde0_x_pB, kde0_x_ne)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_ne)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_pB)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_ne, JSD_cor1_psi_pB_ne, matching_id1, matching_id2))
+    con.commit()
+    
+    JSD_cor1_psi_pB_ne_LOS, KLD_cor1_psi_pB_ne_LOS = calculate_KDE_statistics(kde0_x_pB, kde0_x_ne_LOS)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_pB)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_ne_LOS)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_ne_LOS, JSD_cor1_psi_pB_ne_LOS, matching_id1, matching_id2))
+    con.commit()
+
+    JSD_cor1_psi_ne_ne_LOS, KLD_cor1_psi_ne_ne_LOS = calculate_KDE_statistics(kde0_x_ne, kde0_x_ne_LOS)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_ne)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_ne_LOS)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_ne_ne_LOS, JSD_cor1_psi_ne_ne_LOS, matching_id1, matching_id2))
+    con.commit()
+    
+    JSD_cor1_ne_cor1, KLD_cor1_ne_cor1 = calculate_KDE_statistics(kde0_x_ne, kde0_x_cor1)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_ne)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_cor1)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_ne_cor1, JSD_cor1_ne_cor1, matching_id1, matching_id2))
+    con.commit()
+
+    JSD_cor1_ne_LOS_cor1, KLD_cor1_ne_LOS_cor1 = calculate_KDE_statistics(kde0_x_ne_LOS, kde0_x_cor1)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_ne_LOS)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_cor1)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_ne_LOS_cor1, JSD_cor1_ne_LOS_cor1, matching_id1, matching_id2))
+    con.commit()
+
+    JSD_cor1_psi_pB_cor1, KLD_cor1_psi_pB_cor1 = calculate_KDE_statistics(kde0_x_pB, kde0_x_cor1)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_pB)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_cor1)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_cor1, JSD_cor1_psi_pB_cor1, matching_id1, matching_id2))
+    con.commit()
+
+    # Convert SimpleTable to DataFrame
+    tukey_df = pd.DataFrame(tukey_result.summary().data[1:], columns=tukey_result.summary().data[0])
+
+    for i, row in tukey_df.iterrows():
+        group1 = row['group1']
+        if group1 == 'COR1':
+            group1 = 'COR1'
+        group2 = row['group2']
+        if group2 == 'COR1':
+            group2 = 'COR1'
+        mean_diff = row['meandiff']
+        p_adj = row['p-adj']
+        lower_bound_ci = row['lower']
+        upper_bound_ci = row['upper']
+        reject = row['reject']
+        group1 = row['group1']
+        group2 = row['group2']
+        group_1_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group1, date)).fetchone()[0]
+        group_2_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group2, date)).fetchone()[0]
+        KLD, JSD = cur.execute("SELECT KLD, JSD FROM KLD_JSD WHERE (group_1_central_tendency_stats_cor1_id = ? AND group_2_central_tendency_stats_cor1_id = ?) OR (group_2_central_tendency_stats_cor1_id = ? AND group_1_central_tendency_stats_cor1_id = ?)", (group_1_id, group_2_id, group_1_id, group_2_id)).fetchone()
+        if group1 == 'COR1':
+            group1 = 'COR1'
+        if group2 == 'COR1':
+            group2 = 'COR1'
+        cur.execute("INSERT INTO tukey_hsd_stats_cor1 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (None, group1, group2, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, reject, KLD, JSD, group_1_id, group_2_id))
+        con.commit()
+
+    # retrieve probability density data from seaborne distplots
+    x_dist_values_pB = sns.distplot(angles_signed_arr_finite_pB).get_lines()[0].get_data()[0]
+    xmin_pB = x_dist_values_pB.min()
+    xmax_pB = x_dist_values_pB.max()
+    # #plt.show()
+    plt.close()
+
+    kde0_pB = gaussian_kde(angles_signed_arr_finite_pB)
+    x_1_pB = np.linspace(xmin_pB, xmax_pB, 200)
+    kde0_x_pB = kde0_pB(x_1_pB)
+
+    # retrieve probability density data from seaborne distplots
+    x_dist_values_ne = sns.distplot(angles_signed_arr_finite_ne).get_lines()[0].get_data()[0]
+    xmin_ne = x_dist_values_ne.min()
+    xmax_ne = x_dist_values_ne.max()
+    # #plt.show()
+    plt.close()
+
+    kde0_ne = gaussian_kde(angles_signed_arr_finite_ne)
+    x_1_ne = np.linspace(xmin_ne, xmax_ne, 200)
+    kde0_x_ne = kde0_ne(x_1_ne)
+
+
+
+    # retrieve probability density data from seaborne distplots
+    x_dist_values_ne_LOS = sns.distplot(angles_signed_arr_finite_ne_LOS).get_lines()[0].get_data()[0]
+    xmin_ne_LOS = x_dist_values_ne_LOS.min()
+    xmax_ne_LOS = x_dist_values_ne_LOS.max()
+    # #plt.show()
     plt.close()
 
     kde0_ne_LOS = gaussian_kde(angles_signed_arr_finite_ne_LOS)
@@ -267,7 +488,7 @@ for i in range(len(fits_files_pB)):
     plt.plot(x_1_ne, kde0_x_ne, color='b', label='ne KDE')
     plt.plot(x_1_pB, kde0_x_pB, color='r', label='pB KDE')
     plt.legend()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -319,6 +540,16 @@ combined_ne_ravel = [item for sublist in combined_ne for item in sublist]
 combined_ne_LOS_ravel = [item for sublist in combined_ne_LOS for item in sublist]
 combined_cor1_ravel = [item for sublist in combined_cor1 for item in sublist]
 
+combined_pB_signed_ravel = [item for sublist in combined_pB_signed for item in sublist]
+combined_ne_signed_ravel = [item for sublist in combined_ne_signed for item in sublist]
+combined_ne_signed_LOS_ravel = [item for sublist in combined_ne_signed_LOS for item in sublist]
+combined_cor1_signed_ravel = [item for sublist in combined_cor1_signed for item in sublist]
+
+combined_pB_signed_ravel_arr = np.array(combined_pB_signed_ravel)
+combined_ne_signed_ravel_arr = np.array(combined_ne_signed_ravel)
+combined_ne_signed_LOS_ravel_arr = np.array(combined_ne_signed_LOS_ravel)
+combined_cor1_signed_ravel_arr = np.array(combined_cor1_signed_ravel)
+
 combined_pB_ravel_arr = np.array(combined_pB_ravel)
 angles_arr_mean_pB_combined = np.round(np.mean(combined_pB_ravel_arr), 5)
 angles_arr_median_pB_combined = np.round(np.median(combined_pB_ravel_arr), 5)
@@ -328,7 +559,9 @@ confidence_interval_pB_combined = np.round(1.96 * (std_pB_combined / np.sqrt(len
 data_type_pB_combined = 'pB'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, std_pB_combined, confidence_interval_pB_combined, n_pB_combined, foreign_key_pB, ''))
+JSD_pB_combined, KLD_pB_combined, kurtosis_pB_combined, skewness_pB_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_pB_signed_ravel_arr, data_type_pB_combined, data_source, date_combined)
+data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, std_pB_combined, confidence_interval_pB_combined, 
+                              n_pB_combined, JSD_pB_combined, KLD_pB_combined, kurtosis_pB_combined, skewness_pB_combined, foreign_key_pB, ''))
 
 combined_ne_ravel_arr = np.array(combined_ne_ravel)
 angles_arr_mean_ne_combined = np.round(np.mean(combined_ne_ravel_arr), 5)
@@ -339,7 +572,9 @@ confidence_interval_ne_combined = np.round(1.96 * (std_ne_combined / np.sqrt(len
 data_type_ne_combined = 'ne'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, std_ne_combined, confidence_interval_ne_combined, n_ne_combined, foreign_key_ne, ''))
+JSD_ne_combined, KLD_ne_combined, kurtosis_ne_combined, skewness_ne_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_ne_signed_ravel_arr, data_type_pB_combined, data_source, date_combined)
+data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, std_ne_combined, confidence_interval_ne_combined,
+                               n_ne_combined, JSD_ne_combined, KLD_ne_combined, kurtosis_ne_combined, skewness_ne_combined, foreign_key_ne, ''))
 
 combined_ne_LOS_ravel_arr = np.array(combined_ne_LOS_ravel)
 angles_arr_mean_ne_LOS_combined = np.round(np.mean(combined_ne_LOS_ravel_arr), 5)
@@ -350,7 +585,9 @@ confidence_interval_ne_LOS_combined = np.round(1.96 * (std_ne_LOS_combined / np.
 data_type_ne_LOS_combined = 'ne_LOS'
 date_combined = 'combined'
 data_source = 'COR1_PSI'
-data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, std_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_ne_LOS, ''))
+JSD_ne_LOS_combined, KLD_ne_LOS_combined, kurtosis_ne_LOS_combined, skewness_ne_LOS_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_ne_signed_LOS_ravel_arr, data_type_pB_combined, data_source, date_combined)
+data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, std_ne_LOS_combined, confidence_interval_ne_LOS_combined,
+                               n_ne_LOS_combined, JSD_ne_LOS_combined, KLD_ne_LOS_combined, kurtosis_ne_LOS_combined, skewness_ne_LOS_combined, foreign_key_ne_LOS, ''))
 
 combined_cor1_ravel_arr = np.array(combined_cor1_ravel)
 angles_arr_mean_cor1_combined = np.round(np.mean(combined_cor1_ravel_arr), 5)
@@ -358,27 +595,21 @@ angles_arr_median_cor1_combined = np.round(np.median(combined_cor1_ravel_arr), 5
 n_cor1_combined = len(combined_cor1_ravel_arr)
 std_cor1_combined = np.round(np.std(abs(combined_cor1_ravel_arr)),5)
 confidence_interval_cor1_combined = np.round(1.96 * (std_cor1_combined / np.sqrt(len(combined_cor1_ravel_arr))),5)
-data_type_cor1_combined = 'COR1 median filtered'
+data_type_cor1_combined = 'COR1'
 date_combined = 'combined'
 data_source = 'COR1'
-data_stats_2_combined.append((None, data_type_cor1_combined, data_source, date_combined, angles_arr_mean_cor1_combined, angles_arr_median_cor1_combined, std_cor1_combined, confidence_interval_cor1_combined, n_cor1_combined, foreign_key_cor1, ''))
+JSD_cor1_combined, KLD_cor1_combined, kurtosis_cor1_combined, skewness_cor1_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_cor1_signed_ravel_arr, data_type_pB_combined, data_source, date_combined)
+data_stats_2_combined.append((None, data_type_cor1_combined, data_source, date_combined, angles_arr_mean_cor1_combined, angles_arr_median_cor1_combined, std_cor1_combined, confidence_interval_cor1_combined,
+                               n_cor1_combined, JSD_cor1_combined, KLD_cor1_combined, kurtosis_cor1_combined, skewness_cor1_combined, foreign_key_cor1, ''))
 
 
 
-cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
-cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
 
 
-combined_pB_signed_ravel = [item for sublist in combined_pB_signed for item in sublist]
-combined_ne_signed_ravel = [item for sublist in combined_ne_signed for item in sublist]
-combined_ne_signed_LOS_ravel = [item for sublist in combined_ne_signed_LOS for item in sublist]
-combined_cor1_signed_ravel = [item for sublist in combined_cor1_signed for item in sublist]
 
-combined_pB_signed_ravel_arr = np.array(combined_pB_signed_ravel)
-combined_ne_signed_ravel_arr = np.array(combined_ne_signed_ravel)
-combined_ne_signed_LOS_ravel_arr = np.array(combined_ne_signed_LOS_ravel)
-combined_cor1_signed_ravel_arr = np.array(combined_cor1_signed_ravel)
 
 print(combined_ne_signed_ravel_arr)
 
@@ -406,7 +637,7 @@ ax = fig.subplots(1,1)
 sns.histplot(combined_ne_signed_ravel_arr,kde=True,label='ne',bins=30,ax=ax,color='tab:blue')
 sns.histplot(combined_pB_signed_ravel,kde=True,label='pB',bins=30,ax=ax,color='tab:orange')
 sns.histplot(combined_ne_signed_LOS_ravel,kde=True, bins=30, label='ne_LOS',ax=ax, color='tab:green')
-sns.histplot(combined_cor1_signed_ravel, kde=True, bins=30, label='COR1 median filtered',ax=ax, color='tab:red')
+sns.histplot(combined_cor1_signed_ravel, kde=True, bins=30, label='COR1',ax=ax, color='tab:red')
 #x_axis = np.linspace(-90, 90, len(KDE_cor1_central_deg_new))
 
 
@@ -425,14 +656,14 @@ detector = 'COR1_PSI'
 ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
 ax.set_xlim(-95,95)
 #ax.set_ylim(0,0.07)
-ax.set_yscale('log')
+# ax.set_yscale('log')
 ax.legend(fontsize=13)
 
 # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
-# plt.show()
+# #plt.show()
 #plt.close()
 
 x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new = calculate_KDE(combined_pB_signed_ravel_arr)
@@ -456,12 +687,12 @@ ax.set_xlabel('Angle Discrepancy (Degrees)')
 ax.set_ylabel('Probability Density')
 ax.text(25,0.008,"average discrepancy: " + str(np.round(np.average(combined_pB_signed_ravel_arr),5)))
 ax.text(25,0.007,"standard deviation: " + str(np.round(np.std(abs(combined_pB_signed_ravel_arr)),5)))
-ax.text(25,0.006,"JSD: " + str(np.round(JSD_pB_gaussain,5)))
+ax.text(25,0.006,"Gaussian JSD: " + str(np.round(JSD_pB_gaussain,5)))
 # ax.set_yscale('log')
 ax.set_title('PSI/FORWARD pB Angle Discrepancy Probability Density vs Corresponding Gaussian Fit')
 ax.legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/Test_Comparison_Fig.png'))
-plt.show()
+#plt.show()
 
 query = "SELECT mean, median, date, data_type, data_source, n, confidence_interval FROM central_tendency_stats_cor1_new WHERE date!='combined' ORDER BY mean ASC;"
 cur.execute(query)
@@ -504,7 +735,7 @@ for i, date in enumerate(dates):
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
-plt.ylabel('Mean Value (Degrees)')
+plt.ylabel('Mean Angle Discrepancy (Degrees)')
 plt.title('PSI COR-1 Projection Angle Discrepancy by Date')
 plt.legend()
 plt.ylim(0,20)
@@ -512,13 +743,13 @@ plt.ylim(0,20)
 # Set x-axis ticks and labels
 plt.xticks(range(len(dates)), dates)
 plt.savefig(os.path.join(repo_path, 'Output/Plots', '{}_Angle_Discrepancy_By_Date.png'.format(data_type)))
-plt.show()
+#plt.show()
 
 # Combine data into a single array
 all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_cor1_signed_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr) + ['COR1 median filtered'] * len(combined_cor1_signed_ravel_arr)
+labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr) + ['COR1'] * len(combined_cor1_signed_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
@@ -541,10 +772,142 @@ print(res)
 all_data = np.concatenate([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr) + ['COR1 median filtered'] * len(combined_cor1_ravel_arr)
+labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr) + ['COR1'] * len(combined_cor1_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
+
+# retrieve probability density data from seaborne distplots
+x_dist_values_pB = sns.distplot(combined_pB_ravel_arr).get_lines()[0].get_data()[0]
+xmin_pB = x_dist_values_pB.min()
+xmax_pB = x_dist_values_pB.max()
+# #plt.show()
+plt.close()
+
+kde0_pB = gaussian_kde(combined_pB_ravel_arr)
+x_1_pB = np.linspace(xmin_pB, xmax_pB, 200)
+kde0_x_pB = kde0_pB(x_1_pB)
+
+# retrieve probability density data from seaborne distplots
+x_dist_values_ne = sns.distplot(combined_ne_signed_ravel_arr).get_lines()[0].get_data()[0]
+xmin_ne = x_dist_values_ne.min()
+xmax_ne = x_dist_values_ne.max()
+# #plt.show()
+plt.close()
+
+kde0_ne = gaussian_kde(angles_signed_arr_finite_ne)
+x_1_ne = np.linspace(xmin_ne, xmax_ne, 200)
+kde0_x_ne = kde0_ne(x_1_ne)
+
+
+
+# retrieve probability density data from seaborne distplots
+x_dist_values_ne_LOS = sns.distplot(combined_ne_LOS_ravel_arr).get_lines()[0].get_data()[0]
+xmin_ne_LOS = x_dist_values_ne_LOS.min()
+xmax_ne_LOS = x_dist_values_ne_LOS.max()
+# #plt.show()
+plt.close()
+
+kde0_ne_LOS = gaussian_kde(combined_ne_LOS_ravel_arr)
+x_1_ne_LOS = np.linspace(xmin_ne_LOS, xmax_ne_LOS, 200)
+kde0_x_ne_LOS = kde0_ne_LOS(x_1_ne_LOS)
+
+x_dist_values_cor1 = sns.distplot(combined_cor1_ravel_arr).get_lines()[0].get_data()[0]
+xmin_cor1 = x_dist_values_cor1.min()
+xmax_cor1 = x_dist_values_cor1.max()
+
+
+kde0_cor1 = gaussian_kde(combined_cor1_ravel_arr)
+x_1_cor1 = np.linspace(xmin_cor1, xmax_cor1, 200)
+kde0_x_cor1 = kde0_cor1(x_1_cor1)
+
+# plt.plot(x_1_ne_LOS, kde0_x_ne_LOS, color='g', label='ne LOS KDE')
+# plt.plot(x_1_ne, kde0_x_ne, color='b', label='ne KDE')
+# plt.plot(x_1_pB, kde0_x_pB, color='r', label='pB KDE')
+# plt.legend()
+# # #plt.show()
+plt.close()
+
+
+#compute JS Divergence
+
+data_source_pB, date_pB, data_type_pB = determine_paths(file_pB)
+data_source_ne, date_ne, data_type_ne = determine_paths(file_ne)
+data_source_ne_LOS, date_ne_LOS, data_type_ne_LOS = determine_paths(file_ne_LOS)
+data_source_cor1, date_cor1, data_type_cor1 = determine_paths(file_cor1, PSI=False)
+
+cur.execute("DROP TABLE IF EXISTS KLD_JSD")
+cur.execute("""CREATE TABLE KLD_JSD (
+        KLD_JSD_id INTEGER PRIMARY KEY,
+        KLD,
+        JSD,
+        group_1_central_tendency_stats_cor1_id INTEGER,
+        group_2_central_tendency_stats_cor1_id INTEGER,
+        FOREIGN KEY(group_1_central_tendency_stats_cor1_id) REFERENCES central_tendency_stats_cor1_new(id),
+        FOREIGN KEY(group_2_central_tendency_stats_cor1_id) REFERENCES central_tendency_stats_cor1_new(id)
+        )
+        """
+        )
+
+JSD_cor1_psi_pB_ne, KLD_cor1_psi_pB_ne = calculate_KDE_statistics(kde0_x_pB, kde0_x_ne)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_ne, JSD_cor1_psi_pB_ne, matching_id1, matching_id2))
+con.commit()
+
+JSD_cor1_psi_pB_ne_LOS, KLD_cor1_psi_pB_ne_LOS = calculate_KDE_statistics(kde0_x_pB, kde0_x_ne_LOS)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_ne_LOS, JSD_cor1_psi_pB_ne_LOS, matching_id1, matching_id2))
+con.commit()
+
+JSD_cor1_psi_ne_ne_LOS, KLD_cor1_psi_ne_ne_LOS = calculate_KDE_statistics(kde0_x_ne, kde0_x_ne_LOS)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_ne_ne_LOS, JSD_cor1_psi_ne_ne_LOS, matching_id1, matching_id2))
+con.commit()
+
+JSD_cor1_ne_cor1, KLD_cor1_ne_cor1 = calculate_KDE_statistics(kde0_x_ne, kde0_x_cor1)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_ne_cor1, JSD_cor1_ne_cor1, matching_id1, matching_id2))
+con.commit()
+
+JSD_cor1_ne_LOS_cor1, KLD_cor1_ne_LOS_cor1 = calculate_KDE_statistics(kde0_x_ne_LOS, kde0_x_cor1)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_ne_LOS_cor1, JSD_cor1_ne_LOS_cor1, matching_id1, matching_id2))
+con.commit()
+
+JSD_cor1_psi_pB_cor1, KLD_cor1_psi_pB_cor1 = calculate_KDE_statistics(kde0_x_pB, kde0_x_cor1)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_cor1, JSD_cor1_psi_pB_cor1, matching_id1, matching_id2))
+con.commit()
+
+
+# Convert SimpleTable to DataFrame
+tukey_df = pd.DataFrame(tukey_result.summary().data[1:], columns=tukey_result.summary().data[0])
+
+for i, row in tukey_df.iterrows():
+    group1 = row['group1']
+    group2 = row['group2']
+    mean_diff = row['meandiff']
+    p_adj = row['p-adj']
+    lower_bound_ci = row['lower']
+    upper_bound_ci = row['upper']
+    reject = row['reject']
+    group_1_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group1, date_combined)).fetchone()[0]
+    group_2_id = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (group2, date_combined)).fetchone()[0]
+    KLD, JSD = cur.execute("SELECT KLD, JSD FROM KLD_JSD WHERE (group_1_central_tendency_stats_cor1_id = ? AND group_2_central_tendency_stats_cor1_id = ?) OR (group_2_central_tendency_stats_cor1_id = ? AND group_1_central_tendency_stats_cor1_id = ?)", (group_1_id, group_2_id, group_1_id, group_2_id)).fetchone()
+    if group1 == 'COR1':
+        group1 = 'COR1'
+    if group2 == 'COR1':
+        group2 = 'COR1'
+    cur.execute("INSERT INTO tukey_hsd_stats_cor1 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (None, group1, group2, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, reject, KLD, JSD, group_1_id, group_2_id))
+    con.commit()
+
+
 print(tukey_result)
 fig, ax = plt.subplots(1, 1)
 # ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr], showfliers=False)
@@ -554,7 +917,7 @@ ax.set_ylabel("Data Type")
 ax.set_title('HSD Comparison of Data Types for PSI_COR1 Combined Results')
 tukey_result.plot_simultaneous(xlabel='Mean (Degrees)', ax=ax)
 plt.savefig(os.path.join(repo_path,'Output/Plots/testfig1.png'))
-plt.show()
+#plt.show()
 
 f_statistic, p_value = f_oneway(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr)
 # Check for statistical significance
@@ -566,20 +929,35 @@ else:
 
 fig, ax = plt.subplots(1, 1)
 ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr], showfliers=False)
-ax.set_xticklabels(["ne", "ne_LOS", "pB", "COR1 median filtered"]) 
-ax.set_ylim(0, 40)
-ax.set_ylabel("Mean (Degrees)") 
+ax.set_xticklabels(["ne", "ne_LOS", "pB", "COR1"]) 
+
+# Calculate the first (Q1) and third quartile (Q3)
+Q1 = np.percentile(combined_cor1_ravel_arr, 25)
+Q3 = np.percentile(combined_cor1_ravel_arr, 75)
+
+# Calculate the interquartile range (IQR)
+IQR = Q3 - Q1
+
+# Calculate the upper tail limit
+upper_tail_limit = Q3 + 1.5 * IQR
+
+# Find the maximum value within the upper tail limit
+max_upper_tail = max(x for x in combined_cor1_ravel_arr if x <= upper_tail_limit)
+
+upper_quartile_cor1 = np.percentile(combined_cor1_ravel_arr, 75)
+ax.set_ylim(0, max_upper_tail + 10)
+ax.set_ylabel("Mean Angle Discrepancy (Degrees)") 
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.png'))
-plt.show()
+#plt.show()
 
 res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr)
 print(res)
 
 
 fits_path = os.path.join(repo_path, 'Output/QRaFT_Results')
-fits_input_path = os.path.join(repo_path, 'Data/MLSO')
+fits_input_path = os.path.join(repo_path, config['kcor_data_path'])
 # copy all fits input files to the output directory
 source_dir = fits_input_path
 target_dir = fits_path
@@ -587,10 +965,13 @@ file_names = os.listdir(source_dir)
 for file_name in file_names:
     shutil.copy(os.path.join(source_dir, file_name), target_dir)
 
-fits_files_pB = get_files_from_pattern(fits_path, 'KCor__PSI_pB.fits')
-fits_files_ne = get_files_from_pattern(fits_path, 'KCor__PSI_ne.fits')
-fits_files_ne_LOS = get_files_from_pattern(fits_path, 'KCor__PSI_ne_LOS.fits')
-fits_files_kcor = get_files_from_pattern(fits_path, 'kcor_l2_avg.fts')
+fits_files_pB = get_files_from_pattern(fits_path, 'KCor__PSI_pB', '.fits')
+fits_files_ne = get_files_from_pattern(fits_path, 'KCor__PSI_ne', '.fits')
+fits_files_ne_LOS = get_files_from_pattern(fits_path, 'KCor__PSI_ne_LOS', '.fits')
+if config['kcor_pattern_middle']:
+    fits_files_kcor = get_files_from_pattern(fits_path, 'kcor_l2_avg', '.fts', middle=True)
+else:
+    fits_files_kcor = get_files_from_pattern(fits_path, 'kcor_l2_avg', '.fts')
 
 combined_pB = []
 combined_ne = []
@@ -610,27 +991,34 @@ for i in range(len(fits_files_pB)):
     angles_signed_arr_finite_pB, angles_arr_finite_pB, angles_arr_mean_pB, angles_arr_median_pB, standard_dev_pB, confidence_interval_pB, n_pB, foreign_key_pB = display_fits_image_with_3_0_features_and_B_field(file_pB, file_pB+'.sav', data_type=data_type, data_source=data_source, date=date)
     head_pB = fits.getheader(file_pB)
     forward_input_data_id_pB = head_pB['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, standard_dev_pB, confidence_interval_pB, n_pB, foreign_key_pB, forward_input_data_id_pB))
+    JSD_pB, KLD_pB, kurtosis_pB, skewness_pB = plot_histogram_with_JSD_Gaussian_Analysis(angles_signed_arr_finite_pB, data_type, data_source, date)
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_pB, angles_arr_median_pB, standard_dev_pB, confidence_interval_pB,
+                          n_pB, JSD_pB, KLD_pB, kurtosis_pB, skewness_pB, foreign_key_pB, forward_input_data_id_pB))
 
     file_ne = fits_files_ne[i]
     data_source, date, data_type = determine_paths(file_ne)
     angles_signed_arr_finite_ne, angles_arr_finite_ne, angles_arr_mean_ne, angles_arr_median_ne, standard_dev_ne, confidence_interval_ne, n_ne, foreign_key_ne = display_fits_image_with_3_0_features_and_B_field(file_ne, file_ne+'.sav', data_type=data_type, data_source=data_source, date=date)
     head_ne = fits.getheader(file_ne)
     forward_input_data_id_ne = head_ne['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, standard_dev_ne, confidence_interval_ne, n_ne, foreign_key_ne, forward_input_data_id_ne))
+    JSD_ne, KLD_ne, kurtosis_ne, skewness_ne = plot_histogram_with_JSD_Gaussian_Analysis(angles_signed_arr_finite_ne, data_type, data_source, date)
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne, angles_arr_median_ne, standard_dev_ne, confidence_interval_ne,
+                          n_ne, JSD_ne, KLD_ne, kurtosis_ne, skewness_ne, foreign_key_ne, forward_input_data_id_ne))
 
     file_ne_LOS = fits_files_ne_LOS[i]
     data_source, date, data_type = determine_paths(file_ne_LOS)
     angles_signed_arr_finite_ne_LOS, angles_arr_finite_ne_LOS, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, standard_dev_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS = display_fits_image_with_3_0_features_and_B_field(file_ne_LOS, file_ne_LOS+'.sav', data_type=data_type, data_source=data_source, date=date)
     head_ne_LOS = fits.getheader(file_ne_LOS)
     forward_input_data_id_ne_LOS = head_ne_LOS['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, standard_dev_ne_LOS, confidence_interval_ne_LOS, n_ne_LOS, foreign_key_ne_LOS, forward_input_data_id_ne_LOS))
+    JSD_ne_LOS, KLD_ne_LOS, kurtosis_ne_LOS, skewness_ne_LOS = plot_histogram_with_JSD_Gaussian_Analysis(angles_signed_arr_finite_ne_LOS, data_type, data_source, date)
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_ne_LOS, angles_arr_median_ne_LOS, standard_dev_ne_LOS, confidence_interval_ne_LOS,
+                          n_ne_LOS, JSD_ne_LOS, KLD_ne_LOS, kurtosis_ne_LOS, skewness_ne_LOS, foreign_key_ne_LOS, forward_input_data_id_ne_LOS))
 
     file_kcor = fits_files_kcor[i]
     head_kcor = fits.getheader(file_kcor)
     # search fits headers of all files in directory for header that matches head
     for file in fits_files_pB:
-        head = fits.getheader(file)
+        head = correct_fits_header(file)
+        # head = fits.getheader(file)
         if head['date-obs'] == head_kcor['date-obs']:
             corresponding_file_pB = file
             corresponding_file_By = file.replace('pB', 'By')
@@ -638,19 +1026,30 @@ for i in range(len(fits_files_pB)):
             break
     data_source, date, data_type = determine_paths(file_kcor, PSI=False)
     angles_signed_arr_finite_kcor, angles_arr_finite_kcor, angles_arr_mean_kcor, angles_arr_median_kcor, standard_dev_kcor, confidence_interval_kcor, n_kcor, foreign_key_kcor = display_fits_image_with_3_0_features_and_B_field(file_kcor, file_kcor+'.sav', data_type=data_type, data_source=data_source, date=date, PSI=False, corresponding_By_file=corresponding_file_By, corresponding_Bz_file=corresponding_file_Bz)
-
+    JSD_kcor, KLD_kcor, kurtosis_kcor, skewness_kcor = plot_histogram_with_JSD_Gaussian_Analysis(angles_signed_arr_finite_kcor, data_type, data_source, date)
     forward_input_data_id_kcor = head_kcor['forward_input_data_id']
-    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_kcor, angles_arr_median_kcor, standard_dev_kcor, confidence_interval_kcor, n_kcor, foreign_key_kcor, forward_input_data_id_kcor))
+    data_stats_2.append((None, data_type, data_source, date, angles_arr_mean_kcor, angles_arr_median_kcor, standard_dev_kcor, confidence_interval_kcor,
+                          n_kcor, JSD_kcor, KLD_kcor, kurtosis_kcor, skewness_kcor, foreign_key_kcor, forward_input_data_id_kcor))
 
-    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
-    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
+    cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2)
     con.commit()  # Remember to commit the transaction after executing INSERT.
+
+
+    # Combine data into a single array
+    all_data = np.concatenate([angles_arr_finite_ne, angles_arr_finite_ne_LOS, angles_arr_finite_pB, angles_arr_finite_kcor])
+
+    # Create labels for the data types
+    labels = ['ne'] * len(angles_arr_finite_ne) + ['ne_LOS'] * len(angles_arr_finite_ne_LOS) + ['pB'] * len(angles_arr_finite_pB) + ['KCor l2 avg'] * len(angles_arr_finite_kcor)
+
+    # Perform Tukey's HSD post-hoc test
+    tukey_result = pairwise_tukeyhsd(all_data, labels)
 
     # retrieve probability density data from seaborne distplots
     x_dist_values_pB = sns.distplot(angles_signed_arr_finite_pB).get_lines()[0].get_data()[0]
     xmin_pB = x_dist_values_pB.min()
     xmax_pB = x_dist_values_pB.max()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
     kde0_pB = gaussian_kde(angles_signed_arr_finite_pB)
@@ -661,7 +1060,7 @@ for i in range(len(fits_files_pB)):
     x_dist_values_ne = sns.distplot(angles_signed_arr_finite_ne).get_lines()[0].get_data()[0]
     xmin_ne = x_dist_values_ne.min()
     xmax_ne = x_dist_values_ne.max()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
     kde0_ne = gaussian_kde(angles_signed_arr_finite_ne)
@@ -674,7 +1073,133 @@ for i in range(len(fits_files_pB)):
     x_dist_values_ne_LOS = sns.distplot(angles_signed_arr_finite_ne_LOS).get_lines()[0].get_data()[0]
     xmin_ne_LOS = x_dist_values_ne_LOS.min()
     xmax_ne_LOS = x_dist_values_ne_LOS.max()
-    # plt.show()
+    # #plt.show()
+    plt.close()
+
+    kde0_ne_LOS = gaussian_kde(angles_signed_arr_finite_ne_LOS)
+    x_1_ne_LOS = np.linspace(xmin_ne_LOS, xmax_ne_LOS, 200)
+    kde0_x_ne_LOS = kde0_ne_LOS(x_1_ne_LOS)
+
+    x_dist_values_kcor = sns.distplot(angles_signed_arr_finite_kcor).get_lines()[0].get_data()[0]
+    xmin_kcor = x_dist_values_kcor.min()
+    xmax_kcor = x_dist_values_kcor.max()
+
+
+    kde0_kcor = gaussian_kde(angles_signed_arr_finite_kcor)
+    x_1_kcor = np.linspace(xmin_kcor, xmax_kcor, 200)
+    kde0_x_kcor = kde0_kcor(x_1_kcor)
+
+    # plt.plot(x_1_ne_LOS, kde0_x_ne_LOS, color='g', label='ne LOS KDE')
+    # plt.plot(x_1_ne, kde0_x_ne, color='b', label='ne KDE')
+    # plt.plot(x_1_pB, kde0_x_pB, color='r', label='pB KDE')
+    # plt.legend()
+    # # #plt.show()
+    plt.close()
+
+
+    #compute JS Divergence
+
+    data_source_pB, date_pB, data_type_pB = determine_paths(file_pB)
+    data_source_ne, date_ne, data_type_ne = determine_paths(file_ne)
+    data_source_ne_LOS, date_ne_LOS, data_type_ne_LOS = determine_paths(file_ne_LOS)
+    data_source_kcor, date_kcor, data_type_kcor = determine_paths(file_kcor, PSI=False)
+
+    cur.execute("DROP TABLE IF EXISTS KLD_JSD")
+    cur.execute("""CREATE TABLE KLD_JSD (
+            KLD_JSD_id INTEGER PRIMARY KEY,
+            KLD,
+            JSD,
+            group_1_central_tendency_stats_kcor_id INTEGER,
+            group_2_central_tendency_stats_kcor_id INTEGER,
+            FOREIGN KEY(group_1_central_tendency_stats_kcor_id) REFERENCES central_tendency_stats_kcor_new(id),
+            FOREIGN KEY(group_2_central_tendency_stats_kcor_id) REFERENCES central_tendency_stats_kcor_new(id)
+            )
+            """
+            )
+
+
+    JSD_kcor_psi_pB_ne, KLD_kcor_psi_pB_ne = calculate_KDE_statistics(kde0_x_pB, kde0_x_ne)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_ne, date_ne)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_pB, date_pB)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_kcor_psi_pB_ne, JSD_kcor_psi_pB_ne, matching_id1, matching_id2))
+    con.commit()
+
+    JSD_kcor_psi_pB_ne_LOS, KLD_kcor_psi_pB_ne_LOS = calculate_KDE_statistics(kde0_x_pB, kde0_x_ne_LOS)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_pB, date_pB)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_ne_LOS)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_kcor_psi_pB_ne_LOS, JSD_kcor_psi_pB_ne_LOS, matching_id1, matching_id2))
+    con.commit()
+
+    JSD_kcor_psi_ne_ne_LOS, KLD_kcor_psi_ne_ne_LOS = calculate_KDE_statistics(kde0_x_ne, kde0_x_ne_LOS)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_ne, date_ne)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_ne_LOS)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_kcor_psi_ne_ne_LOS, JSD_kcor_psi_ne_ne_LOS, matching_id1, matching_id2))
+    con.commit()
+
+    JSD_kcor_ne_kcor, KLD_kcor_ne_kcor = calculate_KDE_statistics(kde0_x_ne, kde0_x_kcor)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_ne, date_ne)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_kcor, date_kcor)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_kcor_ne_kcor, JSD_kcor_ne_kcor, matching_id1, matching_id2))
+    con.commit()
+
+    JSD_kcor_ne_LOS_kcor, KLD_kcor_ne_LOS_kcor = calculate_KDE_statistics(kde0_x_ne_LOS, kde0_x_kcor)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_ne_LOS)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_kcor, date_kcor)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_kcor_ne_LOS_kcor, JSD_kcor_ne_LOS_kcor, matching_id1, matching_id2))
+    con.commit()
+
+    JSD_kcor_psi_pB_kcor, KLD_kcor_psi_pB_kcor = calculate_KDE_statistics(kde0_x_pB, kde0_x_kcor)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_pB, date_pB)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_kcor, date_kcor)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_kcor_psi_pB_kcor, JSD_kcor_psi_pB_kcor, matching_id1, matching_id2))
+    con.commit()
+
+    # Convert SimpleTable to DataFrame
+    tukey_df = pd.DataFrame(tukey_result.summary().data[1:], columns=tukey_result.summary().data[0])
+
+    for i, row in tukey_df.iterrows():
+        group1 = row['group1']
+        group2 = row['group2']
+        mean_diff = row['meandiff']
+        p_adj = row['p-adj']
+        lower_bound_ci = row['lower']
+        upper_bound_ci = row['upper']
+        reject = row['reject']
+        group_1_id = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (group1, date)).fetchone()[0]
+        group_2_id = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (group2, date)).fetchone()[0]
+        KLD, JSD = cur.execute("SELECT KLD, JSD FROM KLD_JSD WHERE (group_1_central_tendency_stats_kcor_id = ? AND group_2_central_tendency_stats_kcor_id = ?) OR (group_2_central_tendency_stats_kcor_id = ? AND group_1_central_tendency_stats_kcor_id = ?)", (group_1_id, group_2_id, group_1_id, group_2_id)).fetchone()
+        cur.execute("INSERT INTO tukey_hsd_stats_kcor VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (None, group1, group2, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, reject, KLD, JSD, group_1_id, group_2_id))
+        con.commit()
+
+    # retrieve probability density data from seaborne distplots
+    x_dist_values_pB = sns.distplot(angles_signed_arr_finite_pB).get_lines()[0].get_data()[0]
+    xmin_pB = x_dist_values_pB.min()
+    xmax_pB = x_dist_values_pB.max()
+    # #plt.show()
+    plt.close()
+
+    kde0_pB = gaussian_kde(angles_signed_arr_finite_pB)
+    x_1_pB = np.linspace(xmin_pB, xmax_pB, 200)
+    kde0_x_pB = kde0_pB(x_1_pB)
+
+    # retrieve probability density data from seaborne distplots
+    x_dist_values_ne = sns.distplot(angles_signed_arr_finite_ne).get_lines()[0].get_data()[0]
+    xmin_ne = x_dist_values_ne.min()
+    xmax_ne = x_dist_values_ne.max()
+    # #plt.show()
+    plt.close()
+
+    kde0_ne = gaussian_kde(angles_signed_arr_finite_ne)
+    x_1_ne = np.linspace(xmin_ne, xmax_ne, 200)
+    kde0_x_ne = kde0_ne(x_1_ne)
+
+
+
+    # retrieve probability density data from seaborne distplots
+    x_dist_values_ne_LOS = sns.distplot(angles_signed_arr_finite_ne_LOS).get_lines()[0].get_data()[0]
+    xmin_ne_LOS = x_dist_values_ne_LOS.min()
+    xmax_ne_LOS = x_dist_values_ne_LOS.max()
+    # #plt.show()
     plt.close()
 
     kde0_ne_LOS = gaussian_kde(angles_signed_arr_finite_ne_LOS)
@@ -685,7 +1210,7 @@ for i in range(len(fits_files_pB)):
     plt.plot(x_1_ne, kde0_x_ne, color='b', label='ne KDE')
     plt.plot(x_1_pB, kde0_x_pB, color='r', label='pB KDE')
     plt.legend()
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -737,6 +1262,16 @@ combined_ne_ravel = [item for sublist in combined_ne for item in sublist]
 combined_ne_LOS_ravel = [item for sublist in combined_ne_LOS for item in sublist]
 combined_kcor_ravel = [item for sublist in combined_kcor for item in sublist]
 
+combined_pB_signed_ravel = [item for sublist in combined_pB_signed for item in sublist]
+combined_ne_signed_ravel = [item for sublist in combined_ne_signed for item in sublist]
+combined_ne_signed_LOS_ravel = [item for sublist in combined_ne_signed_LOS for item in sublist]
+combined_kcor_signed_ravel = [item for sublist in combined_kcor_signed for item in sublist]
+
+combined_pB_signed_ravel_arr = np.array(combined_pB_signed_ravel)
+combined_ne_signed_ravel_arr = np.array(combined_ne_signed_ravel)
+combined_ne_signed_LOS_ravel_arr = np.array(combined_ne_signed_LOS_ravel)
+combined_kcor_signed_ravel_arr = np.array(combined_kcor_signed_ravel)
+
 combined_pB_ravel_arr = np.array(combined_pB_ravel)
 angles_arr_mean_pB_combined = np.round(np.mean(combined_pB_ravel_arr), 5)
 angles_arr_median_pB_combined = np.round(np.median(combined_pB_ravel_arr), 5)
@@ -746,7 +1281,9 @@ confidence_interval_pB_combined = np.round(1.96 * (std_pB_combined / np.sqrt(len
 data_type_pB_combined = 'pB'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, std_pB_combined, confidence_interval_pB_combined, n_pB_combined, foreign_key_pB, ''))
+JSD_pB_combined, KLD_pB_combined, kurtosis_pB_combined, skewness_pB_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_pB_signed_ravel_arr, data_type_pB_combined, data_source, date_combined)
+data_stats_2_combined.append((None, data_type_pB_combined, data_source, date_combined, angles_arr_mean_pB_combined, angles_arr_median_pB_combined, std_pB_combined, confidence_interval_pB_combined,
+                               n_pB_combined, JSD_pB_combined, KLD_pB_combined, kurtosis_pB_combined, skewness_pB_combined, foreign_key_pB, ''))
 
 combined_ne_ravel_arr = np.array(combined_ne_ravel)
 angles_arr_mean_ne_combined = np.round(np.mean(combined_ne_ravel_arr), 5)
@@ -757,7 +1294,9 @@ confidence_interval_ne_combined = np.round(1.96 * (std_ne_combined / np.sqrt(len
 data_type_ne_combined = 'ne'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, std_ne_combined, confidence_interval_ne_combined, n_ne_combined, foreign_key_ne, ''))
+JSD_ne_combined, KLD_ne_combined, kurtosis_ne_combined, skewness_ne_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_ne_signed_ravel_arr, data_type_ne_combined, data_source, date_combined)
+data_stats_2_combined.append((None, data_type_ne_combined, data_source, date_combined, angles_arr_mean_ne_combined, angles_arr_median_ne_combined, std_ne_combined, confidence_interval_ne_combined,
+                               n_ne_combined, JSD_ne_combined, KLD_ne_combined, kurtosis_ne_combined, skewness_ne_combined, foreign_key_ne, ''))
 
 combined_ne_LOS_ravel_arr = np.array(combined_ne_LOS_ravel)
 angles_arr_mean_ne_LOS_combined = np.round(np.mean(combined_ne_LOS_ravel_arr), 5)
@@ -768,7 +1307,9 @@ confidence_interval_ne_LOS_combined = np.round(1.96 * (std_ne_LOS_combined / np.
 data_type_ne_LOS_combined = 'ne_LOS'
 date_combined = 'combined'
 data_source = 'KCor_PSI'
-data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, std_ne_LOS_combined, confidence_interval_ne_LOS_combined, n_ne_LOS_combined, foreign_key_ne_LOS, ''))
+JSD_ne_LOS_combined, KLD_ne_LOS_combined, kurtosis_ne_LOS_combined, skewness_ne_LOS_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_ne_signed_LOS_ravel_arr, data_type_ne_LOS_combined, data_source, date_combined)
+data_stats_2_combined.append((None, data_type_ne_LOS_combined, data_source, date_combined, angles_arr_mean_ne_LOS_combined, angles_arr_median_ne_LOS_combined, std_ne_LOS_combined, confidence_interval_ne_LOS_combined,
+                               n_ne_LOS_combined, JSD_ne_LOS_combined, KLD_ne_LOS_combined, kurtosis_ne_LOS_combined, skewness_ne_LOS_combined, foreign_key_ne_LOS, ''))
 
 combined_kcor_ravel_arr = np.array(combined_kcor_ravel)
 angles_arr_mean_kcor_combined = np.round(np.mean(combined_kcor_ravel_arr), 5)
@@ -779,24 +1320,15 @@ confidence_interval_kcor_combined = np.round(1.96 * (std_kcor_combined / np.sqrt
 data_type_kcor_combined = 'KCor l2 avg'
 date_combined = 'combined'
 data_source = 'KCor'
-data_stats_2_combined.append((None, data_type_kcor_combined, data_source, date_combined, angles_arr_mean_kcor_combined, angles_arr_median_kcor_combined, std_kcor_combined, confidence_interval_kcor_combined, n_kcor_combined, foreign_key_kcor, ''))
+JSD_kcor_combined, KLD_kcor_combined, kurtosis_kcor_combined, skewness_kcor_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_kcor_signed_ravel_arr, data_type_kcor_combined, data_source, date_combined)
+data_stats_2_combined.append((None, data_type_kcor_combined, data_source, date_combined, angles_arr_mean_kcor_combined, angles_arr_median_kcor_combined, std_kcor_combined, confidence_interval_kcor_combined,
+                               n_kcor_combined, JSD_kcor_combined, KLD_kcor_combined, kurtosis_kcor_combined, skewness_kcor_combined, foreign_key_kcor, ''))
 
 
 
-cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
-cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
+cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_kcor_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 con.commit()  # Remember to commit the transaction after executing INSERT.
-
-
-combined_pB_signed_ravel = [item for sublist in combined_pB_signed for item in sublist]
-combined_ne_signed_ravel = [item for sublist in combined_ne_signed for item in sublist]
-combined_ne_signed_LOS_ravel = [item for sublist in combined_ne_signed_LOS for item in sublist]
-combined_kcor_signed_ravel = [item for sublist in combined_kcor_signed for item in sublist]
-
-combined_pB_signed_ravel_arr = np.array(combined_pB_signed_ravel)
-combined_ne_signed_ravel_arr = np.array(combined_ne_signed_ravel)
-combined_ne_signed_LOS_ravel_arr = np.array(combined_ne_signed_LOS_ravel)
-combined_kcor_signed_ravel_arr = np.array(combined_kcor_signed_ravel)
 
 
 what = sns.histplot(combined_ne_signed_ravel_arr,kde=True, bins=30)
@@ -835,14 +1367,14 @@ detector = 'KCor_PSI'
 ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
 ax.set_xlim(-95,95)
 #ax.set_ylim(0,0.07)
-ax.set_yscale('log')
+# ax.set_yscale('log')
 ax.legend(fontsize=13)
 
 # plt.text(20,0.045,"kcor average discrepancy: " + str(np.round(np.average(err_kcor_central_deg),5)))
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_kcor_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
-# plt.show()
+# #plt.show()
 #plt.close()
 
 query = "SELECT mean, median, date, data_type, data_source, n, confidence_interval FROM central_tendency_stats_kcor_new WHERE date!='combined' ORDER BY mean ASC;"
@@ -886,7 +1418,7 @@ for i, date in enumerate(dates):
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
-plt.ylabel('Mean Value (Degrees)')
+plt.ylabel('Mean Angle Discrepancy (Degrees)')
 plt.title('PSI K-COR Projection Angle Discrepancy by Date')
 plt.legend()
 plt.ylim(0,30)
@@ -894,7 +1426,7 @@ plt.ylim(0,30)
 # Set x-axis ticks and labels
 plt.xticks(range(len(dates)), dates)
 plt.savefig(os.path.join(repo_path, 'Output/Plots', '{}_Angle_Discrepancy_By_Date.png'.format(data_type)))
-plt.show()
+#plt.show()
 
 
 # Combine data into a single array
@@ -928,6 +1460,135 @@ labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
+
+
+# retrieve probability density data from seaborne distplots
+x_dist_values_pB = sns.distplot(combined_pB_ravel_arr).get_lines()[0].get_data()[0]
+xmin_pB = x_dist_values_pB.min()
+xmax_pB = x_dist_values_pB.max()
+# #plt.show()
+plt.close()
+
+kde0_pB = gaussian_kde(combined_pB_ravel_arr)
+x_1_pB = np.linspace(xmin_pB, xmax_pB, 200)
+kde0_x_pB = kde0_pB(x_1_pB)
+
+# retrieve probability density data from seaborne distplots
+x_dist_values_ne = sns.distplot(combined_ne_signed_ravel_arr).get_lines()[0].get_data()[0]
+xmin_ne = x_dist_values_ne.min()
+xmax_ne = x_dist_values_ne.max()
+# #plt.show()
+plt.close()
+
+kde0_ne = gaussian_kde(angles_signed_arr_finite_ne)
+x_1_ne = np.linspace(xmin_ne, xmax_ne, 200)
+kde0_x_ne = kde0_ne(x_1_ne)
+
+
+
+# retrieve probability density data from seaborne distplots
+x_dist_values_ne_LOS = sns.distplot(combined_ne_LOS_ravel_arr).get_lines()[0].get_data()[0]
+xmin_ne_LOS = x_dist_values_ne_LOS.min()
+xmax_ne_LOS = x_dist_values_ne_LOS.max()
+# #plt.show()
+plt.close()
+
+kde0_ne_LOS = gaussian_kde(combined_ne_LOS_ravel_arr)
+x_1_ne_LOS = np.linspace(xmin_ne_LOS, xmax_ne_LOS, 200)
+kde0_x_ne_LOS = kde0_ne_LOS(x_1_ne_LOS)
+
+x_dist_values_kcor = sns.distplot(combined_kcor_ravel_arr).get_lines()[0].get_data()[0]
+xmin_kcor = x_dist_values_kcor.min()
+xmax_kcor = x_dist_values_kcor.max()
+
+
+kde0_kcor = gaussian_kde(combined_kcor_ravel_arr)
+x_1_kcor = np.linspace(xmin_kcor, xmax_kcor, 200)
+kde0_x_kcor = kde0_kcor(x_1_kcor)
+
+# plt.plot(x_1_ne_LOS, kde0_x_ne_LOS, color='g', label='ne LOS KDE')
+# plt.plot(x_1_ne, kde0_x_ne, color='b', label='ne KDE')
+# plt.plot(x_1_pB, kde0_x_pB, color='r', label='pB KDE')
+# plt.legend()
+# # #plt.show()
+plt.close()
+
+
+#compute JS Divergence
+
+data_source_pB, date_pB, data_type_pB = determine_paths(file_pB)
+data_source_ne, date_ne, data_type_ne = determine_paths(file_ne)
+data_source_ne_LOS, date_ne_LOS, data_type_ne_LOS = determine_paths(file_ne_LOS)
+data_source_kcor, date_kcor, data_type_kcor = determine_paths(file_kcor, PSI=False)
+
+cur.execute("DROP TABLE IF EXISTS KLD_JSD")
+cur.execute("""CREATE TABLE KLD_JSD (
+        KLD_JSD_id INTEGER PRIMARY KEY,
+        KLD,
+        JSD,
+        group_1_central_tendency_stats_kcor_id INTEGER,
+        group_2_central_tendency_stats_kcor_id INTEGER,
+        FOREIGN KEY(group_1_central_tendency_stats_kcor_id) REFERENCES central_tendency_stats_kcor_new(id),
+        FOREIGN KEY(group_2_central_tendency_stats_kcor_id) REFERENCES central_tendency_stats_kcor_new(id)
+        )
+        """
+        )
+
+JSD_kcor_psi_pB_ne, KLD_kcor_psi_pB_ne = calculate_KDE_statistics(kde0_x_pB, kde0_x_ne)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_kcor_psi_pB_ne, JSD_kcor_psi_pB_ne, matching_id1, matching_id2))
+con.commit()
+
+JSD_kcor_psi_pB_ne_LOS, KLD_kcor_psi_pB_ne_LOS = calculate_KDE_statistics(kde0_x_pB, kde0_x_ne_LOS)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_kcor_psi_pB_ne_LOS, JSD_kcor_psi_pB_ne_LOS, matching_id1, matching_id2))
+con.commit()
+
+JSD_kcor_psi_ne_ne_LOS, KLD_kcor_psi_ne_ne_LOS = calculate_KDE_statistics(kde0_x_ne, kde0_x_ne_LOS)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_kcor_psi_ne_ne_LOS, JSD_kcor_psi_ne_ne_LOS, matching_id1, matching_id2))
+con.commit()
+
+JSD_kcor_ne_kcor, KLD_kcor_ne_kcor = calculate_KDE_statistics(kde0_x_ne, kde0_x_kcor)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_kcor, date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_kcor_ne_kcor, JSD_kcor_ne_kcor, matching_id1, matching_id2))
+con.commit()
+
+JSD_kcor_ne_LOS_kcor, KLD_kcor_ne_LOS_kcor = calculate_KDE_statistics(kde0_x_ne_LOS, kde0_x_kcor)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_kcor, date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_kcor_ne_LOS_kcor, JSD_kcor_ne_LOS_kcor, matching_id1, matching_id2))
+con.commit()
+
+JSD_kcor_psi_pB_kcor, KLD_kcor_psi_pB_kcor = calculate_KDE_statistics(kde0_x_pB, kde0_x_kcor)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (data_type_kcor, date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_kcor_psi_pB_kcor, JSD_kcor_psi_pB_kcor, matching_id1, matching_id2))
+con.commit()
+
+
+
+# Convert SimpleTable to DataFrame
+tukey_df = pd.DataFrame(tukey_result.summary().data[1:], columns=tukey_result.summary().data[0])
+
+for i, row in tukey_df.iterrows():
+    group1 = row['group1']
+    group2 = row['group2']
+    mean_diff = row['meandiff']
+    p_adj = row['p-adj']
+    lower_bound_ci = row['lower']
+    upper_bound_ci = row['upper']
+    reject = row['reject']
+    group_1_id = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (group1, date_combined)).fetchone()[0]
+    group_2_id = cur.execute("SELECT id FROM central_tendency_stats_kcor_new WHERE data_type = ? AND date = ?", (group2, date_combined)).fetchone()[0]
+    KLD, JSD = cur.execute("SELECT KLD, JSD FROM KLD_JSD WHERE (group_1_central_tendency_stats_kcor_id = ? AND group_2_central_tendency_stats_kcor_id = ?) OR (group_2_central_tendency_stats_kcor_id = ? AND group_1_central_tendency_stats_kcor_id = ?)", (group_1_id, group_2_id, group_1_id, group_2_id)).fetchone()
+    cur.execute("INSERT INTO tukey_hsd_stats_kcor VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (None, group1, group2, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, reject, KLD, JSD, group_1_id, group_2_id))
+    con.commit()
+
 print(tukey_result)
 fig, ax = plt.subplots(1, 1)
 # ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr], showfliers=False)
@@ -937,7 +1598,7 @@ ax.set_ylabel("Data Type")
 ax.set_title('HSD Comparison of Data Types for PSI_KCor Combined Results')
 tukey_result.plot_simultaneous(xlabel='Mean (Degrees)', ax=ax)
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig1_kcor.png'))
-plt.show()
+#plt.show()
 
 f_statistic, p_value = f_oneway(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_kcor_ravel_arr)
 # Check for statistical significance
@@ -955,7 +1616,7 @@ ax.set_ylabel("Mean (Degrees)")
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_KCor Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2_kcor.png'))
-plt.show()
+#plt.show()
 
 res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_kcor_ravel_arr)
 print(res)

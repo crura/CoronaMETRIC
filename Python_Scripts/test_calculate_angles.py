@@ -302,7 +302,7 @@ lat = cax.coords[0]
 lat.set_ticks_visible(False)
 lat.set_ticklabel_visible(False)
 lat.set_axislabel('')
-plt.show()
+#plt.show()
 plt.close()
 
 
@@ -363,7 +363,7 @@ lat = cax.coords[0]
 lat.set_ticks_visible(False)
 lat.set_ticklabel_visible(False)
 lat.set_axislabel('')
-plt.show()
+#plt.show()
 plt.close()
 
 
@@ -382,5 +382,5 @@ plt.close()
 # divider = make_axes_locatable(axes)
 # cax = divider.append_axes('right', size='5%', pad=0.05)
 # fig.colorbar(np.degrees(angles), cax, label='Angle Error (degrees)')
-# plt.show()
+# #plt.show()
 # plt.close()

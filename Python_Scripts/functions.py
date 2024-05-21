@@ -25,6 +25,9 @@ import glob
 import sqlite3
 import astropy.units as u
 from prettytable import PrettyTable
+from scipy.ndimage import zoom
+from tabulate import tabulate
+import re
 
 repo = git.Repo('.', search_parent_directories=True)
 repo_path = repo.working_tree_dir
@@ -251,7 +254,7 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
     plt.plot(x_1_forward_cor1_central_deg_new, (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward, color='tab:orange', label='PSI/FORWARD pB')
     plt.plot(gaussian_fit_pB, label='gaussian fit', color='tab:blue')
     plt.yscale('log')
-    plt.show()
+    #plt.show()
 
     if masked:
         return combined_dict, data_dict, mask
@@ -288,7 +291,7 @@ def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
     dz = np.linspace(0, int(nz), nz)
     R_SUN = rsun
     # rsun = (head['rsun'] / head['cdelt1']) * occlt_list[i]
-    widths = np.linspace(0,1024,by_los_coaligned_map.data.size)
+    widths = np.linspace(0,512,by_los_coaligned_map.data.size)
     skip_val = int(by_los_coaligned_map.data.shape[0]/73.14285714285714)
     skip = (slice(None, None, skip_val), slice(None, None, skip_val))
     skip1 = slice(None, None, skip_val)
@@ -437,7 +440,7 @@ def create_six_fig_plot(files_z, files_y, outpath, rsun, detector):
     # fig.set_constrained_layout_pads(w_pad=1 / 102, h_pad=1 / 102, hspace=0.0,
     #                                 wspace=0.0)
     plt.savefig(outpath)
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -627,7 +630,7 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
     X, Y = np.meshgrid(np.linspace(0, 2 * np.pi, ny), np.linspace(0, 2 * np.pi, nz))
     # R_SUN = rsun
     # rsun = (head['rsun'] / head['cdelt1']) * occlt_list[i]
-    widths = np.linspace(0,1024,by_los_coaligned_map.data.size)
+    widths = np.linspace(0,512,by_los_coaligned_map.data.size)
     skip_val = int(by_los_coaligned_map.data.shape[0]/233.14285714285714) #73.14285714285714
     skip = (slice(None, None, skip_val), slice(None, None, skip_val))
     skip1 = slice(None, None, skip_val)
@@ -648,7 +651,7 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
 
     plt.subplots_adjust(bottom=0.05, top=0.95)
     # plt.savefig(outpath)
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -711,7 +714,10 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
     telescope = head['telescop']
     instrument = head['instrume']
 
-    date_obs = head['date-obs']
+    try:
+        date_obs = head['date-obs']
+    except:
+        date_obs = head['date_obs']
     str_strip = date_obs.split('T',1)[0]
     string_print = date_obs.split('T')[0].replace('-','_')
 
@@ -769,7 +775,7 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
             plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}.png'.format(string_print, detector, data_type)))
         else:
             plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)))
-    # plt.show()
+    # #plt.show()
     plt.close()
 
 
@@ -777,9 +783,12 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
 
 
 
-def get_files_from_pattern(directory, pattern):
+def get_files_from_pattern(directory, pattern, extension, middle=False):
     # Use glob to get all files with the '.fits' extension in the specified directory
-    fits_files = glob.glob(f"{directory}/*{pattern}")
+    if middle:
+        fits_files = glob.glob(f"{directory}/*{pattern}*{extension}")
+    else:
+        fits_files = glob.glob(f"{directory}/*{pattern}{extension}")
     return sorted(fits_files)
 
 
@@ -814,16 +823,21 @@ def determine_paths(fits_file, PSI=True):
                 file1_y = os.path.join(repo_path, 'Output/fits_images/' + filename.split('COR1')[0] + keyword_By)
                 file1_z = os.path.join(repo_path, 'Output/fits_images/' + filename.split('COR1')[0] + keyword_Bz)
     
-    date_obs = head['date-obs']
+    try:
+        date_obs = head['date-obs']
+    except:
+        date_obs = head['date_obs']
     date = date_obs.split('T',1)[0]
     string_print = date_obs.split('T')[0].replace('-','_')
     data_type = filename.split('_')[-1].strip('.fits')
     if data_type == 'LOS':
         data_type = 'ne_LOS'
-    if data_type == 'med':
-        data_type = 'COR1 median filtered'
-    if data_type == 'avg':
+    elif data_type == 'med':
+        data_type = 'COR1'
+    elif data_type == 'avg':
         data_type = 'KCor l2 avg'
+    elif not PSI:
+        data_type = detector
     if PSI:
         data_source = keyword
     else:
@@ -833,18 +847,57 @@ def determine_paths(fits_file, PSI=True):
 
 
 
-def print_sql_query(dbName, query):
+def print_sql_query(dbName, query, print_to_file=False, output_file=None, latex=False, caption=False, caption_text=None):
     con = sqlite3.connect(dbName)
     cur = con.cursor()
     cur.execute(query)
     rows = cur.fetchall()
     column_names = [description[0] for description in cur.description]
 
-    table = PrettyTable()
-    table.field_names = column_names
-    for row in rows:
-        table.add_row(row)
-    print(table)
+    if latex:
+        # Replace underscores in data
+        rows = [[str(item).replace('_', ' ') for item in row] for row in rows]
+        # replace ne with $n_e$ in data
+        rows = [[re.sub(r'\bne\b', "\\\\acrshort{ne central}", str(item)) for item in row] for row in rows]
+        # replace ne LOS with $n_e$ in data
+        rows = [[re.sub("\\\\acrshort{ne central} LOS", "\\\\acrshort{ne los}", str(item)) for item in row] for row in rows]
+        # replace pB with $pB$ in data
+        rows = [[re.sub(r'\bpB\b', "\\\\acrshort{pB}", str(item)) for item in row] for row in rows]
+
+        # replace pB with $pB$ in data
+        rows = [[re.sub(r'\bKCor\b', "\\\\acrshort{k-cor}", str(item)) for item in row] for row in rows]
+        # replace pB with $pB$ in data
+        rows = [[re.sub(r'\bCOR1\b', "\\\\acrshort{cor-1}", str(item)) for item in row] for row in rows]
+        # Replace underscores in column names
+        column_names = [name.replace('_', ' ') for name in column_names]
+        # Replace underscores in column names
+        column_names = [name.replace('standard deviation', 'std') for name in column_names]
+        # Replace underscores in column names
+        column_names = [name.replace('confidence interval', '$95\%$ CI') for name in column_names]
+
+        table = tabulate(rows, headers=column_names, tablefmt='latex_raw')
+
+        if caption:
+            # Add caption to the table
+            caption = "\\caption{" + caption_text + "}"
+            table = table.replace("\\begin{tabular}", "\\begin{table}[ht]\n\\centering\n" + caption + "\n\\begin{tabular}")
+            table = table.replace("\\end{tabular}", "\\end{tabular}\n\\end{table}")
+    else:
+        table = PrettyTable()
+        table.field_names = column_names
+        for row in rows:
+            table.add_row(row)
+    if print_to_file:
+        with open(output_file, 'a') as f:
+            if not latex:
+                f.write(str(query))
+                f.write("\n")
+            f.write(str(table))
+            f.write("\n")
+            f.write("\n")
+    else:
+        print(query)
+        print(table)
     con.close()
 
 
@@ -857,4 +910,121 @@ def plot_sql_query(dbName, query, parameter_x, parameter_y, title=None, xlabel=N
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     # plt.savefig(outpath)
+    #plt.show()
+
+
+def plot_histograms(arrays, labels, repo_path, detector='COR1_PSI'):
+    if len(arrays) != len(labels):
+        raise ValueError("arrays and labels must have the same length")
+
+    fig = plt.figure(figsize=(10,10))
+    ax = fig.subplots(1,1)
+    
+    colors = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan']
+    
+    for i in range(len(arrays)):
+        sns.histplot(arrays[i], kde=True, label=labels[i], bins=30, ax=ax, color=colors[i % len(colors)])
+
+    ax.set_xlabel('Angle Discrepancy (Degrees)', fontsize=14)
+    ax.set_ylabel('Pixel Count', fontsize=14)
+    ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector), fontsize=15)
+    ax.set_xlim(-95,95)
+    ax.set_yscale('log')
+    ax.legend(fontsize=13)
+    # plt.savefig(os.path.join(repo_path, 'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
     plt.show()
+
+
+def rescale_kcor_file_to_512x512(kcor_fits_file):
+    """
+    Rescales the KCOR fits file to 512x512 pixels from 1024x1024 pixels.
+    """
+
+    hdu1 = fits.open(kcor_fits_file)[0]
+    data = hdu1.data
+    header = hdu1.header
+    old_shape = header['NAXIS1']
+    scale_factor = old_shape / 512
+
+    # Calculate the zoom factors
+    zoom_factors = (512 / data.shape[0], 512 / data.shape[1])
+
+    # Interpolate the data to the new shape
+    interpolated_data = zoom(data, zoom_factors)
+
+    # Update the header
+    hdu1.header['NAXIS1'] = 512
+    hdu1.header['NAXIS2'] = 512
+    hdu1.header['CRPIX1'] = hdu1.header['CRPIX1'] / scale_factor  # Assuming the reference pixel should also be scaled
+    hdu1.header['CRPIX2'] = hdu1.header['CRPIX2'] / scale_factor
+    hdu1.header['CDELT1'] = hdu1.header['CDELT1'] * scale_factor  # Double the pixel size in the X direction (since arcsec/pixel)
+    hdu1.header['CDELT2'] = hdu1.header['CDELT2'] * scale_factor  # Double the pixel size in the Y direction (since arcsec/pixel)
+    hdu1.header['RCAMXCEN'] = hdu1.header['RCAMXCEN'] / scale_factor
+    hdu1.header['RCAMYCEN'] = hdu1.header['RCAMYCEN'] / scale_factor
+    hdu1.header['RCAM_RAD'] = hdu1.header['RCAM_RAD'] / scale_factor
+    hdu1.header['RCAM_DCX'] = hdu1.header['RCAM_DCX'] / scale_factor
+    hdu1.header['RCAM_DCY'] = hdu1.header['RCAM_DCY'] / scale_factor
+    hdu1.header['RCAM_DCR'] = hdu1.header['RCAM_DCR'] / scale_factor
+    hdu1.header['TCAMXCEN'] = hdu1.header['TCAMXCEN'] / scale_factor
+    hdu1.header['TCAMYCEN'] = hdu1.header['TCAMYCEN'] / scale_factor
+    hdu1.header['TCAM_RAD'] = hdu1.header['TCAM_RAD'] / scale_factor
+    hdu1.header['TCAM_DCX'] = hdu1.header['TCAM_DCX'] / scale_factor
+    hdu1.header['TCAM_DCY'] = hdu1.header['TCAM_DCY'] / scale_factor
+    hdu1.header['TCAM_DCR'] = hdu1.header['TCAM_DCR'] / scale_factor
+    hdu1.header['R_SUN'] = hdu1.header['R_SUN'] / scale_factor
+
+    # Create a new FITS HDU with the interpolated data and the original header
+    new_hdu = fits.PrimaryHDU(interpolated_data, header=hdu1.header)
+    print(new_hdu.data.shape)
+    new_hdu.writeto(kcor_fits_file, overwrite=True)
+
+
+def correct_fits_header(filepath):
+    # from astropy.io import fits
+    hdul = fits.open(filepath)
+    head = hdul[0].header
+    try: 
+        head['date-obs']
+    except KeyError:
+        # Rename the key in the header of the first HDU and overwrite header
+        hdul[0].header.rename_keyword('DATE_OBS', 'DATE-OBS')
+        hdul.writeto(filepath, overwrite=True)
+    return hdul[0].header
+
+
+def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, date):
+    x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new = calculate_KDE(array)
+    gaussian_fit = np.random.normal(np.mean(array), np.std(abs(array)), 1000)
+    hi = sci.stats.norm(np.mean(array), np.std(abs(array)))
+    label = data_type
+    min_height = min(array)
+    max_height = max(array)
+    height_values = np.linspace(min_height, max_height, num=1000)
+    probabilities = hi.pdf(x=height_values)
+
+    JSD_gaussain, KLD_gaussian = calculate_KDE_statistics(KDE_forward_cor1_central_deg_new, probabilities)
+
+    kurtosis = sci.stats.kurtosis(array)
+    skew = sci.stats.skew(array)
+
+    fig = plt.figure(figsize=(10,10))
+    ax = fig.subplots(1,1)
+    ax.plot(x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new, color='tab:orange', label='{} Probability Density'.format(label))
+    ax.plot(height_values, probabilities, label='Corresponding Gaussian Fit', color='tab:blue')
+    # plt.plot(x_1_forward_cor1_central_deg_new, gaussian_fit_pB*norm_max_pB, label='gaussian fit', color='tab:blue')
+    # plt.yscale('log')
+    ax.set_xlabel('Angle Discrepancy (Degrees)')
+    ax.set_ylabel('Probability Density')
+    ax.text(0.7,0.8,"average discrepancy: " + str(np.round(np.average(array),5)), transform=ax.transAxes)
+    ax.text(0.7,0.75,"standard deviation: " + str(np.round(np.std(abs(array)),5)), transform=ax.transAxes)
+    ax.text(0.7,0.7,"Gaussian JSD: " + str(np.round(JSD_gaussain,5)), transform=ax.transAxes)
+    ax.text(0.7,0.65,"kurtosis: " + str(np.round(kurtosis,5)), transform=ax.transAxes)
+    ax.text(0.7,0.6,"skewness: " + str(np.round(skew,5)), transform=ax.transAxes)
+    # ax.set_yscale('log')
+    ax.set_title('{} {} vs Corresponding Gaussian Fit {}'.format(data_type, data_source, date))
+    ax.legend()
+    outpath = os.path.join(repo_path, 'Output/Plots/{}_{}_{}_JSD_Gaussian_Analysis.png'.format(data_type, data_source, date))
+    plt.savefig(outpath)
+    plt.close()
+
+    return JSD_gaussain, KLD_gaussian, kurtosis, skew

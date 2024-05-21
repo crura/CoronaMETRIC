@@ -133,7 +133,7 @@ def display_fits_images(fits_files, occlt_list, outpath):
 
     plt.subplots_adjust(bottom=0.05, top=0.95)
     plt.savefig(outpath)
-    # plt.show()
+    # #plt.show()
     # plt.close()
 
 
@@ -218,7 +218,7 @@ ax.legend(bbox_to_anchor=(1, 1.05), loc="upper right")
 ax.set_title('Locations of Observations Chosen in CR 2194')
 ax.set_rlim(0, 1.3)
 plt.savefig(os.path.join(repo_path,'Output/Plots/Polar_Observations_Plot.png'))
-# plt.show()
+# #plt.show()
 
 # params = date_print + str(detector,'utf-8') + '_PSI'
 

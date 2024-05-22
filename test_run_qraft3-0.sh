@@ -46,8 +46,8 @@ echo ".compile -v '$git_repo/QRaFT/blob_tests.pro'" &&
 echo ".compile -v '$git_repo/QRaFT/a_graph_utils.pro'" &&
 echo ".compile -v '$git_repo/QRaFT/qraft_test.pro'" &&
 echo "device, dec=0" &&
-# echo "flipcolors" &&
 echo "SetColors" &&
+echo "flipcolors" &&
 echo ".compile -v '$git_repo/run_qraft_test.pro'" &&
 echo "run_qraft_test, '$git_repo'" 
 # echo "script4, '$git_repo/Output/fits_images/', '$git_repo/Output/QRaFT_Results/',  err_arr_COR1,  err_arr_LOS_COR1, err_arr_FORWARD,  err_arr_LOS_FORWARD,  err_arr_rnd, L_COR1, L_FORWARD, /manual" &&

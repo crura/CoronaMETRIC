@@ -656,15 +656,65 @@ detector = 'COR1_PSI'
 ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
 ax.set_xlim(-95,95)
 #ax.set_ylim(0,0.07)
-# ax.set_yscale('log')
 ax.legend(fontsize=13)
 
 # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
+ax.set_yscale('log')
+plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_Log.png'.format(detector.replace('-',''))))
 # #plt.show()
 #plt.close()
+
+fig, axs = plt.subplots(1, 2, figsize=(20, 8))
+
+# # Combine all the data into one array
+# all_data = np.concatenate([combined_ne_signed_ravel_arr, 
+#                            combined_pB_signed_ravel_arr, 
+#                            combined_ne_signed_LOS_ravel_arr, 
+#                            combined_cor1_signed_ravel_arr])
+
+
+# # Calculate the weights for each dataset
+# weights_ne = np.ones_like(combined_ne_signed_ravel_arr) / all_data.max()
+# weights_pB = np.ones_like(combined_pB_signed_ravel_arr) / all_data.max()
+# weights_ne_LOS = np.ones_like(combined_ne_signed_LOS_ravel_arr) / all_data.max()
+# weights_COR1 = np.ones_like(combined_cor1_signed_ravel_arr) / all_data.max()
+
+
+sns.histplot(combined_ne_signed_ravel_arr, kde=True,label='ne',bins=30,ax=axs[0],color='tab:blue')
+sns.histplot(combined_pB_signed_ravel_arr, kde=True,label='pB',bins=30,ax=axs[0],color='tab:orange')
+sns.histplot(combined_ne_signed_LOS_ravel_arr, kde=True, bins=30, label='ne_LOS',ax=axs[0], color='tab:green')
+sns.histplot(combined_cor1_signed_ravel_arr, kde=True, bins=30, label='COR1',ax=axs[0], color='tab:red')
+
+sns.histplot(combined_ne_signed_ravel_arr,kde=True,label='ne',bins=30,ax=axs[1],color='tab:blue')
+sns.histplot(combined_pB_signed_ravel_arr,kde=True,label='pB',bins=30,ax=axs[1],color='tab:orange')
+sns.histplot(combined_ne_signed_LOS_ravel_arr,kde=True, bins=30, label='ne_LOS',ax=axs[1], color='tab:green')
+sns.histplot(combined_cor1_signed_ravel_arr, kde=True, bins=30, label='COR1',ax=axs[1], color='tab:red')
+ax.set_yscale('log')
+
+
+axs[1].set_yscale('log')
+
+axs[0].set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
+axs[0].set_ylabel('Pixel Count',fontsize=14)
+detector = 'COR1_PSI'
+axs[0].set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
+axs[0].set_xlim(-95,95)
+#ax.set_ylim(0,0.07)
+axs[0].legend(fontsize=13)
+
+axs[1].set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
+axs[1].set_ylabel('Log Pixel Count',fontsize=14)
+detector = 'COR1_PSI'
+axs[1].set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
+axs[1].set_xlim(-95,95)
+#ax.set_ylim(0,0.07)
+axs[1].legend(fontsize=13)
+
+plt.tight_layout()
+plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_Performance_Fig.png'))
 
 x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new = calculate_KDE(combined_pB_signed_ravel_arr)
 gaussian_fit_pB = np.random.normal(np.mean(combined_pB_signed_ravel_arr), np.std(abs(combined_pB_signed_ravel_arr)), 1000)
@@ -688,10 +738,11 @@ ax.set_ylabel('Probability Density')
 ax.text(25,0.008,"average discrepancy: " + str(np.round(np.average(combined_pB_signed_ravel_arr),5)))
 ax.text(25,0.007,"standard deviation: " + str(np.round(np.std(abs(combined_pB_signed_ravel_arr)),5)))
 ax.text(25,0.006,"Gaussian JSD: " + str(np.round(JSD_pB_gaussain,5)))
-# ax.set_yscale('log')
 ax.set_title('PSI/FORWARD pB Angle Discrepancy Probability Density vs Corresponding Gaussian Fit')
 ax.legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/Test_Comparison_Fig.png'))
+ax.set_yscale('log')
+plt.savefig(os.path.join(repo_path,'Output/Plots/Test_Comparison_Fig_Log.png'))
 #plt.show()
 
 query = "SELECT mean, median, date, data_type, data_source, n, confidence_interval FROM central_tendency_stats_cor1_new WHERE date!='combined' ORDER BY mean ASC;"
@@ -1367,13 +1418,14 @@ detector = 'KCor_PSI'
 ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
 ax.set_xlim(-95,95)
 #ax.set_ylim(0,0.07)
-# ax.set_yscale('log')
 ax.legend(fontsize=13)
 
 # plt.text(20,0.045,"kcor average discrepancy: " + str(np.round(np.average(err_kcor_central_deg),5)))
 # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_kcor_central_deg),5)))
 # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
+ax.set_yscale('log')
+plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_log.png'.format(detector.replace('-',''))))
 # #plt.show()
 #plt.close()
 

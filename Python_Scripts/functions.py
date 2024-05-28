@@ -886,6 +886,11 @@ def print_sql_query(dbName, query, print_to_file=False, output_file=None, latex=
         table = PrettyTable()
         table.field_names = column_names
         for row in rows:
+            row = list(row)
+            for i, value in enumerate(row):
+                if isinstance(value, float):
+                    if value < 1:
+                        row[i] = "{:.5f}".format(value)
             table.add_row(row)
     if print_to_file:
         with open(output_file, 'a') as f:

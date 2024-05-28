@@ -2,7 +2,7 @@
 ; s = '5\' & fname = file_search(dr+s+'*ne.f*') & fname_B1 = file_search(dr+s+'\*By.f*') & fname_B2 = file_search(dr+s+'*Bz.f*')
 ; qraft_test,1, fname, fname_B1, fname_B2, 110
 
-PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_save_path_1, image_save_path_2, image_save_path_3, image_save_path_4, color_flip, save=save, features=features, standard_size=standard_size, IMG_orig_p_=IMG_orig_p_
+PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_save_path_1, image_save_path_2, image_save_path_3, image_save_path_4, filter_features, save=save, features=features, standard_size=standard_size, IMG_orig_p_=IMG_orig_p_
   
   if n_elements(key) eq 0 then key=1
     
@@ -165,6 +165,12 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
     
     if key le 1  then begin ; PSI model only
       
+      if filter_features then begin
+        mean_IMG_orig = mean(abs(IMG_orig[where(IMG_orig gt 0)]))
+        w = where(features.intensity gt inten_thresh*mean_IMG_orig) 
+        features = features[w]
+      endif
+      
       angle_err = features_vs_B(features, B1, B2, angle_err_avr=angle_err_avr, angle_err_sd=angle_err_sd, angle_err_signed=angle_err_signed)
 
       ;-------------------------------------
@@ -197,9 +203,6 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
   erase
   image_plot_1, IMG_d2_phi_enh, range=[0, adapt_thresh_prob(IMG_d2_phi_enh, p=0.95)]
   setcolors
-  ; if color_flip then begin
-  ; flipcolors
-  ; endif
   for i=0, n_elements(rho_min_arr)-1 do $
     for k = 0, n_elements(p_arr)-1 do begin
     i1=blob_indices[0,k,i] & i2=blob_indices[1,k,i]
@@ -244,9 +247,6 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
   loadct,0 , /silent
   image_plot_1, IMG_orig, X, Y, range=[0, adapt_thresh_prob(IMG_orig, p=0.95)], ctable=0
   setcolors
-  if color_flip then begin
-    flipcolors
-    endif
   for i=0, n_elements(blob_stat.length)-1 do begin & l=blob_stat.length[i] & phi= d_phi*blob_stat.phi_fit[i,0:l-1] & rho= d_rho*blob_stat.rho[i,0:l-1] + rho_min & xx_r = rho*cos(phi) &  yy_r = rho*sin(phi) & plots, [xx_r, yy_r], color=2, thick=2 & endfor
 
   window, 2, xsize=1000, ysize=1000 & erase
@@ -259,8 +259,10 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
   mean_IMG_orig = mean(abs(IMG_orig[where(IMG_orig gt 0)]))
   w = where(features.intensity gt inten_thresh*mean_IMG_orig) 
   
-  for i=0, n_elements(features[w])-1 do begin & n=features[w[i]].n_nodes & xx_r = features[w[i]].xx_r[0:n-1]-XYCenter[0] & yy_r = features[w[i]].yy_r[0:n-1]-XYCenter[1] & plots, xx_r, yy_r, color=4, thick=2 & endfor
-
+  
+  if ~filter_features then begin 
+    for i=0, n_elements(features[w])-1 do begin & n=features[w[i]].n_nodes & xx_r = features[w[i]].xx_r[0:n-1]-XYCenter[0] & yy_r = features[w[i]].yy_r[0:n-1]-XYCenter[1] & plots, xx_r, yy_r, color=4, thick=2 & endfor
+  endif
   ; --------------------------------------------
   
   win_to_png, 2, image_save_path_3
@@ -272,9 +274,6 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
     !P.noerase=0
     !P.multi = 0
     setcolors
-    if color_flip then begin
-    flipcolors
-    endif
     plot_B_lines, B1, B2, XYCenter=XYCenter, rho_min=rho_min;, title=file_basename(fname)
     oplot_features, features, XYCenter
     plots, [0], [0], psym=4, thick=2

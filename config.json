@@ -1,9 +1,9 @@
 {
     "psi_cube_path": "/Users/crura/Desktop/Research/Magnetic_Field/eclipse2017_mhd_final_copy/2194_WTD_local_cube_MAS.dat",
-    "cor1_data_path": "Data/COR1_Original",
-    "cor1_data_extension": ".fts",
-    "cor1_pattern_search": "rep_med",
-    "cor1_pattern_middle": false,
+    "cor1_data_path": "Data/COR1_60_min_mean",
+    "cor1_data_extension": ".fits",
+    "cor1_pattern_search": "bff",
+    "cor1_pattern_middle": true,
     "kcor_data_path": "Data/MLSO",
     "kcor_data_extension": ".fts",
     "kcor_pattern_search": "",

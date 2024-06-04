@@ -260,9 +260,9 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
   w = where(features.intensity gt inten_thresh*mean_IMG_orig) 
   
   
-  if ~filter_features then begin 
-    for i=0, n_elements(features[w])-1 do begin & n=features[w[i]].n_nodes & xx_r = features[w[i]].xx_r[0:n-1]-XYCenter[0] & yy_r = features[w[i]].yy_r[0:n-1]-XYCenter[1] & plots, xx_r, yy_r, color=4, thick=2 & endfor
-  endif
+  ; if ~filter_features then begin 
+  for i=0, n_elements(features[w])-1 do begin & n=features[w[i]].n_nodes & xx_r = features[w[i]].xx_r[0:n-1]-XYCenter[0] & yy_r = features[w[i]].yy_r[0:n-1]-XYCenter[1] & plots, xx_r, yy_r, color=4, thick=2 & endfor
+  ; endif
   ; --------------------------------------------
   
   win_to_png, 2, image_save_path_3

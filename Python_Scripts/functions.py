@@ -93,6 +93,14 @@ def calculate_KDE_statistics(KDE_1, KDE_2, norm=False):
         #compute KL Divergence
         result_KLD = KL_div(KDE_1, KDE_2)
 
+        # #normalize KDEs
+        # KDE_1 = KDE_1 / np.sum(KDE_1)
+        # KDE_2 = KDE_2 / np.sum(KDE_2)
+
+        # #compute JS Divergence
+        # result_JSD = JS_Div(KDE_1, KDE_2)
+        # #compute KL Divergence
+        # result_KLD = KL_div(KDE_1, KDE_2)
     else:
         #compute JS Divergence
         result_JSD = JS_Div(KDE_1, KDE_2)
@@ -1005,7 +1013,7 @@ def correct_fits_header(filepath):
     except KeyError:
         # Rename the key in the header of the first HDU and overwrite header
         hdul[0].header.rename_keyword('DATE_OBS', 'DATE-OBS')
-        hdul.writeto(filepath, overwrite=True)
+        # hdul.writeto(filepath, overwrite=True)
     return hdul[0].header
 
 

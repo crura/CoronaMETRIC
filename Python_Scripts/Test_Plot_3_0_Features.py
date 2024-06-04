@@ -286,6 +286,7 @@ for i in range(len(fits_files_pB)):
     # search fits headers of all files in directory for header that matches head
     for file in fits_files_pB:
         head = correct_fits_header(file)
+        head_cor1 = correct_fits_header(file_cor1)    
         # head = fits.getheader(file)
         if head['date-obs'] == head_cor1['date-obs']:
             corresponding_file_pB = file
@@ -314,6 +315,7 @@ for i in range(len(fits_files_pB)):
     tukey_result = pairwise_tukeyhsd(all_data, labels)
 
     # retrieve probability density data from seaborne distplots
+    plt.close()
     x_dist_values_pB = sns.distplot(angles_signed_arr_finite_pB).get_lines()[0].get_data()[0]
     xmin_pB = x_dist_values_pB.min()
     xmax_pB = x_dist_values_pB.max()
@@ -450,6 +452,7 @@ for i in range(len(fits_files_pB)):
         con.commit()
 
     # retrieve probability density data from seaborne distplots
+    plt.close()
     x_dist_values_pB = sns.distplot(angles_signed_arr_finite_pB).get_lines()[0].get_data()[0]
     xmin_pB = x_dist_values_pB.min()
     xmax_pB = x_dist_values_pB.max()
@@ -1070,6 +1073,7 @@ for i in range(len(fits_files_pB)):
     # search fits headers of all files in directory for header that matches head
     for file in fits_files_pB:
         head = correct_fits_header(file)
+        head_kcor = correct_fits_header(file_kcor)
         # head = fits.getheader(file)
         if head['date-obs'] == head_kcor['date-obs']:
             corresponding_file_pB = file
@@ -1098,6 +1102,7 @@ for i in range(len(fits_files_pB)):
     tukey_result = pairwise_tukeyhsd(all_data, labels)
 
     # retrieve probability density data from seaborne distplots
+    plt.close()
     x_dist_values_pB = sns.distplot(angles_signed_arr_finite_pB).get_lines()[0].get_data()[0]
     xmin_pB = x_dist_values_pB.min()
     xmax_pB = x_dist_values_pB.max()
@@ -1224,6 +1229,7 @@ for i in range(len(fits_files_pB)):
         con.commit()
 
     # retrieve probability density data from seaborne distplots
+    plt.close()
     x_dist_values_pB = sns.distplot(angles_signed_arr_finite_pB).get_lines()[0].get_data()[0]
     xmin_pB = x_dist_values_pB.min()
     xmax_pB = x_dist_values_pB.max()

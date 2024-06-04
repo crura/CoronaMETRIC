@@ -80,13 +80,25 @@ def remove_nans_infs(array, array2):
     # Filter out NaNs and Infs from the array
     return filtered_array, filtered_array2
 
-def calculate_KDE_statistics(KDE_1, KDE_2):
+def calculate_KDE_statistics(KDE_1, KDE_2, norm=False):
 
-    #compute JS Divergence
-    result_JSD = JS_Div(KDE_1, KDE_2)
+    if norm:
+        # normalize KDEs by amplitude
+        KDE_1 = KDE_1/max(KDE_1)
+        KDE_2 = KDE_2/max(KDE_2)
 
-    #compute KL Divergence
-    result_KLD = KL_div(KDE_1, KDE_2)
+        #compute JS Divergence
+        result_JSD = JS_Div(KDE_1, KDE_2)
+
+        #compute KL Divergence
+        result_KLD = KL_div(KDE_1, KDE_2)
+
+    else:
+        #compute JS Divergence
+        result_JSD = JS_Div(KDE_1, KDE_2)
+
+        #compute KL Divergence
+        result_KLD = KL_div(KDE_1, KDE_2)
 
     return result_JSD, result_KLD
 

@@ -253,7 +253,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
   loadct,0, /silent
   image_plot_1, IMG_d2_phi_r, X, Y, range=[0, adapt_thresh_prob(IMG_d2_phi_r, p=0.95)], ctable=0
   setcolors
-  for i=0, n_elements(blob_stat.length)-1 do begin & l=blob_stat.length[i] & phi= d_phi*blob_stat.phi_fit[i,0:l-1] & rho= d_rho*blob_stat.rho[i,0:l-1] + rho_min & xx_r = rho*cos(phi) &  yy_r = rho*sin(phi) & plots, [xx_r, yy_r], color=2, thick=2 & endfor
+  ; for i=0, n_elements(blob_stat.length)-1 do begin & l=blob_stat.length[i] & phi= d_phi*blob_stat.phi_fit[i,0:l-1] & rho= d_rho*blob_stat.rho[i,0:l-1] + rho_min & xx_r = rho*cos(phi) &  yy_r = rho*sin(phi) & plots, [xx_r, yy_r], color=2, thick=2 & endfor
 
 
   mean_IMG_orig = mean(abs(IMG_orig[where(IMG_orig gt 0)]))
@@ -261,7 +261,7 @@ PRO QRaFT_TEST, key, fname, fname_B1, fname_B2, rho_min, image_save_path, image_
   
   
   ; if ~filter_features then begin 
-  for i=0, n_elements(features[w])-1 do begin & n=features[w[i]].n_nodes & xx_r = features[w[i]].xx_r[0:n-1]-XYCenter[0] & yy_r = features[w[i]].yy_r[0:n-1]-XYCenter[1] & plots, xx_r, yy_r, color=4, thick=2 & endfor
+  for i=0, n_elements(features[w])-1 do begin & n=features[w[i]].n_nodes & xx_r = features[w[i]].xx_r[0:n-1]-XYCenter[0] & yy_r = features[w[i]].yy_r[0:n-1]-XYCenter[1] & plots, xx_r, yy_r, color=2, thick=2 & endfor
   ; endif
   ; --------------------------------------------
   

@@ -245,11 +245,13 @@ combined_pB = []
 combined_ne = []
 combined_ne_LOS = []
 combined_cor1 = []
+combined_random = []
 
 combined_pB_signed = []
 combined_ne_signed = []
 combined_ne_signed_LOS = []
 combined_cor1_signed = []
+combined_random_signed = []
 
 for i in range(len(fits_files_pB)):
     data_stats_2 = []
@@ -605,7 +607,25 @@ JSD_cor1_combined, KLD_cor1_combined, kurtosis_cor1_combined, skewness_cor1_comb
 data_stats_2_combined.append((None, data_type_cor1_combined, data_source, date_combined, angles_arr_mean_cor1_combined, angles_arr_median_cor1_combined, std_cor1_combined, confidence_interval_cor1_combined,
                                n_cor1_combined, JSD_cor1_combined, KLD_cor1_combined, kurtosis_cor1_combined, skewness_cor1_combined, foreign_key_cor1, ''))
 
+avg_n = int((len(combined_pB_signed_ravel_arr) + len(combined_ne_signed_ravel_arr) + len(combined_ne_signed_LOS_ravel_arr) + len(combined_cor1_signed_ravel_arr)) / 4)
+for i in range(avg_n):
+    combined_random.append(np.random.uniform(0, 90))
+    combined_random_signed.append(np.random.uniform(-90, 90))
 
+
+combined_random_ravel_arr = np.array(combined_random)
+combined_random_signed_ravel_arr = np.array(combined_random_signed)
+angles_arr_mean_random_combined = np.round(np.mean(combined_random_ravel_arr), 5)
+angles_arr_median_random_combined = np.round(np.median(combined_random_ravel_arr), 5)
+n_random_combined = len(combined_random_ravel_arr)
+std_random_combined = np.round(np.std(abs(combined_random_ravel_arr)),5)
+confidence_interval_random_combined = np.round(1.96 * (std_random_combined / np.sqrt(len(combined_random_ravel_arr))),5)
+data_type_random_combined = 'random'
+date_combined = 'combined'
+data_source = ''
+JSD_random_combined, KLD_random_combined, kurtosis_random_combined, skewness_random_combined = plot_histogram_with_JSD_Gaussian_Analysis(combined_random_signed_ravel_arr, data_type_pB_combined, data_source, date_combined)
+data_stats_2_combined.append((None, data_type_random_combined, data_source, date_combined, angles_arr_mean_random_combined, angles_arr_median_random_combined, std_random_combined, confidence_interval_random_combined,
+                               n_random_combined, JSD_random_combined, KLD_random_combined, kurtosis_random_combined, skewness_random_combined, '', ''))
 
 cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_new VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
 cur.executemany("INSERT OR IGNORE INTO central_tendency_stats_cor1_all VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data_stats_2_combined)
@@ -800,10 +820,10 @@ plt.savefig(os.path.join(repo_path, 'Output/Plots', '{}_Angle_Discrepancy_By_Dat
 #plt.show()
 
 # Combine data into a single array
-all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_cor1_signed_ravel_arr])
+all_data = np.concatenate([combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_cor1_signed_ravel_arr, combined_random_signed_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr) + ['COR1'] * len(combined_cor1_signed_ravel_arr)
+labels = ['ne'] * len(combined_ne_signed_ravel_arr) + ['ne_LOS'] * len(combined_ne_signed_LOS_ravel_arr) + ['pB'] * len(combined_pB_signed_ravel_arr) + ['COR1'] * len(combined_cor1_signed_ravel_arr) + ['random'] * len(combined_random_signed_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
@@ -818,15 +838,15 @@ else:
     print("No significant differences detected between data types.")
 
 
-res = tukey_hsd(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_cor1_signed_ravel_arr)
+res = tukey_hsd(combined_ne_signed_ravel_arr, combined_ne_signed_LOS_ravel_arr, combined_pB_signed_ravel_arr, combined_cor1_signed_ravel_arr, combined_random_signed_ravel_arr)
 print(res)
 
 
 # Combine data into a single array
-all_data = np.concatenate([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr])
+all_data = np.concatenate([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr, combined_random_ravel_arr])
 
 # Create labels for the data types
-labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr) + ['COR1'] * len(combined_cor1_ravel_arr)
+labels = ['ne'] * len(combined_ne_ravel_arr) + ['ne_LOS'] * len(combined_ne_LOS_ravel_arr) + ['pB'] * len(combined_pB_ravel_arr) + ['COR1'] * len(combined_cor1_ravel_arr) + ['random'] * len(combined_random_ravel_arr)
 
 # Perform Tukey's HSD post-hoc test
 tukey_result = pairwise_tukeyhsd(all_data, labels)
@@ -883,6 +903,10 @@ kde0_x_cor1 = kde0_cor1(x_1_cor1)
 # # #plt.show()
 plt.close()
 
+kde0_random = gaussian_kde(combined_random_signed_ravel_arr)
+x_1_random = np.linspace(-90, 90, 200)
+kde0_x_random = kde0_random(x_1_random)
+
 
 #compute JS Divergence
 
@@ -938,6 +962,30 @@ JSD_cor1_psi_pB_cor1, KLD_cor1_psi_pB_cor1 = calculate_KDE_statistics(kde0_x_pB,
 matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
 matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
 cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_cor1, JSD_cor1_psi_pB_cor1, matching_id1, matching_id2))
+con.commit()
+
+JSD_cor1_cor1_random, KLD_cor1_cor1_random = calculate_KDE_statistics(kde0_x_cor1, kde0_x_random, norm=True)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_cor1_random, JSD_cor1_cor1_random, matching_id1, matching_id2))
+con.commit()
+
+JSD_cor1_psi_pB_random, KLD_cor1_psi_pB_random = calculate_KDE_statistics(kde0_x_pB, kde0_x_random, norm=True)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_random, JSD_cor1_psi_pB_random, matching_id1, matching_id2))
+con.commit()
+
+JSD_cor1_psi_ne_random, KLD_cor1_psi_ne_random = calculate_KDE_statistics(kde0_x_ne, kde0_x_random, norm=True)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_ne_random, JSD_cor1_psi_ne_random, matching_id1, matching_id2))
+con.commit()
+
+JSD_cor1_psi_ne_LOS_random, KLD_cor1_psi_ne_LOS_random = calculate_KDE_statistics(kde0_x_ne_LOS, kde0_x_random, norm=True)
+matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
+matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
+cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_ne_LOS_random, JSD_cor1_psi_ne_LOS_random, matching_id1, matching_id2))
 con.commit()
 
 

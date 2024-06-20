@@ -36,7 +36,7 @@ from functions import display_fits_image_with_3_0_features_and_B_field
 from scipy.stats import norm
 from matplotlib import pyplot as plt
 import seaborn as sns
-from functions import calculate_KDE_statistics, determine_paths, get_files_from_pattern, calculate_KDE, plot_histogram_with_JSD_Gaussian_Analysis, correct_fits_header
+from functions import calculate_KDE_statistics, determine_paths, get_files_from_pattern, calculate_KDE, plot_histogram_with_JSD_Gaussian_Analysis, correct_fits_header, heatmap_sql_query
 import sqlite3
 from scipy.stats import f_oneway
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
@@ -182,8 +182,8 @@ CREATE TABLE IF NOT EXISTS tukey_hsd_stats_cor1(
     lower_bound_ci,
     upper_bound_ci,
     reject boolean,
-    JSD,
     KLD,
+    JSD,
     group_1_central_tendency_stats_cor1_id INTEGER,
     group_2_central_tendency_stats_cor1_id INTEGER,
     FOREIGN KEY(group_1_central_tendency_stats_cor1_id) REFERENCES central_tendency_stats_cor1_new(id),
@@ -204,8 +204,8 @@ CREATE TABLE IF NOT EXISTS tukey_hsd_stats_kcor(
     lower_bound_ci,
     upper_bound_ci,
     reject boolean,
-    JSD,
     KLD,
+    JSD,
     group_1_central_tendency_stats_kcor_id INTEGER,
     group_2_central_tendency_stats_kcor_id INTEGER,
     FOREIGN KEY(group_1_central_tendency_stats_kcor_id) REFERENCES central_tendency_stats_kcor_new(id),
@@ -424,6 +424,30 @@ for i in range(len(fits_files_pB)):
     matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_pB)).fetchone()[0]
     matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_cor1)).fetchone()[0]
     cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_cor1, JSD_cor1_psi_pB_cor1, matching_id1, matching_id2))
+    con.commit()
+
+    JSD_cor1_cor1_cor1, KLD_cor1_cor1_cor1 = calculate_KDE_statistics(kde0_x_cor1, kde0_x_cor1, norm=True)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_cor1)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_cor1)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_cor1_cor1, JSD_cor1_cor1_cor1, matching_id1, matching_id2))
+    con.commit()
+
+    JSD_psi_pB_psi_pB, KLD_psi_pB_psi_pB = calculate_KDE_statistics(kde0_x_pB, kde0_x_pB, norm=True)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_pB)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_pB)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_psi_pB_psi_pB, JSD_psi_pB_psi_pB, matching_id1, matching_id2))
+    con.commit()
+
+    JSD_psi_ne_psi_ne, KLD_psi_ne_psi_ne = calculate_KDE_statistics(kde0_x_ne, kde0_x_ne, norm=True)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_ne)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_ne)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_psi_ne_psi_ne, JSD_psi_ne_psi_ne, matching_id1, matching_id2))
+    con.commit()
+
+    JSD_psi_ne_LOS_psi_ne_LOS, KLD_psi_ne_LOS_psi_ne_LOS = calculate_KDE_statistics(kde0_x_ne_LOS, kde0_x_ne_LOS, norm=True)
+    matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_ne_LOS)).fetchone()[0]
+    matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_ne_LOS)).fetchone()[0]
+    cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_psi_ne_LOS_psi_ne_LOS, JSD_psi_ne_LOS_psi_ne_LOS, matching_id1, matching_id2))
     con.commit()
 
     # Convert SimpleTable to DataFrame
@@ -790,14 +814,41 @@ for row in rows:
 # Plot the scatter plot with error bars by date
 dates = sorted(list(data_by_date.keys()))
 data_types = sorted(list(set(data_by_date[dates[0]]['data_type'])))  # Assuming data types are consistent across dates
+data_types_original = data_types.copy()
+for j in range(len(data_types)):
+    if data_types[j] == 'ne':
+        data_types[j] = 'MAS ne'
+    elif data_types[j] == 'ne_LOS':
+        data_types[j] = 'MAS ne LOS'
+    elif data_types[j] == 'pB':
+        data_types[j] = 'MAS pB'
+    elif data_types[j] == 'COR1':
+        data_types[j] = 'COR1 pB'
 
 fig = plt.figure(figsize=(8, 8))
 # Create a scatter plot for each date
 for i, date in enumerate(dates):
+    # for i in range(len(data_by_date[date]['data_type'])):
+    #     if data_by_date[date]['data_type'][i] == 'ne':
+    #         data_by_date[date]['data_type'][i] = 'MAS ne'
+    #     elif data_by_date[date]['data_type'][i] == 'ne_LOS':
+    #         data_by_date[date]['data_type'][i] = 'MAS ne LOS'
+    #     elif data_by_date[date]['data_type'][i] == 'pB':
+    #         data_by_date[date]['data_type'][i] = 'MAS pB'
+    #     elif data_by_date[date]['data_type'][i] == 'COR1':
+    #         data_by_date[date]['data_type'][i] = 'COR1 pB'
     data_to_plot = [data_by_date[date]['mean'][j] for j in range(len(data_by_date[date]['data_type']))]
     confidence_to_plot = [data_by_date[date]['confidence_interval'][j] for j in range(len(data_by_date[date]['data_type']))]
     data_type_to_plot = [data_by_date[date]['data_type'][j] for j in range(len(data_by_date[date]['data_type']))]
     for j in range(len(data_to_plot)):
+        if data_type_to_plot[j] == 'ne':
+            data_type_to_plot[j] = 'MAS ne'
+        elif data_type_to_plot[j] == 'ne_LOS':
+            data_type_to_plot[j] = 'MAS ne LOS'
+        elif data_type_to_plot[j] == 'pB':
+            data_type_to_plot[j] = 'MAS pB'
+        elif data_type_to_plot[j] == 'COR1':
+            data_type_to_plot[j] = 'COR1 pB'
         if data_type_to_plot[j] == data_types[0]:
             plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C0' ,label=data_type_to_plot[j] if i == 0 else "")
         elif data_type_to_plot[j] == data_types[1]:
@@ -928,65 +979,123 @@ cur.execute("""CREATE TABLE KLD_JSD (
         """
         )
 
-JSD_cor1_psi_pB_ne, KLD_cor1_psi_pB_ne = calculate_KDE_statistics(kde0_x_pB, kde0_x_ne, norm=True)
-matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
-matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
-cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_ne, JSD_cor1_psi_pB_ne, matching_id1, matching_id2))
+# JSD_cor1_psi_pB_ne, KLD_cor1_psi_pB_ne = calculate_KDE_statistics(kde0_x_pB, kde0_x_ne, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_ne, JSD_cor1_psi_pB_ne, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_cor1_psi_pB_ne_LOS, KLD_cor1_psi_pB_ne_LOS = calculate_KDE_statistics(kde0_x_pB, kde0_x_ne_LOS, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_ne_LOS, JSD_cor1_psi_pB_ne_LOS, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_cor1_psi_ne_ne_LOS, KLD_cor1_psi_ne_ne_LOS = calculate_KDE_statistics(kde0_x_ne, kde0_x_ne_LOS, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_ne_ne_LOS, JSD_cor1_psi_ne_ne_LOS, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_cor1_ne_cor1, KLD_cor1_ne_cor1 = calculate_KDE_statistics(kde0_x_ne, kde0_x_cor1, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_ne_cor1, JSD_cor1_ne_cor1, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_cor1_ne_LOS_cor1, KLD_cor1_ne_LOS_cor1 = calculate_KDE_statistics(kde0_x_ne_LOS, kde0_x_cor1, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_ne_LOS_cor1, JSD_cor1_ne_LOS_cor1, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_cor1_psi_pB_cor1, KLD_cor1_psi_pB_cor1 = calculate_KDE_statistics(kde0_x_pB, kde0_x_cor1, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_cor1, JSD_cor1_psi_pB_cor1, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_cor1_cor1_random, KLD_cor1_cor1_random = calculate_KDE_statistics(kde0_x_cor1, kde0_x_random, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_cor1_random, JSD_cor1_cor1_random, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_cor1_psi_pB_random, KLD_cor1_psi_pB_random = calculate_KDE_statistics(kde0_x_pB, kde0_x_random, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_random, JSD_cor1_psi_pB_random, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_cor1_psi_ne_random, KLD_cor1_psi_ne_random = calculate_KDE_statistics(kde0_x_ne, kde0_x_random, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_ne_random, JSD_cor1_psi_ne_random, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_cor1_psi_ne_LOS_random, KLD_cor1_psi_ne_LOS_random = calculate_KDE_statistics(kde0_x_ne_LOS, kde0_x_random, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_ne_LOS_random, JSD_cor1_psi_ne_LOS_random, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_random_random, KLD_random_random = calculate_KDE_statistics(kde0_x_random, kde0_x_random, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_random_random, JSD_random_random, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_cor1_cor1_cor1, KLD_cor1_cor1_cor1 = calculate_KDE_statistics(kde0_x_cor1, kde0_x_cor1, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_cor1_cor1, JSD_cor1_cor1_cor1, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_cor1_psi_pB_psi_pB, KLD_cor1_psi_pB_psi_pB = calculate_KDE_statistics(kde0_x_pB, kde0_x_pB, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_psi_pB, JSD_cor1_psi_pB_psi_pB, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_cor1_psi_ne_psi_ne, KLD_cor1_psi_ne_psi_ne = calculate_KDE_statistics(kde0_x_ne, kde0_x_ne, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_ne_psi_ne, JSD_cor1_psi_ne_psi_ne, matching_id1, matching_id2))
+# con.commit()
+
+# JSD_cor1_psi_ne_LOS_psi_ne_LOS, KLD_cor1_psi_ne_LOS_psi_ne_LOS = calculate_KDE_statistics(kde0_x_ne_LOS, kde0_x_ne_LOS, norm=True)
+# matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
+# matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
+# cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_ne_LOS_psi_ne_LOS, JSD_cor1_psi_ne_LOS_psi_ne_LOS, matching_id1, matching_id2))
+# con.commit()
+
+cur.execute("DROP TABLE IF EXISTS KLD_JSD_no_random")
+cur.execute("CREATE TABLE KLD_JSD_no_random AS SELECT * FROM KLD_JSD WHERE 0")
 con.commit()
 
-JSD_cor1_psi_pB_ne_LOS, KLD_cor1_psi_pB_ne_LOS = calculate_KDE_statistics(kde0_x_pB, kde0_x_ne_LOS, norm=True)
-matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
-matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
-cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_ne_LOS, JSD_cor1_psi_pB_ne_LOS, matching_id1, matching_id2))
-con.commit()
+JSD_data_types = ['ne', 'ne_LOS', 'pB', 'COR1']
+JSD_input_values = [kde0_x_ne, kde0_x_ne_LOS, kde0_x_pB, kde0_x_cor1]
+for i in range(len(JSD_input_values)):
+    for j in range(len(JSD_input_values)):
+        JSD, KLD = calculate_KDE_statistics(JSD_input_values[i], JSD_input_values[j], norm=True)
+        matching_id1 = cur.execute("SELECT data_type FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (JSD_data_types[i], date_combined)).fetchone()[0]
+        matching_id2 = cur.execute("SELECT data_type FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (JSD_data_types[j], date_combined)).fetchone()[0]
+        cur.execute("INSERT INTO KLD_JSD_no_random VALUES(?, ?, ?, ?, ?)", (None, KLD, JSD, matching_id1, matching_id2))
+        con.commit()
 
-JSD_cor1_psi_ne_ne_LOS, KLD_cor1_psi_ne_ne_LOS = calculate_KDE_statistics(kde0_x_ne, kde0_x_ne_LOS, norm=True)
-matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
-matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
-cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_ne_ne_LOS, JSD_cor1_psi_ne_ne_LOS, matching_id1, matching_id2))
-con.commit()
+query = "SELECT group_1_central_tendency_stats_cor1_id, group_2_central_tendency_stats_cor1_id, JSD from KLD_JSD_no_random;"
+dbName = "tutorial.db"
+heatmap_sql_query(dbName, query)
 
-JSD_cor1_ne_cor1, KLD_cor1_ne_cor1 = calculate_KDE_statistics(kde0_x_ne, kde0_x_cor1, norm=True)
-matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
-matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
-cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_ne_cor1, JSD_cor1_ne_cor1, matching_id1, matching_id2))
-con.commit()
-
-JSD_cor1_ne_LOS_cor1, KLD_cor1_ne_LOS_cor1 = calculate_KDE_statistics(kde0_x_ne_LOS, kde0_x_cor1, norm=True)
-matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
-matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
-cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_ne_LOS_cor1, JSD_cor1_ne_LOS_cor1, matching_id1, matching_id2))
-con.commit()
-
-JSD_cor1_psi_pB_cor1, KLD_cor1_psi_pB_cor1 = calculate_KDE_statistics(kde0_x_pB, kde0_x_cor1, norm=True)
-matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
-matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
-cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_cor1, JSD_cor1_psi_pB_cor1, matching_id1, matching_id2))
-con.commit()
-
-JSD_cor1_cor1_random, KLD_cor1_cor1_random = calculate_KDE_statistics(kde0_x_cor1, kde0_x_random, norm=True)
-matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_cor1, date_combined)).fetchone()[0]
-matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
-cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_cor1_random, JSD_cor1_cor1_random, matching_id1, matching_id2))
-con.commit()
-
-JSD_cor1_psi_pB_random, KLD_cor1_psi_pB_random = calculate_KDE_statistics(kde0_x_pB, kde0_x_random, norm=True)
-matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_pB, date_combined)).fetchone()[0]
-matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
-cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_pB_random, JSD_cor1_psi_pB_random, matching_id1, matching_id2))
-con.commit()
-
-JSD_cor1_psi_ne_random, KLD_cor1_psi_ne_random = calculate_KDE_statistics(kde0_x_ne, kde0_x_random, norm=True)
-matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne, date_combined)).fetchone()[0]
-matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
-cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_ne_random, JSD_cor1_psi_ne_random, matching_id1, matching_id2))
-con.commit()
-
-JSD_cor1_psi_ne_LOS_random, KLD_cor1_psi_ne_LOS_random = calculate_KDE_statistics(kde0_x_ne_LOS, kde0_x_random, norm=True)
-matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (data_type_ne_LOS, date_combined)).fetchone()[0]
-matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", ('random', date_combined)).fetchone()[0]
-cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD_cor1_psi_ne_LOS_random, JSD_cor1_psi_ne_LOS_random, matching_id1, matching_id2))
-con.commit()
+JSD_data_types = ['ne', 'ne_LOS', 'pB', 'COR1', 'random']
+JSD_input_values = [kde0_x_ne, kde0_x_ne_LOS, kde0_x_pB, kde0_x_cor1, kde0_x_random]
+for i in range(len(JSD_input_values)):
+    for j in range(len(JSD_input_values)):
+        JSD, KLD = calculate_KDE_statistics(JSD_input_values[i], JSD_input_values[j], norm=True)
+        matching_id1 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (JSD_data_types[i], date_combined)).fetchone()[0]
+        matching_id2 = cur.execute("SELECT id FROM central_tendency_stats_cor1_new WHERE data_type = ? AND date = ?", (JSD_data_types[j], date_combined)).fetchone()[0]
+        cur.execute("INSERT INTO KLD_JSD VALUES(?, ?, ?, ?, ?)", (None, KLD, JSD, matching_id1, matching_id2))
+        con.commit()
 
 
 # Convert SimpleTable to DataFrame
@@ -1054,6 +1163,7 @@ ax.set_xlabel("Data Type")
 ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.png'))
 #plt.show()
+plt.close()
 
 res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr)
 print(res)

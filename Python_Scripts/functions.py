@@ -1053,3 +1053,25 @@ def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, dat
     plt.close()
 
     return JSD_gaussain, KLD_gaussian, kurtosis, skew
+
+
+
+def heatmap_sql_query(dbName, query, output_file=None, print_to_file=False, latex=False, caption=False, caption_text=None):
+    import sqlite3
+    import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    conn = sqlite3.connect(dbName)
+    df = pd.read_sql_query(query, conn)
+    # df = df.pivot(index='group1', columns='group2', values='JSD')
+
+    # group1 = df['group1'].unique()
+    # group2 = df['group2'].unique()
+    # JSD = df['JSD'].values
+
+
+
+
+    pivot_df = df.pivot(index='group_1_central_tendency_stats_cor1_id', columns='group_2_central_tendency_stats_cor1_id', values='JSD')
+    sns.heatmap(pivot_df, annot=True)
+    plt.show()

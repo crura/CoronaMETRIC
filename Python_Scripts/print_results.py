@@ -77,15 +77,15 @@ print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, cap
 
 
 
-query = "SELECT group1, group2, date, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, KLD, JSD, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date!='combined';"
+query = "SELECT group1, group2, date, mean_diff, lower_bound_ci, upper_bound_ci, KLD, JSD, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date!='combined';"
 print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Tukey HSD Statistics for COR-1 Data by Date',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
-query = "SELECT group1, group2, date, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, KLD, JSD, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined';"
+query = "SELECT group1, group2, date, mean_diff, lower_bound_ci, upper_bound_ci, KLD, JSD, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined';"
 print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Tukey HSD Statistics for Combined COR-1 Data',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
-query = "SELECT group1, group2, date, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, KLD, JSD, reject from tukey_hsd_stats_kcor inner join central_tendency_stats_kcor_new on central_tendency_stats_kcor_new.id = tukey_hsd_stats_kcor.group_1_central_tendency_stats_kcor_id;"
+query = "SELECT group1, group2, date, mean_diff, lower_bound_ci, upper_bound_ci, KLD, JSD, reject from tukey_hsd_stats_kcor inner join central_tendency_stats_kcor_new on central_tendency_stats_kcor_new.id = tukey_hsd_stats_kcor.group_1_central_tendency_stats_kcor_id;"
 print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Tukey HSD Statistics for K-COR Data',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 

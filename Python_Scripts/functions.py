@@ -882,12 +882,12 @@ def print_sql_query(dbName, query, print_to_file=False, output_file=None, latex=
         # replace ne LOS with $n_e$ in data
         rows = [[re.sub("\\\\acrshort{ne central} LOS", "\\\\acrshort{ne los}", str(item)) for item in row] for row in rows]
         # replace pB with $pB$ in data
-        rows = [[re.sub(r'\bpB\b', "\\\\acrshort{pB}", str(item)) for item in row] for row in rows]
+        rows = [[re.sub(r'\bpB\b', "\\\\acrshort{forward pB}", str(item)) for item in row] for row in rows]
 
         # replace pB with $pB$ in data
         rows = [[re.sub(r'\bKCor\b', "\\\\acrshort{k-cor}", str(item)) for item in row] for row in rows]
         # replace pB with $pB$ in data
-        rows = [[re.sub(r'\bCOR1\b', "\\\\acrshort{cor-1}", str(item)) for item in row] for row in rows]
+        rows = [[re.sub(r'\bCOR1\b', "\\\\acrshort{cor-1 pB}", str(item)) for item in row] for row in rows]
         # Replace underscores in column names
         column_names = [name.replace('_', ' ') for name in column_names]
         # Replace underscores in column names
@@ -1070,8 +1070,34 @@ def heatmap_sql_query(dbName, query, output_file=None, print_to_file=False, late
     # JSD = df['JSD'].values
 
 
-
+    for i in range(len(df)):
+        if df['group_1_central_tendency_stats_cor1_id'][i] == 'ne':
+            df['group_1_central_tendency_stats_cor1_id'][i] = 'MAS ne'
+        if df['group_2_central_tendency_stats_cor1_id'][i] == 'ne':
+            df['group_2_central_tendency_stats_cor1_id'][i] = 'MAS ne'
+        if df['group_1_central_tendency_stats_cor1_id'][i] == 'ne_LOS':
+            df['group_1_central_tendency_stats_cor1_id'][i] = 'MAS ne_LOS'
+        if df['group_2_central_tendency_stats_cor1_id'][i] == 'ne_LOS':
+            df['group_2_central_tendency_stats_cor1_id'][i] = 'MAS ne_LOS'
+        if df['group_1_central_tendency_stats_cor1_id'][i] == 'pB':
+            df['group_1_central_tendency_stats_cor1_id'][i] = 'FORWARD pB'
+        if df['group_2_central_tendency_stats_cor1_id'][i] == 'pB':
+            df['group_2_central_tendency_stats_cor1_id'][i] = 'FORWARD pB'
+        if df['group_1_central_tendency_stats_cor1_id'][i] == 'COR1':
+            df['group_1_central_tendency_stats_cor1_id'][i] = 'COR1 pB'
+        if df['group_2_central_tendency_stats_cor1_id'][i] == 'COR1':
+            df['group_2_central_tendency_stats_cor1_id'][i] = 'COR1 pB'
 
     pivot_df = df.pivot(index='group_1_central_tendency_stats_cor1_id', columns='group_2_central_tendency_stats_cor1_id', values='JSD')
     sns.heatmap(pivot_df, annot=True)
-    plt.show()
+    plt.title('JSD Evaluation for Aggregated Data')
+    plt.xlabel('group 1')
+    plt.ylabel('group 2')
+    # set colorbar label
+    cbar = plt.gca().collections[0].colorbar
+    cbar.set_label('JSD')
+    if print_to_file:
+        plt.savefig(output_file)
+    else:
+        plt.show()
+    plt.close()

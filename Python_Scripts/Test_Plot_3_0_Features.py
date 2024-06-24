@@ -730,15 +730,15 @@ fig, axs = plt.subplots(1, 2, figsize=(20, 8))
 # weights_COR1 = np.ones_like(combined_cor1_signed_ravel_arr) / all_data.max()
 
 
-sns.histplot(combined_ne_signed_ravel_arr, kde=True,label='ne',bins=30,ax=axs[0],color='tab:blue')
-sns.histplot(combined_pB_signed_ravel_arr, kde=True,label='pB',bins=30,ax=axs[0],color='tab:orange')
-sns.histplot(combined_ne_signed_LOS_ravel_arr, kde=True, bins=30, label='ne_LOS',ax=axs[0], color='tab:green')
-sns.histplot(combined_cor1_signed_ravel_arr, kde=True, bins=30, label='COR1',ax=axs[0], color='tab:red')
+sns.histplot(combined_ne_signed_ravel_arr, kde=True,label='MAS ne',bins=30,ax=axs[0],color='tab:blue')
+sns.histplot(combined_pB_signed_ravel_arr, kde=True,label='FORWARD pB',bins=30,ax=axs[0],color='tab:orange')
+sns.histplot(combined_ne_signed_LOS_ravel_arr, kde=True, bins=30, label='MAS ne_LOS',ax=axs[0], color='tab:green')
+sns.histplot(combined_cor1_signed_ravel_arr, kde=True, bins=30, label='COR1 pB',ax=axs[0], color='tab:red')
 
-sns.histplot(combined_ne_signed_ravel_arr,kde=True,label='ne',bins=30,ax=axs[1],color='tab:blue')
-sns.histplot(combined_pB_signed_ravel_arr,kde=True,label='pB',bins=30,ax=axs[1],color='tab:orange')
-sns.histplot(combined_ne_signed_LOS_ravel_arr,kde=True, bins=30, label='ne_LOS',ax=axs[1], color='tab:green')
-sns.histplot(combined_cor1_signed_ravel_arr, kde=True, bins=30, label='COR1',ax=axs[1], color='tab:red')
+sns.histplot(combined_ne_signed_ravel_arr,kde=True,label='MAS ne',bins=30,ax=axs[1],color='tab:blue')
+sns.histplot(combined_pB_signed_ravel_arr,kde=True,label='FORWARD pB',bins=30,ax=axs[1],color='tab:orange')
+sns.histplot(combined_ne_signed_LOS_ravel_arr,kde=True, bins=30, label='MAS ne_LOS',ax=axs[1], color='tab:green')
+sns.histplot(combined_cor1_signed_ravel_arr, kde=True, bins=30, label='COR1 pB',ax=axs[1], color='tab:red')
 ax.set_yscale('log')
 
 
@@ -821,7 +821,7 @@ for j in range(len(data_types)):
     elif data_types[j] == 'ne_LOS':
         data_types[j] = 'MAS ne LOS'
     elif data_types[j] == 'pB':
-        data_types[j] = 'MAS pB'
+        data_types[j] = 'FORWARD pB'
     elif data_types[j] == 'COR1':
         data_types[j] = 'COR1 pB'
 
@@ -834,7 +834,7 @@ for i, date in enumerate(dates):
     #     elif data_by_date[date]['data_type'][i] == 'ne_LOS':
     #         data_by_date[date]['data_type'][i] = 'MAS ne LOS'
     #     elif data_by_date[date]['data_type'][i] == 'pB':
-    #         data_by_date[date]['data_type'][i] = 'MAS pB'
+    #         data_by_date[date]['data_type'][i] = 'FORWARD pB'
     #     elif data_by_date[date]['data_type'][i] == 'COR1':
     #         data_by_date[date]['data_type'][i] = 'COR1 pB'
     data_to_plot = [data_by_date[date]['mean'][j] for j in range(len(data_by_date[date]['data_type']))]
@@ -846,7 +846,7 @@ for i, date in enumerate(dates):
         elif data_type_to_plot[j] == 'ne_LOS':
             data_type_to_plot[j] = 'MAS ne LOS'
         elif data_type_to_plot[j] == 'pB':
-            data_type_to_plot[j] = 'MAS pB'
+            data_type_to_plot[j] = 'FORWARD pB'
         elif data_type_to_plot[j] == 'COR1':
             data_type_to_plot[j] = 'COR1 pB'
         if data_type_to_plot[j] == data_types[0]:
@@ -1085,7 +1085,7 @@ for i in range(len(JSD_input_values)):
 
 query = "SELECT group_1_central_tendency_stats_cor1_id, group_2_central_tendency_stats_cor1_id, JSD from KLD_JSD_no_random;"
 dbName = "tutorial.db"
-heatmap_sql_query(dbName, query)
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_no_random_heatmap.png'))
 
 JSD_data_types = ['ne', 'ne_LOS', 'pB', 'COR1', 'random']
 JSD_input_values = [kde0_x_ne, kde0_x_ne_LOS, kde0_x_pB, kde0_x_cor1, kde0_x_random]

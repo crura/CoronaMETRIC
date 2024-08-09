@@ -702,20 +702,21 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
             v1_mag = np.sqrt(np.sum(np.array(v1) ** 2))
             v2_mag = np.sqrt(np.sum(np.array(v2) ** 2))
 
-            d_angle = np.arccos(np.sum(np.array(v1)*np.array(v2)) / (v1_mag * v2_mag) )
-            if d_angle > math.pi/2:
-                d_angle = math.pi - d_angle
-            angle_err[i, k] = d_angle
-            angles.append(d_angle)
+            # d_angle = np.arccos(np.sum(np.array(v1)*np.array(v2)) / (v1_mag * v2_mag) )
+            # if d_angle > math.pi/2:
+            #     d_angle = math.pi - d_angle
+            # angle_err[i, k] = d_angle
+            # angles.append(d_angle)
             angles_xx_positions.append(int(xx[k]))
             angles_yy_positions.append(int(yy[k]))
 
             d_angle_signed = np.arcsin((v1[0] * v2[1] - v1[1] * v2[0]) / (v1_mag * v2_mag))
             d_angle_signed_test = np.arctan2((v1[0] * v2[1] - v1[1] * v2[0]),  (v1[0] * v2[0] + v1[1] * v2[1]))
             d_angle_signed_test_2 = np.arctan((v1[0] * v2[1] - v1[1] * v2[0]) / (v1[0] * v2[0] + v1[1] * v2[1]))
-            angles_signed.append(d_angle_signed)
+            angles_signed.append(d_angle_signed_test_2)
             angles_signed_test.append(d_angle_signed_test)
             angles_signed_test_2.append(d_angle_signed_test_2)
+            angles.append(abs(d_angle_signed_test_2))
 
 
     angles_arr = np.array(angles)

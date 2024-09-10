@@ -3,16 +3,18 @@
 skinparam linetype ortho
 
 RECTANGLE User {
-  <color:red>*</color> Input: Coronagraph Observations (.fits files)
+  <color:red>*</color> Input: Coronagraph Observations
   --
   <color:red>*</color> Outputs: Comprehensive Metrics and Statistics
 }
 
-User --> "Component 1: Image Processing" : Input .fits files
-' User --> "Component 2: Synthetic Image Generation" : Input \n .fits files
+User --> "Component 1: Image Processing" : Input \n Coronagraph \n Observations
+
+
+User --> "Component 2: Synthetic Image Generation" : \n Input \n Coronagraph Observations
 
 RECTANGLE "Component 1: Image Processing" {
-    <color:red>*</color> Input: .fits files
+    <color:red>*</color> Input: Coronagraph Observations
     --
 '   - Use `secchi_prep` routine:
   - Download sequential polarized images
@@ -26,7 +28,7 @@ RECTANGLE "Component 1: Image Processing" {
 
 
 RECTANGLE "Component 2: Synthetic Image Generation" {
-    <color:red>*</color> Input: .fits files
+    <color:red>*</color> Input: Coronagraph Observations
     --
   - Generate MHD model solution
   - Coordinate Transformation
@@ -35,7 +37,7 @@ RECTANGLE "Component 2: Synthetic Image Generation" {
 --
   <color:red>*</color> Outputs: Synthetic Images (Coaligned) and MHD Model Outputs (B, ne parameters)
 }
-"Component 1: Image Processing" --> "Component 2: Synthetic Image Generation" : Output representative pB image
+' "Component 1: Image Processing" --> "Component 2: Synthetic Image Generation" : Output representative pB image
 "Component 2: Synthetic Image Generation" --> "Component 3: Image Segmentation" : Output synthetic pB image
 
 

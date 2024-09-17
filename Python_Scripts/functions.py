@@ -1057,13 +1057,17 @@ def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, dat
 
 
 
-def heatmap_sql_query(dbName, query, output_file=None, print_to_file=False, latex=False, caption=False, caption_text=None):
+def heatmap_sql_query(dbName, query, output_file=None, print_to_file=False, latex=False, caption=False, caption_text=None, colorbar_label=None, title=None, x_label=None, y_label=None):
     import sqlite3
     import pandas as pd
     import seaborn as sns
     import matplotlib.pyplot as plt
     conn = sqlite3.connect(dbName)
     df = pd.read_sql_query(query, conn)
+    parameters = query.split('from')[0].strip('SELECT').strip().split(',')
+    index_1 = parameters[0].strip()
+    index_2 = parameters[1].strip()
+    value = parameters[2].strip()
     # df = df.pivot(index='group1', columns='group2', values='JSD')
 
     # group1 = df['group1'].unique()
@@ -1071,32 +1075,60 @@ def heatmap_sql_query(dbName, query, output_file=None, print_to_file=False, late
     # JSD = df['JSD'].values
 
 
-    for i in range(len(df)):
-        if df['group_1_central_tendency_stats_cor1_id'][i] == 'ne':
-            df['group_1_central_tendency_stats_cor1_id'][i] = 'MAS ne'
-        if df['group_2_central_tendency_stats_cor1_id'][i] == 'ne':
-            df['group_2_central_tendency_stats_cor1_id'][i] = 'MAS ne'
-        if df['group_1_central_tendency_stats_cor1_id'][i] == 'ne_LOS':
-            df['group_1_central_tendency_stats_cor1_id'][i] = 'MAS ne_LOS'
-        if df['group_2_central_tendency_stats_cor1_id'][i] == 'ne_LOS':
-            df['group_2_central_tendency_stats_cor1_id'][i] = 'MAS ne_LOS'
-        if df['group_1_central_tendency_stats_cor1_id'][i] == 'pB':
-            df['group_1_central_tendency_stats_cor1_id'][i] = 'FORWARD pB'
-        if df['group_2_central_tendency_stats_cor1_id'][i] == 'pB':
-            df['group_2_central_tendency_stats_cor1_id'][i] = 'FORWARD pB'
-        if df['group_1_central_tendency_stats_cor1_id'][i] == 'COR1':
-            df['group_1_central_tendency_stats_cor1_id'][i] = 'COR1 pB'
-        if df['group_2_central_tendency_stats_cor1_id'][i] == 'COR1':
-            df['group_2_central_tendency_stats_cor1_id'][i] = 'COR1 pB'
+    # try:
+    #     for i in range(len(df)):
+    #         if df['group_1_central_tendency_stats_cor1_id'][i] == 'ne':
+    #             df['group_1_central_tendency_stats_cor1_id'][i] = 'MAS ne'
+    #         if df['group_2_central_tendency_stats_cor1_id'][i] == 'ne':
+    #             df['group_2_central_tendency_stats_cor1_id'][i] = 'MAS ne'
+    #         if df['group_1_central_tendency_stats_cor1_id'][i] == 'ne_LOS':
+    #             df['group_1_central_tendency_stats_cor1_id'][i] = 'MAS ne_LOS'
+    #         if df['group_2_central_tendency_stats_cor1_id'][i] == 'ne_LOS':
+    #             df['group_2_central_tendency_stats_cor1_id'][i] = 'MAS ne_LOS'
+    #         if df['group_1_central_tendency_stats_cor1_id'][i] == 'pB':
+    #             df['group_1_central_tendency_stats_cor1_id'][i] = 'FORWARD pB'
+    #         if df['group_2_central_tendency_stats_cor1_id'][i] == 'pB':
+    #             df['group_2_central_tendency_stats_cor1_id'][i] = 'FORWARD pB'
+    #         if df['group_1_central_tendency_stats_cor1_id'][i] == 'COR1':
+    #             df['group_1_central_tendency_stats_cor1_id'][i] = 'COR1 pB'
+    #         if df['group_2_central_tendency_stats_cor1_id'][i] == 'COR1':
+    #             df['group_2_central_tendency_stats_cor1_id'][i] = 'COR1 pB'
+    # except KeyError:
+    #     pass
 
-    pivot_df = df.pivot(index='group_1_central_tendency_stats_cor1_id', columns='group_2_central_tendency_stats_cor1_id', values='JSD')
-    sns.heatmap(pivot_df, annot=True)
-    plt.title('JSD Evaluation for Aggregated Data')
-    plt.xlabel('group 1')
-    plt.ylabel('group 2')
+    # try:
+    #     for i in range(len(df)):
+    #         if df[index_1][i] == 'ne':
+    #             df[index_1][i] = 'MAS ne'
+    #         if df[index_2][i] == 'ne':
+    #             df[index_2][i] = 'MAS ne'
+    #         if df[index_1][i] == 'ne_LOS':
+    #             df[index_2][i] = 'MAS ne_LOS'
+    #         if df[index_2][i] == 'ne_LOS':
+    #             df[index_2][i] = 'MAS ne_LOS'
+    #         if df[index_1][i] == 'pB':
+    #             df[index_1][i] = 'FORWARD pB'
+    #         if df[index_2][i] == 'pB':
+    #             df[index_2][i] = 'FORWARD pB'
+    #         if df[index_1][i] == 'COR1':
+    #             df[index_1][i] = 'COR1 pB'
+    #         if df[index_2][i] == 'COR1':
+    #             df[index_2][i] = 'COR1 pB'
+    # except KeyError:
+    #     pass
+
+    df[value] = abs(df[value])
+
+
+    pivot_df = df.pivot_table(index=index_1, columns=index_2, values=value)
+    symmetric_df = pivot_df.add(pivot_df.T, fill_value=0)
+    sns.heatmap(symmetric_df, annot=True)
+    plt.title(title)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
     # set colorbar label
     cbar = plt.gca().collections[0].colorbar
-    cbar.set_label('JSD')
+    cbar.set_label(colorbar_label)
     if print_to_file:
         plt.savefig(output_file)
     else:

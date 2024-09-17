@@ -1085,7 +1085,7 @@ for i in range(len(JSD_input_values)):
 
 query = "SELECT group_1_central_tendency_stats_cor1_id, group_2_central_tendency_stats_cor1_id, JSD from KLD_JSD_no_random;"
 dbName = "tutorial.db"
-heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_no_random_heatmap.png'))
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_no_random_heatmap.png'), title='JSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='JSD')
 
 JSD_data_types = ['ne', 'ne_LOS', 'pB', 'COR1', 'random']
 JSD_input_values = [kde0_x_ne, kde0_x_ne_LOS, kde0_x_pB, kde0_x_cor1, kde0_x_random]
@@ -1121,6 +1121,24 @@ for i, row in tukey_df.iterrows():
 
 
 print(tukey_result)
+
+for i in range (len(tukey_result.summary().data[0])):
+    if tukey_result.summary().data[i][0] == 'COR1':
+        tukey_result.summary().data[i][0] = 'COR1 pB'
+    if tukey_result.summary().data[i][1] == 'COR1':
+        tukey_result.summary().data[i][1] = 'COR1 pB'
+    if tukey_result.summary().data[i][0] == 'ne':
+        tukey_result.summary().data[i][0] = 'MAS ne'
+    if tukey_result.summary().data[i][1] == 'ne':
+        tukey_result.summary().data[i][1] = 'MAS ne'
+    if tukey_result.summary().data[i][0] == 'ne_LOS':
+        tukey_result.summary().data[i][0] = 'MAS ne LOS'
+    if tukey_result.summary().data[i][1] == 'ne_LOS':
+        tukey_result.summary().data[i][1] = 'MAS ne LOS'
+    if tukey_result.summary().data[i][0] == 'pB':
+        tukey_result.summary().data[i][0] = 'FORWARD pB'
+    if tukey_result.summary().data[i][1] == 'pB':
+        tukey_result.summary().data[i][1] = 'FORWARD pB'
 fig, ax = plt.subplots(1, 1)
 # ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr], showfliers=False)
 # ax.set_xticklabels(["ne", "ne_LOS", "pB"]) 
@@ -1168,6 +1186,17 @@ plt.close()
 res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr)
 print(res)
 
+
+# Read SQL Query File
+with open(os.path.join(repo_path, 'Python_Scripts', 'Test_SQL_Queries.sql'), 'r') as file:
+    script = file.read()
+
+cur.executescript(script)
+con.commit()
+
+query = "SELECT group1, group2, mean_diff from tukey_hsd_mean_diff_combined_cor1;"
+dbName = "tutorial.db"
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Test_COR1_Combined_HSD_mean_diff_heatmap.png'), colorbar_label='Absolute Mean Difference (Degrees)', title='Heatmap of Mean Differences by Population', x_label='group 1', y_label='group 2')
 
 fits_path = os.path.join(repo_path, 'Output/QRaFT_Results')
 fits_input_path = os.path.join(repo_path, config['kcor_data_path'])

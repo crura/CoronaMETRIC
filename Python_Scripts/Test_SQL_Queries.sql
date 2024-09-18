@@ -25,3 +25,11 @@ INSERT INTO tukey_hsd_mean_diff_combined_cor1 VALUES ('ne', 'ne', 0);
 INSERT INTO tukey_hsd_mean_diff_combined_cor1 VALUES ('ne_LOS', 'ne_LOS', 0);
 INSERT INTO tukey_hsd_mean_diff_combined_cor1 VALUES ('pB', 'pB', 0);
 INSERT INTO tukey_hsd_mean_diff_combined_cor1 VALUES ('random', 'random', 0);
+
+DROP TABLE IF EXISTS tukey_hsd_reject_combined_cor1;
+CREATE TABLE tukey_hsd_reject_combined_cor1 AS SELECT group1, group2, reject from tukey_hsd_results_with_JSD WHERE date = 'combined';
+INSERT INTO tukey_hsd_reject_combined_cor1 VALUES ('COR1', 'COR1', 0);
+INSERT INTO tukey_hsd_reject_combined_cor1 VALUES ('ne', 'ne', 0);
+INSERT INTO tukey_hsd_reject_combined_cor1 VALUES ('ne_LOS', 'ne_LOS', 0);
+INSERT INTO tukey_hsd_reject_combined_cor1 VALUES ('pB', 'pB', 0);
+INSERT INTO tukey_hsd_reject_combined_cor1 VALUES ('random', 'random', 0);

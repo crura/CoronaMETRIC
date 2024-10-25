@@ -896,6 +896,33 @@ def print_sql_query(dbName, query, print_to_file=False, output_file=None, latex=
         # Replace underscores in column names
         column_names = [name.replace('confidence interval', '$95\%$ CI') for name in column_names]
 
+        for index, row in enumerate(rows):
+            row = list(row)
+            for i, value in enumerate(row):
+                try:
+                    if '.' in value:
+                        value = float(value)
+                        result = True
+                    else:
+                        result = False
+                except ValueError:
+                    result = False
+                if result:
+                    if np.abs(value) < .000001:
+                        row[i] = "{:.9f}".format(value)
+                    elif np.abs(value) < .00001:
+                        row[i] = "{:.8f}".format(value)
+                    elif np.abs(value) < .0001:
+                        row[i] = "{:.7f}".format(value)
+                    elif np.abs(value) < .001:
+                        row[i] = "{:.6f}".format(value)
+                    elif np.abs(value) < .01:
+                        row[i] = "{:.5f}".format(value)
+                    elif np.abs(value) < .1:
+                        row[i] = "{:.4f}".format(value)
+                    else:
+                        row[i] = "{:.3f}".format(value)                    
+            rows[index] = row
         table = tabulate(rows, headers=column_names, tablefmt='latex_raw')
 
         if caption:
@@ -910,7 +937,13 @@ def print_sql_query(dbName, query, print_to_file=False, output_file=None, latex=
             row = list(row)
             for i, value in enumerate(row):
                 if isinstance(value, float):
-                    if value < 1:
+                    if value >= .1:
+                        row[i] = "{:.2f}".format(value)
+                    elif value < .1:
+                        row[i] = "{:.3f}".format(value)
+                    elif value < .01:
+                        row[i] = "{:.4f}".format(value)
+                    elif value < .001:
                         row[i] = "{:.5f}".format(value)
             table.add_row(row)
     if print_to_file:

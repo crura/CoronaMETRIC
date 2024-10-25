@@ -1163,7 +1163,7 @@ def heatmap_sql_query(dbName, query, output_file=None, print_to_file=False, late
     cbar = plt.gca().collections[0].colorbar
     cbar.set_label(colorbar_label)
     if print_to_file:
-        plt.savefig(output_file)
+        plt.savefig(output_file, format='eps')
     else:
         plt.show()
     plt.close()

@@ -217,7 +217,7 @@ ax.set_theta_zero_location("S")
 ax.legend(bbox_to_anchor=(1, 1.05), loc="upper right")
 ax.set_title('Locations of Observations Chosen in CR 2194')
 ax.set_rlim(0, 1.3)
-plt.savefig(os.path.join(repo_path,'Output/Plots/Polar_Observations_Plot.png'))
+plt.savefig(os.path.join(repo_path,'Output/Plots/Polar_Observations_Plot.eps'), format='eps')
 # #plt.show()
 
 # params = date_print + str(detector,'utf-8') + '_PSI'

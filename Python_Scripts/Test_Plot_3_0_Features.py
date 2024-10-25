@@ -761,7 +761,7 @@ axs[1].set_xlim(-95,95)
 axs[1].legend(fontsize=13)
 
 plt.tight_layout()
-plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_Performance_Fig.png'))
+plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_Performance_Fig.eps'), format='eps')
 
 x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new = calculate_KDE(combined_pB_signed_ravel_arr)
 gaussian_fit_pB = np.random.normal(np.mean(combined_pB_signed_ravel_arr), np.std(abs(combined_pB_signed_ravel_arr)), 1000)
@@ -1085,7 +1085,7 @@ for i in range(len(JSD_input_values)):
 
 query = "SELECT group_1_central_tendency_stats_cor1_id, group_2_central_tendency_stats_cor1_id, JSD from KLD_JSD_no_random;"
 dbName = "tutorial.db"
-heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_no_random_heatmap.png'), title='JSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='JSD')
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_no_random_heatmap.eps'), title='JSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='JSD')
 
 JSD_data_types = ['ne', 'ne_LOS', 'pB', 'COR1', 'random']
 JSD_input_values = [kde0_x_ne, kde0_x_ne_LOS, kde0_x_pB, kde0_x_cor1, kde0_x_random]
@@ -1179,7 +1179,7 @@ ax.set_ylim(0, max_upper_tail + 10)
 ax.set_ylabel("Mean Angle Discrepancy (Degrees)") 
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
-plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.png'))
+plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.eps'), format='eps')
 #plt.show()
 plt.close()
 

@@ -1,9 +1,14 @@
 name: Generate EPS from PlantUML
 
 on:
-  push:
-    paths:
-      - '**/*.puml'
+    push:
+        branches: [ cicd_configuration, dev, build_coalign_function ]
+        paths:
+            - '**/*.puml'
+    pull_request:
+        branches: [ cicd_configuration, dev, build_coalign_function ]
+        paths:
+            - '**/*.puml'
 
 jobs:
   generate-eps:

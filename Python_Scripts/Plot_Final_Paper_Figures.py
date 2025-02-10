@@ -31,7 +31,7 @@ for ax in axs:
 # Adjust the spacing between subplots
 # plt.subplots_adjust(hspace=0, wspace=0)
 plt.tight_layout()
-plt.savefig(os.path.join(repo_path, 'Output/Plots/QRaFT_Figures/Test_Combined_QraFT_Fig.eps'), format='eps')
+plt.savefig(os.path.join(repo_path, 'Output/Plots/QRaFT_Figures/Test_Combined_QraFT_Fig.png'))
 
 
 
@@ -77,7 +77,7 @@ for ax in axs:
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_QraFT_Fig.png'))
+plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_QraFT_Fig.eps'), format='eps')
 
 
 def Create1x2Figure(image1, image2, output_file):

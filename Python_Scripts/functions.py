@@ -923,7 +923,7 @@ def print_sql_query(dbName, query, print_to_file=False, output_file=None, latex=
                     else:
                         row[i] = "{:.3f}".format(value)                    
             rows[index] = row
-        table = tabulate(rows, headers=column_names, tablefmt='latex_raw')
+        table = tabulate(rows, floatfmt=".3f", headers=column_names, tablefmt='latex_raw')
 
         if caption:
             # Add caption to the table

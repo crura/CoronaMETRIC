@@ -9,6 +9,9 @@ fits_directory = git_repo + '/' + directory; '/Data/MLSO/20170911_202927_kcor_l2
 head = headfits(fits_directory)
 head_struct = fitshead2struct(head)
 
+config = JSON_PARSE('config.json')
+mas_data_path = string(config['psi_cube_path'])
+
 telescope = head_struct.telescop
 if (telescope eq 'COSMO K-Coronagraph') then begin
   SXADDPAR, head, 'detector', 'KCor'
@@ -49,7 +52,7 @@ crln_obs_print = strcompress(string(CRLN_OBS),/remove_all)
 ; read, range, 'enter model axes range (R_Sun): '
 
 ; Set this path to path of PSI mas cube after following instructions in README
-psi_mas_cube_path = '/Users/crura/Desktop/Research/Magnetic_Field/eclipse2017_mhd_final_copy/2194_WTD_local_cube_MAS.dat'
+psi_mas_cube_path = mas_data_path
 
 ;for_drive,'PSIMAS',instrument='WL',line='PB',gridtype='PLANEOFSKY',pos=0.0000000,CMER=183.44300,BANG=7.1530000,OCCULT=1.0600000,XXMIN=-6.0799999,XXMAX=6.0799999,YYMIN=-6.0799999,YYMAX=6.0799999,CUBENAME='/Users/crura/Desktop/Research/Magnetic_Field/eclipse2017_mhd_final_copy/2194_WTD_local_cube_MAS.dat',DATE='2017-08-30T02:23:16.968',/verbose
 for_drive,'PSIMAS',instrument='WL',line='PB',gridtype='PLANEOFSKY',pos=0.0000000,CMER=crln_obs,BANG=crlt_obs,OCCULT=occlt,XXMIN=-range,XXMAX=range,YYMIN=-range,YYMAX=range,CUBENAME=psi_mas_cube_path,DATE=date_obs,SAVEPRAMS='output',SAVEMAP=1,MAPNAME='output',/verbose

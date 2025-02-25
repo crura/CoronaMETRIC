@@ -80,13 +80,33 @@ def remove_nans_infs(array, array2):
     # Filter out NaNs and Infs from the array
     return filtered_array, filtered_array2
 
-def calculate_KDE_statistics(KDE_1, KDE_2):
+def calculate_KDE_statistics(KDE_1, KDE_2, norm=False):
 
-    #compute JS Divergence
-    result_JSD = JS_Div(KDE_1, KDE_2)
+    if norm:
+        # normalize KDEs by amplitude
+        KDE_1 = KDE_1/max(KDE_1)
+        KDE_2 = KDE_2/max(KDE_2)
 
-    #compute KL Divergence
-    result_KLD = KL_div(KDE_1, KDE_2)
+        #compute JS Divergence
+        result_JSD = JS_Div(KDE_1, KDE_2)
+
+        #compute KL Divergence
+        result_KLD = KL_div(KDE_1, KDE_2)
+
+        # #normalize KDEs
+        # KDE_1 = KDE_1 / np.sum(KDE_1)
+        # KDE_2 = KDE_2 / np.sum(KDE_2)
+
+        # #compute JS Divergence
+        # result_JSD = JS_Div(KDE_1, KDE_2)
+        # #compute KL Divergence
+        # result_KLD = KL_div(KDE_1, KDE_2)
+    else:
+        #compute JS Divergence
+        result_JSD = JS_Div(KDE_1, KDE_2)
+
+        #compute KL Divergence
+        result_KLD = KL_div(KDE_1, KDE_2)
 
     return result_JSD, result_KLD
 
@@ -682,20 +702,21 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
             v1_mag = np.sqrt(np.sum(np.array(v1) ** 2))
             v2_mag = np.sqrt(np.sum(np.array(v2) ** 2))
 
-            d_angle = np.arccos(np.sum(np.array(v1)*np.array(v2)) / (v1_mag * v2_mag) )
-            if d_angle > math.pi/2:
-                d_angle = math.pi - d_angle
-            angle_err[i, k] = d_angle
-            angles.append(d_angle)
+            # d_angle = np.arccos(np.sum(np.array(v1)*np.array(v2)) / (v1_mag * v2_mag) )
+            # if d_angle > math.pi/2:
+            #     d_angle = math.pi - d_angle
+            # angle_err[i, k] = d_angle
+            # angles.append(d_angle)
             angles_xx_positions.append(int(xx[k]))
             angles_yy_positions.append(int(yy[k]))
 
             d_angle_signed = np.arcsin((v1[0] * v2[1] - v1[1] * v2[0]) / (v1_mag * v2_mag))
             d_angle_signed_test = np.arctan2((v1[0] * v2[1] - v1[1] * v2[0]),  (v1[0] * v2[0] + v1[1] * v2[1]))
             d_angle_signed_test_2 = np.arctan((v1[0] * v2[1] - v1[1] * v2[0]) / (v1[0] * v2[0] + v1[1] * v2[1]))
-            angles_signed.append(d_angle_signed)
+            angles_signed.append(d_angle_signed_test_2)
             angles_signed_test.append(d_angle_signed_test)
             angles_signed_test_2.append(d_angle_signed_test_2)
+            angles.append(abs(d_angle_signed_test_2))
 
 
     angles_arr = np.array(angles)
@@ -862,12 +883,12 @@ def print_sql_query(dbName, query, print_to_file=False, output_file=None, latex=
         # replace ne LOS with $n_e$ in data
         rows = [[re.sub("\\\\acrshort{ne central} LOS", "\\\\acrshort{ne los}", str(item)) for item in row] for row in rows]
         # replace pB with $pB$ in data
-        rows = [[re.sub(r'\bpB\b', "\\\\acrshort{pB}", str(item)) for item in row] for row in rows]
+        rows = [[re.sub(r'\bpB\b', "\\\\acrshort{forward pB}", str(item)) for item in row] for row in rows]
 
         # replace pB with $pB$ in data
         rows = [[re.sub(r'\bKCor\b', "\\\\acrshort{k-cor}", str(item)) for item in row] for row in rows]
         # replace pB with $pB$ in data
-        rows = [[re.sub(r'\bCOR1\b', "\\\\acrshort{cor-1}", str(item)) for item in row] for row in rows]
+        rows = [[re.sub(r'\bCOR1\b', "\\\\acrshort{cor-1 pB}", str(item)) for item in row] for row in rows]
         # Replace underscores in column names
         column_names = [name.replace('_', ' ') for name in column_names]
         # Replace underscores in column names
@@ -875,7 +896,34 @@ def print_sql_query(dbName, query, print_to_file=False, output_file=None, latex=
         # Replace underscores in column names
         column_names = [name.replace('confidence interval', '$95\%$ CI') for name in column_names]
 
-        table = tabulate(rows, headers=column_names, tablefmt='latex_raw')
+        for index, row in enumerate(rows):
+            row = list(row)
+            for i, value in enumerate(row):
+                try:
+                    if '.' in value:
+                        value = float(value)
+                        result = True
+                    else:
+                        result = False
+                except ValueError:
+                    result = False
+                if result:
+                    if np.abs(value) < .000001:
+                        row[i] = "{:.9f}".format(value)
+                    elif np.abs(value) < .00001:
+                        row[i] = "{:.8f}".format(value)
+                    elif np.abs(value) < .0001:
+                        row[i] = "{:.7f}".format(value)
+                    elif np.abs(value) < .001:
+                        row[i] = "{:.6f}".format(value)
+                    elif np.abs(value) < .01:
+                        row[i] = "{:.5f}".format(value)
+                    elif np.abs(value) < .1:
+                        row[i] = "{:.4f}".format(value)
+                    else:
+                        row[i] = "{:.3f}".format(value)                    
+            rows[index] = row
+        table = tabulate(rows, floatfmt=".3f", headers=column_names, tablefmt='latex_raw')
 
         if caption:
             # Add caption to the table
@@ -886,6 +934,17 @@ def print_sql_query(dbName, query, print_to_file=False, output_file=None, latex=
         table = PrettyTable()
         table.field_names = column_names
         for row in rows:
+            row = list(row)
+            for i, value in enumerate(row):
+                if isinstance(value, float):
+                    if value >= .1:
+                        row[i] = "{:.2f}".format(value)
+                    elif value < .1:
+                        row[i] = "{:.3f}".format(value)
+                    elif value < .01:
+                        row[i] = "{:.4f}".format(value)
+                    elif value < .001:
+                        row[i] = "{:.5f}".format(value)
             table.add_row(row)
     if print_to_file:
         with open(output_file, 'a') as f:
@@ -988,7 +1047,7 @@ def correct_fits_header(filepath):
     except KeyError:
         # Rename the key in the header of the first HDU and overwrite header
         hdul[0].header.rename_keyword('DATE_OBS', 'DATE-OBS')
-        hdul.writeto(filepath, overwrite=True)
+        # hdul.writeto(filepath, overwrite=True)
     return hdul[0].header
 
 
@@ -1028,3 +1087,83 @@ def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, dat
     plt.close()
 
     return JSD_gaussain, KLD_gaussian, kurtosis, skew
+
+
+
+def heatmap_sql_query(dbName, query, output_file=None, print_to_file=False, latex=False, caption=False, caption_text=None, colorbar_label=None, title=None, x_label=None, y_label=None):
+    import sqlite3
+    import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    conn = sqlite3.connect(dbName)
+    df = pd.read_sql_query(query, conn)
+    parameters = query.split('from')[0].strip('SELECT').strip().split(',')
+    index_1 = parameters[0].strip()
+    index_2 = parameters[1].strip()
+    value = parameters[2].strip()
+    # df = df.pivot(index='group1', columns='group2', values='JSD')
+
+    # group1 = df['group1'].unique()
+    # group2 = df['group2'].unique()
+    # JSD = df['JSD'].values
+
+
+    # try:
+    #     for i in range(len(df)):
+    #         if df['group_1_central_tendency_stats_cor1_id'][i] == 'ne':
+    #             df['group_1_central_tendency_stats_cor1_id'][i] = 'MAS ne'
+    #         if df['group_2_central_tendency_stats_cor1_id'][i] == 'ne':
+    #             df['group_2_central_tendency_stats_cor1_id'][i] = 'MAS ne'
+    #         if df['group_1_central_tendency_stats_cor1_id'][i] == 'ne_LOS':
+    #             df['group_1_central_tendency_stats_cor1_id'][i] = 'MAS ne_LOS'
+    #         if df['group_2_central_tendency_stats_cor1_id'][i] == 'ne_LOS':
+    #             df['group_2_central_tendency_stats_cor1_id'][i] = 'MAS ne_LOS'
+    #         if df['group_1_central_tendency_stats_cor1_id'][i] == 'pB':
+    #             df['group_1_central_tendency_stats_cor1_id'][i] = 'FORWARD pB'
+    #         if df['group_2_central_tendency_stats_cor1_id'][i] == 'pB':
+    #             df['group_2_central_tendency_stats_cor1_id'][i] = 'FORWARD pB'
+    #         if df['group_1_central_tendency_stats_cor1_id'][i] == 'COR1':
+    #             df['group_1_central_tendency_stats_cor1_id'][i] = 'COR1 pB'
+    #         if df['group_2_central_tendency_stats_cor1_id'][i] == 'COR1':
+    #             df['group_2_central_tendency_stats_cor1_id'][i] = 'COR1 pB'
+    # except KeyError:
+    #     pass
+
+    # try:
+    #     for i in range(len(df)):
+    #         if df[index_1][i] == 'ne':
+    #             df[index_1][i] = 'MAS ne'
+    #         if df[index_2][i] == 'ne':
+    #             df[index_2][i] = 'MAS ne'
+    #         if df[index_1][i] == 'ne_LOS':
+    #             df[index_2][i] = 'MAS ne_LOS'
+    #         if df[index_2][i] == 'ne_LOS':
+    #             df[index_2][i] = 'MAS ne_LOS'
+    #         if df[index_1][i] == 'pB':
+    #             df[index_1][i] = 'FORWARD pB'
+    #         if df[index_2][i] == 'pB':
+    #             df[index_2][i] = 'FORWARD pB'
+    #         if df[index_1][i] == 'COR1':
+    #             df[index_1][i] = 'COR1 pB'
+    #         if df[index_2][i] == 'COR1':
+    #             df[index_2][i] = 'COR1 pB'
+    # except KeyError:
+    #     pass
+
+    df[value] = abs(df[value])
+
+
+    pivot_df = df.pivot_table(index=index_1, columns=index_2, values=value)
+    symmetric_df = pivot_df.add(pivot_df.T, fill_value=0)
+    sns.heatmap(symmetric_df, annot=True)
+    plt.title(title)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    # set colorbar label
+    cbar = plt.gca().collections[0].colorbar
+    cbar.set_label(colorbar_label)
+    if print_to_file:
+        plt.savefig(output_file, format='eps')
+    else:
+        plt.show()
+    plt.close()

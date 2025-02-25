@@ -211,13 +211,13 @@ circle = plt.Circle((0.0, 0.0), (10*u.Rsun).to_value(u.AU),
                     transform=ax.transProjectionAffine + ax.transAxes, color="yellow",
                     alpha=1, label="Sun")
 ax.add_artist(circle)
-ax.scatter(np.deg2rad(longitudes), x_radius/astropy.constants.au.to_value(u.m), color='red',label='MLSO K-COR Observations')
+# ax.scatter(np.deg2rad(longitudes), x_radius/astropy.constants.au.to_value(u.m), color='red',label='MLSO K-COR Observations')
 ax.scatter(np.deg2rad(longitudes2), x2_radius/astropy.constants.au.to_value(u.m), color='blue',label='COR-1 Observations')
 ax.set_theta_zero_location("S")
 ax.legend(bbox_to_anchor=(1, 1.05), loc="upper right")
 ax.set_title('Locations of Observations Chosen in CR 2194')
 ax.set_rlim(0, 1.3)
-plt.savefig(os.path.join(repo_path,'Output/Plots/Polar_Observations_Plot.png'))
+plt.savefig(os.path.join(repo_path,'Output/Plots/Polar_Observations_Plot.eps'), format='eps')
 # #plt.show()
 
 # params = date_print + str(detector,'utf-8') + '_PSI'

@@ -46,9 +46,9 @@ PRO run_qraft_test, input_file_path
     date_split = strsplit(date_obs,'T',/extract)
     date_str = date_split[0]
     QRaFT_TEST, 1, f_pB[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_pB_COR1_fig_1.png", output_image_path+"/"+date_str+"_pB_COR1_fig_2.png", output_image_path+"/"+date_str+"_pB_COR1_fig_3.png", output_image_path+"/"+date_str+"_pB_COR1_fig_4.png", output_image_path+"/"+date_str+"_pB_COR1_fig_5.png", 1
-    QRaFT_TEST, 1, f_ne[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_ne_COR1_fig_1.png", output_image_path+"/"+date_str+"_ne_COR1_fig_2.png", output_image_path+"/"+date_str+"_ne_COR1_fig_3.png", output_image_path+"/"+date_str+"_ne_COR1_fig_4.png", output_image_path+"/"+date_str+"_ne_COR1_fig_5.png", 0
-    QRaFT_TEST, 1, f_ne_LOS[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_ne_LOS_COR1_fig_1.png", output_image_path+"/"+date_str+"_ne_LOS_COR1_fig_2.png", output_image_path+"/"+date_str+"_ne_LOS_COR1_fig_3.png", output_image_path+"/"+date_str+"_ne_LOS_COR1_fig_4.png", output_image_path+"/"+date_str+"_ne_LOS_COR1_fig_5.png", 0
-    QRaFT_TEST, 1, f_COR1[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_COR1_fig_1.png", output_image_path+"/"+date_str+"_COR1_fig_2.png", output_image_path+"/"+date_str+"_COR1_fig_3.png", output_image_path+"/"+date_str+"_COR1_fig_4.png", output_image_path+"/"+date_str+"_COR1_fig_5.png", 0
+    QRaFT_TEST, 1, f_ne[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_ne_COR1_fig_1.png", output_image_path+"/"+date_str+"_ne_COR1_fig_2.png", output_image_path+"/"+date_str+"_ne_COR1_fig_3.png", output_image_path+"/"+date_str+"_ne_COR1_fig_4.png", output_image_path+"/"+date_str+"_ne_COR1_fig_5.png", 1
+    QRaFT_TEST, 1, f_ne_LOS[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_ne_LOS_COR1_fig_1.png", output_image_path+"/"+date_str+"_ne_LOS_COR1_fig_2.png", output_image_path+"/"+date_str+"_ne_LOS_COR1_fig_3.png", output_image_path+"/"+date_str+"_ne_LOS_COR1_fig_4.png", output_image_path+"/"+date_str+"_ne_LOS_COR1_fig_5.png", 1
+    QRaFT_TEST, 1, f_COR1[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_COR1_fig_1.png", output_image_path+"/"+date_str+"_COR1_fig_2.png", output_image_path+"/"+date_str+"_COR1_fig_3.png", output_image_path+"/"+date_str+"_COR1_fig_4.png", output_image_path+"/"+date_str+"_COR1_fig_5.png", 1
     
   endfor
   
@@ -68,10 +68,10 @@ PRO run_qraft_test, input_file_path
     date_obs = head_struct.date_obs
     date_split = strsplit(date_obs,'T',/extract)
     date_str = date_split[0]
-    QRaFT_TEST, 1, f_pB[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_pB_KCOR_fig_1.png", output_image_path+"/"+date_str+"_pB_KCOR_fig_2.png", output_image_path+"/"+date_str+"_pB_KCOR_fig_3.png", output_image_path+"/"+date_str+"_pB_KCOR_fig_4.png", output_image_path+"/"+date_str+"_pB_KCOR_fig_5.png", 0
-    QRaFT_TEST, 1, f_ne[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_ne_KCOR_fig_1.png", output_image_path+"/"+date_str+"_ne_KCOR_fig_2.png", output_image_path+"/"+date_str+"_ne_KCOR_fig_3.png", output_image_path+"/"+date_str+"_ne_KCOR_fig_4.png", output_image_path+"/"+date_str+"_ne_KCOR_fig_5.png", 0
-    QRaFT_TEST, 1, f_ne_LOS[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_ne_LOS_KCOR_fig_1.png", output_image_path+"/"+date_str+"_ne_LOS_KCOR_fig_2.png", output_image_path+"/"+date_str+"_ne_LOS_KCOR_fig_3.png", output_image_path+"/"+date_str+"_ne_LOS_KCOR_fig_4.png", output_image_path+"/"+date_str+"_ne_LOS_KCOR_fig_5.png", 0
-    QRaFT_TEST, 1, f_KCor[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_KCOR_fig_1.png", output_image_path+"/"+date_str+"_KCOR_fig_2.png", output_image_path+"/"+date_str+"_KCOR_fig_3.png", output_image_path+"/"+date_str+"_KCOR_fig_4.png", output_image_path+"/"+date_str+"_KCOR_fig_5.png", 0
+    QRaFT_TEST, 1, f_pB[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_pB_KCOR_fig_1.png", output_image_path+"/"+date_str+"_pB_KCOR_fig_2.png", output_image_path+"/"+date_str+"_pB_KCOR_fig_3.png", output_image_path+"/"+date_str+"_pB_KCOR_fig_4.png", output_image_path+"/"+date_str+"_pB_KCOR_fig_5.png", 1
+    QRaFT_TEST, 1, f_ne[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_ne_KCOR_fig_1.png", output_image_path+"/"+date_str+"_ne_KCOR_fig_2.png", output_image_path+"/"+date_str+"_ne_KCOR_fig_3.png", output_image_path+"/"+date_str+"_ne_KCOR_fig_4.png", output_image_path+"/"+date_str+"_ne_KCOR_fig_5.png", 1
+    QRaFT_TEST, 1, f_ne_LOS[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_ne_LOS_KCOR_fig_1.png", output_image_path+"/"+date_str+"_ne_LOS_KCOR_fig_2.png", output_image_path+"/"+date_str+"_ne_LOS_KCOR_fig_3.png", output_image_path+"/"+date_str+"_ne_LOS_KCOR_fig_4.png", output_image_path+"/"+date_str+"_ne_LOS_KCOR_fig_5.png", 1
+    QRaFT_TEST, 1, f_KCor[i], f_By[i], f_Bz[i], 110.0, output_image_path+"/"+date_str+"_KCOR_fig_1.png", output_image_path+"/"+date_str+"_KCOR_fig_2.png", output_image_path+"/"+date_str+"_KCOR_fig_3.png", output_image_path+"/"+date_str+"_KCOR_fig_4.png", output_image_path+"/"+date_str+"_KCOR_fig_5.png", 1
 
   endfor
   

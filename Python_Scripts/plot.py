@@ -82,6 +82,6 @@ ax2.set_title('Corresponding PSI/FORWARD pB Eclipse Model', fontsize=18)
 
 string_print = str(date_obs,'utf-8').split('T')[0].replace('-','_') + 'cor1'
 
-plt.savefig(os.path.join(repo_path,'Output/Plots/Model_Comparison_{}_{}.png'.format(string_print, detector)))
+plt.savefig(os.path.join(repo_path,'Output/Plots/Model_Comparison_{}_{}.eps'.format(string_print, detector)), format='eps')
 # #plt.show()
 plt.close()

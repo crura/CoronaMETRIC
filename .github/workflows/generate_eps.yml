@@ -1,0 +1,31 @@
+name: Generate EPS from PlantUML
+
+on:
+    push:
+        branches: [ cicd_configuration, dev, build_coalign_function ]
+        paths:
+            - '**/*.puml'
+    pull_request:
+        branches: [ cicd_configuration, dev, build_coalign_function ]
+        paths:
+            - '**/*.puml'
+
+jobs:
+  generate-eps:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Make the script executable
+        run: chmod +x ./generate_eps.sh
+
+      - name: Generate EPS file from PlantUML
+        run: ./generate_eps.sh Docs/Framework.puml
+
+      - name: Upload EPS artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: EPS Figures
+          path: '**/*.eps'

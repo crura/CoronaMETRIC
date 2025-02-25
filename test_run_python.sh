@@ -7,5 +7,6 @@ pip install -r requirements.txt &&
 # python Python_Scripts/new_plot_paper_figures.py
 # python Python_Scripts/test_new_plot_paper_figs.py
 # python Python_Scripts/calculate_KDE_statistics.py
-python Python_Scripts/Test_Plot_3_0_Features.py
+python Python_Scripts/Test_Plot_3_0_Features.py 
+python Python_Scripts/print_results.py 
 deactivate

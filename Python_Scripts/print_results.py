@@ -1,4 +1,4 @@
-from functions import print_sql_query, plot_sql_query
+from functions import heatmap_sql_query, print_sql_query, plot_sql_query
 import git
 import os
 dbName = "tutorial.db"
@@ -55,20 +55,11 @@ print_sql_query(dbName, query, latex=True, print_to_file=True, output_file=os.pa
 # print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Central Tendency Statistics for K-COR Data Combined',
 #                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
-
-query = "SELECT group1, group2, date, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, KLD, JSD, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id;"
-print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Tukey HSD Statistics for COR-1 Data',
-                 output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
-
-query = "SELECT group1, group2, date, mean_diff, p_adj, lower_bound_ci, upper_bound_ci, KLD, JSD, reject from tukey_hsd_stats_kcor inner join central_tendency_stats_kcor_new on central_tendency_stats_kcor_new.id = tukey_hsd_stats_kcor.group_1_central_tendency_stats_kcor_id;"
-print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Tukey HSD Statistics for K-COR Data',
-                 output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
-
-query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, Gaussian_JSD, Gaussian_KLD, kurtosis, skewness from central_tendency_stats_cor1_new where date!='combined' order by mean asc;"
+query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, kurtosis, skewness from central_tendency_stats_cor1_new where date!='combined' order by mean asc;"
 print_sql_query(dbName, query, print_to_file=True, latex=True, caption=True, caption_text='Central Tendency Statistics for COR-1 Data By Date',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
-query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, Gaussian_JSD, Gaussian_KLD, kurtosis, skewness from central_tendency_stats_cor1_new where date='combined' order by mean asc;"
+query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, kurtosis, skewness from central_tendency_stats_cor1_new where date='combined' order by mean asc;"
 print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Central Tendency Statistics for COR-1 Data Combined',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
@@ -76,12 +67,26 @@ print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, cap
 # print_sql_query(dbName, query, print_to_file=True, latex=True, caption=True, caption_text='Advanced Central Tendency Statistics for COR-1 Data By Date',
 #                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
-query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, Gaussian_JSD, Gaussian_KLD, kurtosis, skewness from central_tendency_stats_kcor_new where date!='combined' order by mean asc;"
+query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, kurtosis, skewness from central_tendency_stats_kcor_new where date!='combined' order by mean asc;"
 print_sql_query(dbName, query, print_to_file=True, latex=True, caption=True, caption_text='Central Tendency Statistics for K-COR Data By Date',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
-query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, Gaussian_JSD, Gaussian_KLD, kurtosis, skewness from central_tendency_stats_kcor_all where date='combined' order by mean asc;"
+query = "SELECT data_type, date, mean, median, standard_deviation, confidence_interval, n, kurtosis, skewness from central_tendency_stats_kcor_new where date='combined' order by mean asc;"
 print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Central Tendency Statistics for K-COR Data Combined',
+                 output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
+
+
+
+query = "SELECT group1, group2, date, mean_diff, lower_bound_ci, upper_bound_ci, KLD, JSD, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date!='combined';"
+print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Tukey HSD Statistics for COR-1 Data by Date',
+                 output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
+
+query = "SELECT group1, group2, date, mean_diff, lower_bound_ci, upper_bound_ci, KLD, JSD, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined';"
+print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Tukey HSD Statistics for Combined COR-1 Data',
+                 output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
+
+query = "SELECT group1, group2, date, mean_diff, lower_bound_ci, upper_bound_ci, KLD, JSD, reject from tukey_hsd_stats_kcor inner join central_tendency_stats_kcor_new on central_tendency_stats_kcor_new.id = tukey_hsd_stats_kcor.group_1_central_tendency_stats_kcor_id;"
+print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, caption_text='Tukey HSD Statistics for K-COR Data',
                  output_file=os.path.join(repo_path, 'Output/Plots/Print_Out.txt'))
 
 # query = "SELECT Gaussian_JSD, Gaussian_KLD, kurtosis, skewness from central_tendency_stats_kcor_all where date!='combined' order by mean asc;"
@@ -94,3 +99,9 @@ print_sql_query(dbName, query, latex=True, print_to_file=True, caption=True, cap
 
 # query = "CREATE TABLE central_tendency_stats_cor1_all_naty_original AS SELECT * FROM central_tendency_stats_cor1_all WHERE 0;"
 # print_sql_query(dbName, query)
+
+query = "SELECT group_1_central_tendency_stats_cor1_id, group_2_central_tendency_stats_cor1_id, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined';"
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_Tukey_HSD_heatmap.png'), title='Null Hypothesis Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='Tukey HSD Reject')
+
+query = "SELECT group_1_central_tendency_stats_kcor_id, group_2_central_tendency_stats_kcor_id, reject from tukey_hsd_stats_kcor inner join central_tendency_stats_kcor_new on central_tendency_stats_kcor_new.id = tukey_hsd_stats_kcor.group_1_central_tendency_stats_kcor_id where date='combined';"
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/KCOR_Combined_Tukey_HSD_heatmap.png'), title='Null Hypothesis Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='Tukey HSD Reject')

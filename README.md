@@ -1,4 +1,4 @@
-# Image-Coalignment
+# CoronaMETRIC - Corona Magnetic Evaluation Through Real Image Comparison
 
 
 ## Description

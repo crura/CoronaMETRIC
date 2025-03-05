@@ -1,0 +1,3 @@
+[submodule "QRaFT"]
+	path = QRaFT
+	url = git@github.com:crura/QRaFT.git

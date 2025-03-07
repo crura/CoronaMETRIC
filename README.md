@@ -1,4 +1,4 @@
-# CoronaMETRIC - Corona Magnetic Evaluation Through Real Image Comparison
+# CoronaMETRIC - Corona Magnetic-field Evaluation Through Real Image-model Comparison
 
 
 ## Description

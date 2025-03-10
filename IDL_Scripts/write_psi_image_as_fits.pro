@@ -16,7 +16,7 @@
 ; Inputs:
 ;
 ;   OutFile: Path of the output file name.
-; 
+;
 ;   Im: A 2D array containing the image values.
 ;
 ;    x: 1D array of pixel coordinates in x [Rs] or [Degrees].
@@ -31,7 +31,7 @@
 ;
 ; Keywords: (should be self explanatory).
 ;
-; Compatibility Note: 
+; Compatibility Note:
 ;   - sunpy.map parses the Wavelength and WaveUnit fields in a specific way.
 ;     - Wavelength must be a number.
 ;     - WaveUnit must be a as a valid AstroPy unit ('' defaults to "one").
@@ -40,8 +40,8 @@
 ; HISTORY:
 ;  v1.0, 2020ish, Cooper Downs, Predictive Science Inc. (cdowns@predsci.com)
 ;     - First version I've shared externally.
-;     - This is based on several previous iterations since 2017 of CD's 
-;       SSW/IDL stuff for converting with PSI/MAS forward modeled data 
+;     - This is based on several previous iterations since 2017 of CD's
+;       SSW/IDL stuff for converting with PSI/MAS forward modeled data
 ;       products from HDF to FITS.
 ;
 ;----------------------------------------------------------------------
@@ -120,14 +120,29 @@ pro write_psi_image_as_fits, OutFile, Im, x, y, ObsDate, Lon, B0, $
    ; this R_SUN is in pixels (consistent with AIA documentation)
    R_SUN = Rs_arcsec/CDELT1
 
-   
+
    ; Compute HCI and HAE corrdinates for reference
    ; i'm pretty sure I don't need to supply KM unless transformations are non-linear
    if keyword_set(GetCoords) then begin
      r = DSUN_OBS
      t = (90-B0)*!dtor
      p = Lon*!dtor
-     Carr_Vec = rtp2xyz([r,t,p])
+     Rtp_D = [r,t,p]
+     r_=0
+     t_=1
+     p_=2
+
+     x_=0
+     y_=1
+     z_=2
+
+     Xyz_D = dblarr(3)
+
+     Xyz_D[x_] = Rtp_D[r_]*cos(Rtp_D[p_])*sin(Rtp_D[t_])
+     Xyz_D[y_] = Rtp_D[r_]*sin(Rtp_D[p_])*sin(Rtp_D[t_])
+     Xyz_D[z_] = Rtp_D[r_]*cos(Rtp_D[t_])
+
+     Carr_Vec = xyz_D
 
      Coord = Carr_Vec
      convert_sunspice_coord, ObsDate, Coord, 'Carrington', 'HCI'
@@ -165,12 +180,12 @@ pro write_psi_image_as_fits, OutFile, Im, x, y, ObsDate, Lon, B0, $
       'CUNIT1', 'arcsec', $
       'CRVAL1', 0d0, $
       'CDELT1', CDELT1, $
-      'CRPIX1', 128, $;128
+      'CRPIX1', n_elements(x) /2 , $;128
       'CTYPE2', 'HPLT-TAN', $
       'CUNIT2', 'arcsec', $
       'CRVAL2', 0d0, $
       'CDELT2', CDELT2, $
-      'CRPIX2', 128, $;128
+      'CRPIX2', n_elements(x) /2, $;128
       'CROTA2', double(-pAngle), $
       'R_SUN', R_SUN, $
       'DSUN_REF', DSUN_REF, $
@@ -199,4 +214,3 @@ pro write_psi_image_as_fits, OutFile, Im, x, y, ObsDate, Lon, B0, $
    mwritefits, HdrOut, Im, OutFile=OutFile
 
 end
-

@@ -18,7 +18,6 @@ Xyz_D[x_] = Rtp_D[r_]*cos(Rtp_D[p_])*sin(Rtp_D[t_])
 Xyz_D[y_] = Rtp_D[r_]*sin(Rtp_D[p_])*sin(Rtp_D[t_])
 Xyz_D[z_] = Rtp_D[r_]*cos(Rtp_D[t_])
 
-return, xyz_D
+return, Xyz_D
 
 end
-

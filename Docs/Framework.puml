@@ -1,0 +1,85 @@
+' Copyright 2025 Christopher Rura
+
+' Licensed under the Apache License, Version 2.0 (the "License");
+' you may not use this file except in compliance with the License.
+' You may obtain a copy of the License at
+
+'     http://www.apache.org/licenses/LICENSE-2.0
+
+' Unless required by applicable law or agreed to in writing, software
+' distributed under the License is distributed on an "AS IS" BASIS,
+' WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+' See the License for the specific language governing permissions and
+' limitations under the License.
+@startuml framework diagram
+!define RECTANGLE class
+skinparam linetype ortho
+
+RECTANGLE User {
+  <color:red>*</color> Input: Coronagraph Observations
+  --
+  <color:red>*</color> Outputs: Comprehensive Metrics and Statistics
+}
+
+User --> "Component 1: Image Processing" : Input \n Coronagraph \n Observations
+
+
+User --> "Component 2: Synthetic Image Generation" : \n Input \n Coronagraph Observations
+
+RECTANGLE "Component 1: Image Processing" {
+    <color:red>*</color> Input: Coronagraph Observations
+    --
+'   - Use `secchi_prep` routine:
+  - Download sequential polarized images
+  - Apply calibration
+  - Perform background subtraction
+  - Combine sequential images to generate pB images
+  - Stacking & Median Filtering
+--
+  <color:red>*</color> Output: Representative pB Image
+}
+
+
+RECTANGLE "Component 2: Synthetic Image Generation" {
+    <color:red>*</color> Input: Coronagraph Observations
+    --
+  - Generate MHD model solution
+  - Coordinate Transformation
+  - Generate Synthetic pB Image using FORWARD
+  - Coalignment using .fits headers
+--
+  <color:red>*</color> Outputs: Synthetic Images (Coaligned) and MHD Model Outputs (B, ne parameters)
+}
+' "Component 1: Image Processing" --> "Component 2: Synthetic Image Generation" : Output representative pB image
+"Component 2: Synthetic Image Generation" --> "Component 3: Image Segmentation" : Output synthetic pB image
+
+
+"Component 1: Image Processing" --> "Component 3: Image Segmentation" : Output representative pB image
+RECTANGLE "Component 3: Image Segmentation" {
+    <color:red>*</color> Inputs: Representative Image and Synthetic Image
+    --
+  - Preprocessing & Noise Reduction
+  - Transform to Plane Polar Coordinates
+  - Detrending & Thresholding
+  - Measure Detected Features as Polynomials
+--
+  <color:red>*</color> Outputs: Detected Features & Geometry Parameters
+}
+
+"Component 3: Image Segmentation" --> "Component 4: Comparative Analysis" : Output feature geometry parameters
+"Component 2: Synthetic Image Generation" --> "Component 4: Comparative Analysis" : Output MHD\n Model Parameters\n (B, ne parameters)
+
+RECTANGLE "Component 4: Comparative Analysis" {
+  <color:red>*</color> Inputs: MHD Model B Field and Detected Features
+--
+  - Compare Orientation Angles (Real vs Synthetic) vs Model B Field Orienation
+  - Calculate Angle Differences
+  - Perform Statistical Analysis on Angle Differences
+  - Generate Metrics and Global Statistics
+--
+  <color:red>*</color> Outputs: Comprehensive Metrics and Statistics
+}
+
+"Component 4: Comparative Analysis" --> User : Returns Comprehensive\nMetrics and Statistics
+
+@enduml

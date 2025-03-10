@@ -46,5 +46,6 @@ echo ".compile -v '$git_repo/get_fordump.pro'" &&
 echo ".compile -v '$git_repo/image_coalignment.pro'" &&
 echo ".compile -v '$git_repo/save_parameters.pro'" &&
 echo ".compile -v '$git_repo/run_code.pro'" &&
+sqlite3 $git_repo/tutorial.db < $git_repo/setupDB.sql &&
 echo "run_code" &&
 cat) | /Users/crura/Documents/bin/ssw

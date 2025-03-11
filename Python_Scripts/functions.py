@@ -1168,15 +1168,20 @@ def heatmap_sql_query(dbName, query, output_file=None, print_to_file=False, late
 
     pivot_df = df.pivot_table(index=index_1, columns=index_2, values=value)
     symmetric_df = pivot_df.add(pivot_df.T, fill_value=0)
-    sns.heatmap(symmetric_df, annot=True)
-    plt.title(title)
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
+    # Set diagonal values to 0 as by definition the JSD between the same group is 0
+    for i in symmetric_df.index:
+        symmetric_df.at[i, i] = 0
+    plt.close()
+    heatmap = sns.heatmap(symmetric_df, annot=True)
+    heatmap.set_title(title)
+    heatmap.set_xlabel(x_label)
+    heatmap.set_ylabel(y_label)
     # set colorbar label
-    cbar = plt.gca().collections[0].colorbar
+    cbar = heatmap.collections[0].colorbar
     cbar.set_label(colorbar_label)
     if print_to_file:
         plt.savefig(output_file, format='eps')
     else:
         plt.show()
+    heatmap.clear()
     plt.close()

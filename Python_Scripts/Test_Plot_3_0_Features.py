@@ -1096,10 +1096,6 @@ for i in range(len(JSD_input_values)):
         cur.execute("INSERT INTO KLD_JSD_no_random VALUES(?, ?, ?, ?, ?)", (None, KLD, JSD, matching_id1, matching_id2))
         con.commit()
 
-query = "SELECT group_1_central_tendency_stats_cor1_id, group_2_central_tendency_stats_cor1_id, JSD from KLD_JSD_no_random;"
-dbName = "tutorial.db"
-heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_no_random_heatmap.eps'), title='JSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='JSD')
-
 JSD_data_types = ['ne', 'ne_LOS', 'pB', 'COR1', 'random']
 JSD_input_values = [kde0_x_ne, kde0_x_ne_LOS, kde0_x_pB, kde0_x_cor1, kde0_x_random]
 for i in range(len(JSD_input_values)):
@@ -1199,6 +1195,16 @@ plt.close()
 res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr)
 print(res)
 
+
+query = "SELECT group1, group2, JSD from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined';"
+
+dbName = "tutorial.db"
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_heatmap.eps'), title='JSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='JSD')
+
+query = "SELECT group1, group2, JSD from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined' and group1 != 'random' and group2 != 'random';"
+
+dbName = "tutorial.db"
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_no_random_heatmap.eps'), title='JSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='JSD')
 
 # # Read SQL Query File
 # with open(os.path.join(repo_path, 'Python_Scripts', 'Test_SQL_Queries.sql'), 'r') as file:

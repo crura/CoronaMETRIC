@@ -772,6 +772,12 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
         map.plot(axes=axes,title=False,clip_interval=(1, 99.99)*u.percent)
     else:
         map.plot(axes=axes,title=False)
+    # Update the font size of the x and y labels while retaining their WCS-specific text
+    axes.coords[0].set_axislabel(axes.coords[0].get_axislabel(), fontsize=15)  # X-axis
+    axes.coords[1].set_axislabel(axes.coords[1].get_axislabel(), fontsize=15)  # Y-axis
+    # Update the font size of the tick labels
+    axes.coords[0].set_ticklabel(size=12)  # X-axis tick labels
+    axes.coords[1].set_ticklabel(size=12)  # Y-axis tick labels
     # axes.add_patch(Circle((int(data.shape[0]/2),int(data.shape[1]/2)), rsun, color='black',zorder=100))
 
     colors = plt.cm.jet(np.linspace(0, 1, len(FEATURES)))
@@ -789,6 +795,9 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
     cax.yaxis.set_label_position('right')
     norm = mpl.colors.Normalize(vmin=-90, vmax=90)
     cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical', norm=norm)
+    cbar.set_label('Angle Error (degrees)', fontsize=15, labelpad=0.25)
+    # Adjust the position of the label
+    cbar.ax.yaxis.label.set_position((1.05, 0.25))  # (x, y) coordinates
     # cax.set_xlabel(' ')
     # cax.grid(axis='y')
     lat = cax.coords[0]
@@ -796,19 +805,20 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
     lat.set_ticks_visible(False)
     lat.set_ticklabel_visible(False)
     lat.set_axislabel('')
+    cbar.ax.tick_params(labelsize=12)  # Adjust the font size of cbar
     if PSI:
         if data_type:
-            axes.set_title('PSI/FORWARD {} Eclipse Model Corresponding to {} {} Observation'.format(data_type, date, data_source.strip('_PSI')))
-            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}_PSI.png'.format(string_print, detector, data_type)))
+            axes.set_title('MAS {} Corresponding to {} {} Observation'.format(data_type, date, data_source.strip('_PSI')), fontsize=20)
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}_PSI.eps'.format(string_print, detector, data_type)), format='eps')
         else:
-            axes.set_title('Corresponding PSI/FORWARD pB Eclipse Model')
-            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.png'.format(string_print, detector)))
+            axes.set_title('Corresponding PSI/FORWARD pB Eclipse Model', fontsize=20)
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.eps'.format(string_print, detector)), format='eps')
     else:
-        axes.set_title('{} Observation {}'.format(detector, str_strip))
+        axes.set_title('{} Observation {}'.format(detector, str_strip), fontsize=20)
         if data_type:
-            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}.png'.format(string_print, detector, data_type)))
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}.eps'.format(string_print, detector, data_type)), format='eps')
         else:
-            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)))
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.eps'.format(string_print, detector)), format='eps')
     # #plt.show()
     plt.close()
 

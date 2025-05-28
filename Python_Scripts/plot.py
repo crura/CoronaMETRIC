@@ -70,28 +70,28 @@ psimap = sunpy.map.Map(data1, head1)
 str_strip = str(date_obs,'utf-8').split('T',1)[0]
 
 fig1 = plt.figure(figsize=(15, 8))
-ax1 = fig1.add_subplot(1, 2, 1, projection=cor1map)
+ax2 = fig1.add_subplot(1, 2, 1, projection=cor1map)
 cor1map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
-cor1map.plot(axes=ax1,title=False)
+cor1map.plot(axes=ax2,title=False)
 
 R_SUN = occlt * (head2['rsun'] / head2['cdelt1'])
-ax1.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
+ax2.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
 
 
 
-ax2 = fig1.add_subplot(1, 2, 2, projection=cor1map)
+ax1 = fig1.add_subplot(1, 2, 2, projection=cor1map)
 psimap.plot_settings['norm'] = plt.Normalize(cor1map.min(), cor1map.max())
 
-psimap.plot(axes=ax2,title=False,norm=matplotlib.colors.LogNorm())
+psimap.plot(axes=ax1,title=False,norm=matplotlib.colors.LogNorm())
 R_SUN = occlt * (head1['rsun'] / head1['cdelt1'])
-ax2.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
 ax1.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
-ax1.set_xlabel('Helioprojective Longitude (Solar-X)',fontsize=18)
+ax2.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
 ax2.set_xlabel('Helioprojective Longitude (Solar-X)',fontsize=18)
-ax1.set_ylabel('Helioprojective Latitude (Solar-Y)',fontsize=18)
+ax1.set_xlabel('Helioprojective Longitude (Solar-X)',fontsize=18)
 ax2.set_ylabel('Helioprojective Latitude (Solar-Y)',fontsize=18)
-ax1.set_title('COR-1 Observation {}'.format(str_strip), fontsize=18)
-ax2.set_title('Corresponding PSI/FORWARD pB Eclipse Model', fontsize=18)
+ax1.set_ylabel('Helioprojective Latitude (Solar-Y)',fontsize=18)
+ax2.set_title('COR-1 Observation {}'.format(str_strip), fontsize=18)
+ax1.set_title('Corresponding PSI/FORWARD pB Eclipse Model', fontsize=18)
 
 string_print = str(date_obs,'utf-8').split('T')[0].replace('-','_') + 'cor1'
 

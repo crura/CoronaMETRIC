@@ -117,7 +117,7 @@ def Create1x2Figure(image1, image2, output_file):
     plt.tight_layout()
     plt.savefig(output_file, format='eps')
 
-image_path_1 = os.path.join(repo_path, 'Output/Plots/Features_Angle_Error_2017_08_20_COR1_ne_PSI.png')
-image_path_2 = os.path.join(repo_path, 'Output/Plots/Features_Angle_Error_2017_08_20_COR1_COR1.png')
+image_path_1 = os.path.join(repo_path, 'Output/Plots/Features_Angle_Error_2017_08_20_COR1_ne_PSI.eps')
+image_path_2 = os.path.join(repo_path, 'Output/Plots/Features_Angle_Error_2017_08_20_COR1_COR1.eps')
 output_file = os.path.join(repo_path, 'Output/Plots/Test_Combined_Angle_Error_Fig.eps')
 Create1x2Figure(image_path_1, image_path_2, output_file)

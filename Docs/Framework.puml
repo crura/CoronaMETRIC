@@ -15,17 +15,6 @@
 !define RECTANGLE class
 skinparam linetype ortho
 
-RECTANGLE User {
-  <color:red>*</color> Input: Coronagraph Observations
-  --
-  <color:red>*</color> Outputs: Comprehensive Metrics and Statistics
-}
-
-User --> "Component 1: Image Processing" : Input \n Coronagraph \n Observations
-
-
-User --> "Component 2: Synthetic Image Generation" : \n Input \n Coronagraph Observations
-
 RECTANGLE "Component 1: Image Processing" {
     <color:red>*</color> Input: Coronagraph Observations
     --
@@ -41,7 +30,7 @@ RECTANGLE "Component 1: Image Processing" {
 
 
 RECTANGLE "Component 2: Synthetic Image Generation" {
-    <color:red>*</color> Input: Coronagraph Observations
+    <color:red>*</color> Input: Coronagraph Observation Headers
     --
   - Generate MHD model solution
   - Coordinate Transformation
@@ -80,6 +69,5 @@ RECTANGLE "Component 4: Comparative Analysis" {
   <color:red>*</color> Outputs: Comprehensive Metrics and Statistics
 }
 
-"Component 4: Comparative Analysis" --> User : Returns Comprehensive\nMetrics and Statistics
 
 @enduml

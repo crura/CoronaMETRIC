@@ -171,7 +171,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Upload QRaFT Data
-          path: $git_repo/Output/QRaFT_Results
+          path: ${{ github.workspace }}/Output/QRaFT_Results
 
       - name: Plot Figures for Paper
 
@@ -196,7 +196,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: output-plots
-          path: $git_repo/Output/Plots
+          path: ${{ github.workspace }}/Output/Plots
           retention-days: 30
 
   #

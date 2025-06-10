@@ -189,6 +189,7 @@ jobs:
           python Python_Scripts/print_results.py 
           # python Python_Scripts/Test_SQL_Heatmap.py
           python Python_Scripts/Plot_Final_Paper_Figures.py
+          python Python_Scripts/plot.py
           python Python_Scripts/forward_model_db_cleanup.py
           cp tutorial.db Output/Plots
           deactivate

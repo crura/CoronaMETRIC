@@ -219,7 +219,7 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
 
 
 
-    combined_dict = dict(metric=['average discrepancy', 'median discrepancy'],
+    combined_dict = dict(metric=['average difference', 'median difference'],
                         cor1=['{} +- {}'.format(str(cor1_avg_rounded), str(cor1_confidence_interval_rounded)), cor1_med],
                        psi=['{} +- {}'.format(str(forward_avg_rounded), str(forward_confidence_interval_rounded)), forward_med],
                        random=['{} +- {}'.format(str(random_avg_rounded), str(random_confidence_interval_rounded)), random_med])
@@ -264,7 +264,7 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
     norm_kde_forward = (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward
     norm_kde_cor1 = (KDE_cor1_central_deg_new/max(KDE_cor1_central_deg_new))*norm_max_cor1
     #sns.kdeplot()
-    ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
+    ax.set_xlabel('Angular Difference (Degrees)',fontsize=14)
     ax.set_ylabel('Pixel Count',fontsize=14)
     if masked:
         ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field {} (L > {})'.format(detector, date, mask),fontsize=15)
@@ -274,9 +274,9 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
     #ax.set_ylim(0,0.07)
     ax.legend(fontsize=13)
 
-    # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
-    # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
-    # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
+    # plt.text(20,0.045,"COR1 average difference: " + str(np.round(np.average(err_cor1_central_deg),5)))
+    # plt.text(20,0.04,"FORWARD average difference: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
+    # plt.text(20,0.035,"Random average difference: " + str(np.round(np.average(err_random_deg),5)))
     if masked:
         plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_{}_L_gt_{}.png'.format(detector.replace('-',''), date, mask)))
     else:
@@ -1007,7 +1007,7 @@ def plot_histograms(arrays, labels, repo_path, detector='COR1_PSI'):
     for i in range(len(arrays)):
         sns.histplot(arrays[i], kde=True, label=labels[i], bins=30, ax=ax, color=colors[i % len(colors)])
 
-    ax.set_xlabel('Angle Discrepancy (Degrees)', fontsize=14)
+    ax.set_xlabel('Angular Difference (Degrees)', fontsize=14)
     ax.set_ylabel('Pixel Count', fontsize=14)
     ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector), fontsize=15)
     ax.set_xlim(-95,95)
@@ -1095,9 +1095,9 @@ def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, dat
     ax.plot(height_values, probabilities, label='Corresponding Gaussian Fit', color='tab:blue')
     # plt.plot(x_1_forward_cor1_central_deg_new, gaussian_fit_pB*norm_max_pB, label='gaussian fit', color='tab:blue')
     # plt.yscale('log')
-    ax.set_xlabel('Angle Discrepancy (Degrees)')
+    ax.set_xlabel('Angular Difference (Degrees)')
     ax.set_ylabel('Probability Density')
-    ax.text(0.7,0.8,"average discrepancy: " + str(np.round(np.average(array),5)), transform=ax.transAxes)
+    ax.text(0.7,0.8,"average difference: " + str(np.round(np.average(array),5)), transform=ax.transAxes)
     ax.text(0.7,0.75,"standard deviation: " + str(np.round(np.std(abs(array)),5)), transform=ax.transAxes)
     ax.text(0.7,0.7,"Gaussian JSD: " + str(np.round(JSD_gaussain,5)), transform=ax.transAxes)
     ax.text(0.7,0.65,"kurtosis: " + str(np.round(kurtosis,5)), transform=ax.transAxes)

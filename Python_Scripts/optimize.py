@@ -232,16 +232,16 @@ def optimize_for_avg(detector, optimization_array):
     norm_kde_forward = (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward
     norm_kde_cor1 = (KDE_cor1_central_deg_new/max(KDE_cor1_central_deg_new))*norm_max_cor1
     #sns.kdeplot()
-    ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
+    ax.set_xlabel('Angular Difference (Degrees)',fontsize=14)
     ax.set_ylabel('Pixel Count',fontsize=14)
     ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
     ax.set_xlim(-95,95)
     #ax.set_ylim(0,0.07)
     ax.legend(fontsize=13)
     
-    # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
-    # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
-    # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
+    # plt.text(20,0.045,"COR1 average difference: " + str(np.round(np.average(err_cor1_central_deg),5)))
+    # plt.text(20,0.04,"FORWARD average difference: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
+    # plt.text(20,0.035,"Random average difference: " + str(np.round(np.average(err_random_deg),5)))
     plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
     #plt.show()
     #plt.close()
@@ -278,7 +278,7 @@ def optimize_for_avg(detector, optimization_array):
     random_med = np.round(np.median(abs(err_random_deg_new)),5)
     
     
-    combined_dict = dict(metric=['average discrepancy', 'median discrepancy'],
+    combined_dict = dict(metric=['average difference', 'median difference'],
                         cor1=[cor1_avg, cor1_med],
                        psi=[forward_avg, forward_med],
                         random=[random_avg, random_med])
@@ -297,7 +297,7 @@ def optimize_for_avg(detector, optimization_array):
     sns.distplot(err_mlso_central_deg,hist=True,label='MLSO K-COR',bins=30,ax=ax[0])
     sns.distplot(err_forward_central_deg,hist=True,label='PSI/FORWARD pB',bins=30,ax=ax[0])
     sns.distplot(err_random_deg,hist=False,label='Random',ax=ax[0])
-    ax[0].set_xlabel('Angle Discrepancy',fontsize=22)
+    ax[0].set_xlabel('Angular Difference',fontsize=22)
     ax[0].set_ylabel('Probability Density',fontsize=22)
     ax[0].set_title('QRaFT Feature Tracing Performance MLSO K-COR vs PSI',fontsize=22)
     ax[0].set_xlim(0,90)
@@ -309,7 +309,7 @@ def optimize_for_avg(detector, optimization_array):
     sns.distplot(err_forward_cor1_central_deg,hist=True,label='PSI/FORWARD pB',bins=30,ax=ax[1])
     sns.distplot(err_random_deg,hist=False,label='Random',ax=ax[1])
     # sns.kdeplot(err_mlso_los_deg,label='KDE')
-    ax[1].set_xlabel('Angle Discrepancy',fontsize=22)
+    ax[1].set_xlabel('Angular Difference',fontsize=22)
     ax[1].set_ylabel('Probability Density',fontsize=22)
     ax[1].set_title('QRaFT Feature Tracing Performance COR-1 vs PSI',fontsize=22)
     ax[1].set_xlim(0,90)
@@ -381,16 +381,16 @@ def optimize_for_avg(detector, optimization_array):
     norm_kde_forward = (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward
     norm_kde_cor1 = (KDE_cor1_central_deg_new/max(KDE_cor1_central_deg_new))*norm_max_cor1
     #sns.kdeplot()
-    ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
+    ax.set_xlabel('Angular Difference (Degrees)',fontsize=14)
     ax.set_ylabel('Pixel Count',fontsize=14)
     ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field (L > {})'.format(detector, mask),fontsize=15)
     ax.set_xlim(-95,95)
     #ax.set_ylim(0,0.07)
     ax.legend(fontsize=13)
     
-    # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
-    # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
-    # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
+    # plt.text(20,0.045,"COR1 average difference: " + str(np.round(np.average(err_cor1_central_deg),5)))
+    # plt.text(20,0.04,"FORWARD average difference: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
+    # plt.text(20,0.035,"Random average difference: " + str(np.round(np.average(err_random_deg),5)))
     plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_masked_L{}.png'.format(detector.replace('-',''), mask)))
     #plt.show()
     plt.close()
@@ -405,7 +405,7 @@ def optimize_for_avg(detector, optimization_array):
     random_med = np.round(np.median(abs(err_random_centrak_masked)),5)
     
     
-    combined_dict = dict(metric=['average discrepancy (L>{})'.format(mask), 'median discrepancy (L>{})'.format(mask)],
+    combined_dict = dict(metric=['average difference (L>{})'.format(mask), 'median difference (L>{})'.format(mask)],
                         kcor=[cor1_avg, cor1_med],
                        psi=[forward_avg, forward_med],
                         random=[random_avg, random_med])

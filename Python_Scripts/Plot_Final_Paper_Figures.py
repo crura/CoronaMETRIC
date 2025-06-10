@@ -51,8 +51,8 @@ plt.savefig(os.path.join(repo_path, 'Output/Plots/QRaFT_Figures/Test_Combined_Qr
 
 # Plot a side by side figure with two png files 
 # Load the images
-img1 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/Updated_COR1_PSI_vs_FORWARD_Feature_Tracing_Performance.png'))
-img2 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/Updated_COR1_PSI_vs_FORWARD_Feature_Tracing_Performance_Log.png'))
+img1 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/Updated_COR1_PSI_vs_FORWARD_Feature_Tracing_Performance.eps'))
+img2 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/Updated_COR1_PSI_vs_FORWARD_Feature_Tracing_Performance_Log.eps'))
 
 # Create a figure and two subplots
 fig, axs = plt.subplots(1, 2, figsize=(12, 6))

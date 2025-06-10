@@ -28,6 +28,7 @@ from scipy.io import readsav
 import os
 from matplotlib.patches import Circle
 from functions import print_sql_query
+import numpy as np
 
 
 import subprocess
@@ -103,7 +104,9 @@ for i in os.listdir(fits_input_path):
     fig1 = plt.figure(figsize=(15, 8))
     ax1 = fig1.add_subplot(1, 2, 1, projection=cor1map)
     ax2 = fig1.add_subplot(1, 2, 2, projection=cor1map)
+    # Adjust brightness by modifying normalization
     cor1map.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
+    cor1map.plot_settings['norm'] = plt.Normalize(vmin=np.percentile(cor1map.data, 1), vmax=np.percentile(cor1map.data, 99))  # Match brightness range in both plots
     cor1map.plot(axes=ax2,title=False)
 
     R_SUN = occlt * (head2['rsun'] / head2['cdelt1'])
@@ -111,9 +114,9 @@ for i in os.listdir(fits_input_path):
 
 
 
-    psimap.plot_settings['norm'] = plt.Normalize(cor1map.min(), cor1map.max())
-
-    psimap.plot(axes=ax1,title=False,norm=matplotlib.colors.LogNorm())
+    # Adjust PSI map normalization
+    psimap.plot_settings['norm'] = plt.Normalize(vmin=np.percentile(psimap.data, 1), vmax=np.percentile(psimap.data, 99))  # Match brightness range in both plots
+    psimap.plot(axes=ax1, title=False, norm=matplotlib.colors.LogNorm())
 
     query = "SELECT occlt from central_tendency_stats_cor1_new inner join forward_input_variables on central_tendency_stats_cor1_new.forward_input_data_id = forward_input_variables.forward_parameters_id where crlt_obs={} and data_type='{}';".format(round(cor1map.carrington_latitude.value,11), 'pB')
     cur.execute(query)

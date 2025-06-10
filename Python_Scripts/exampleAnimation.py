@@ -20,6 +20,7 @@ fig, ax = plt.subplots(figsize=(8, 5))
 line_p, = ax.plot([], [], label="Distribution A (p)", linewidth=2)
 line_q, = ax.plot([], [], label="Distribution B (q)", linewidth=2, linestyle='--')
 text_kl = ax.text(-4.5, 0.14, '', fontsize=12, bbox=dict(facecolor='white', edgecolor='black'))
+text_jsd = ax.text(-4.5, 0.12, '', fontsize=12, bbox=dict(facecolor='white', edgecolor='black'))
 
 ax.set_xlim(-5, 5)
 ax.set_ylim(0, 0.15)
@@ -35,11 +36,18 @@ def animate(i):
     q = amplitude * (1 / (sigma * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x - mu_shift) / sigma) ** 2)
     kl = entropy(p, q)
 
+    m = 0.5 * (p + q)
+    kl_p_m = entropy(p, m)
+    kl_q_m = entropy(q, m)
+    jsd = 0.5 * (kl_p_m + kl_q_m)
+
     line_p.set_data(x, p)
     line_q.set_data(x, q)
     text_kl.set_text(f'Total KL(p || q) = {kl:.4f}')
+    text_jsd.set_text(f'Total JS(p || q) = {jsd:.4f}')
 
-    return line_p, line_q, text_kl
+
+    return line_p, line_q, text_kl, text_jsd
 
 # Run animation
 ani = FuncAnimation(fig, animate, frames=frames, interval=100, blit=True)
@@ -221,3 +229,61 @@ plt.legend()
 plt.tight_layout()
 
 plt.savefig(os.path.join(repo_path,"Output/js_divergence_example_fig.png"))
+
+
+
+# Re-import necessary libraries after code execution state reset
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from scipy.stats import entropy
+
+# Define x-axis
+x = np.linspace(0, 2 * np.pi, 1000)
+
+# Create two more complex, periodic probability distributions
+p = 0.5 * (np.sin(x) ** 2 + 1)  # non-negative and smooth
+q_base = 0.5 * (np.cos(x) ** 2 + 1)
+
+# Normalize to make valid probability distributions
+p /= np.trapz(p, x)
+q_base /= np.trapz(q_base, x)
+
+# Setup the figure
+fig, ax = plt.subplots(figsize=(10, 4))
+line_p, = ax.plot([], [], label='Distribution A (p)', color='orange', linewidth=2)
+line_q, = ax.plot([], [], label='Distribution B (q)', color='orangered', linestyle='--', linewidth=2)
+line_m, = ax.plot([], [], label='Mixture m(x)', color='purple', linestyle=':', linewidth=2)
+text_kl = ax.text(0.02, 0.82, '', transform=ax.transAxes, fontsize=10, bbox=dict(facecolor='white'))
+text_jsd = ax.text(0.02, 0.7, '', transform=ax.transAxes, fontsize=10, bbox=dict(facecolor='white'))
+
+ax.set_xlim(0, 2 * np.pi)
+ax.set_ylim(0, 0.4)
+ax.set_title("KL vs. JS Divergence on Complicated Distributions")
+ax.set_xlabel("x")
+ax.set_ylabel("Probability Density")
+ax.legend()
+ax.grid(True)
+
+# Animation function
+def animate(i):
+    phase_shift = i * np.pi / 30  # full oscillation over ~60 frames
+    q = 0.5 * (np.cos(x + phase_shift) ** 2 + 1)
+    q /= np.trapz(q, x)
+    m = 0.5 * (p + q)
+
+    kl = entropy(p, q)
+    jsd = 0.5 * (entropy(p, m) + entropy(q, m))
+
+    line_p.set_data(x, p)
+    line_q.set_data(x, q)
+    line_m.set_data(x, m)
+    text_kl.set_text(f'KL(p || q) = {kl:.4f}')
+    text_jsd.set_text(f'JSD(p || q) = {jsd:.4f}')
+
+    return line_p, line_q, line_m, text_kl, text_jsd
+
+# Create and save the animation
+ani = animation.FuncAnimation(fig, animate, frames=60, interval=150, blit=True)
+gif_path = os.path.join(repo_path,"Output/js_kl_divergence_example_fig.gif")
+ani.save(gif_path, writer='pillow', fps=10)

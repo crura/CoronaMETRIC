@@ -232,7 +232,7 @@ def optimize_for_avg(detector, optimization_array):
     norm_kde_forward = (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward
     norm_kde_cor1 = (KDE_cor1_central_deg_new/max(KDE_cor1_central_deg_new))*norm_max_cor1
     #sns.kdeplot()
-    ax.set_xlabel('Angular Difference (Degrees)',fontsize=14)
+    ax.set_xlabel(r'$\Delta \theta$ (Degrees)',fontsize=14)
     ax.set_ylabel('Pixel Count',fontsize=14)
     ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
     ax.set_xlim(-95,95)
@@ -297,7 +297,7 @@ def optimize_for_avg(detector, optimization_array):
     sns.distplot(err_mlso_central_deg,hist=True,label='MLSO K-COR',bins=30,ax=ax[0])
     sns.distplot(err_forward_central_deg,hist=True,label='PSI/FORWARD pB',bins=30,ax=ax[0])
     sns.distplot(err_random_deg,hist=False,label='Random',ax=ax[0])
-    ax[0].set_xlabel('Angular Difference',fontsize=22)
+    ax[0].set_xlabel(r'$\Delta \theta$',fontsize=22)
     ax[0].set_ylabel('Probability Density',fontsize=22)
     ax[0].set_title('QRaFT Feature Tracing Performance MLSO K-COR vs PSI',fontsize=22)
     ax[0].set_xlim(0,90)
@@ -309,7 +309,7 @@ def optimize_for_avg(detector, optimization_array):
     sns.distplot(err_forward_cor1_central_deg,hist=True,label='PSI/FORWARD pB',bins=30,ax=ax[1])
     sns.distplot(err_random_deg,hist=False,label='Random',ax=ax[1])
     # sns.kdeplot(err_mlso_los_deg,label='KDE')
-    ax[1].set_xlabel('Angular Difference',fontsize=22)
+    ax[1].set_xlabel(r'$\Delta \theta$',fontsize=22)
     ax[1].set_ylabel('Probability Density',fontsize=22)
     ax[1].set_title('QRaFT Feature Tracing Performance COR-1 vs PSI',fontsize=22)
     ax[1].set_xlim(0,90)
@@ -381,7 +381,7 @@ def optimize_for_avg(detector, optimization_array):
     norm_kde_forward = (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward
     norm_kde_cor1 = (KDE_cor1_central_deg_new/max(KDE_cor1_central_deg_new))*norm_max_cor1
     #sns.kdeplot()
-    ax.set_xlabel('Angular Difference (Degrees)',fontsize=14)
+    ax.set_xlabel(r'$\Delta \theta$ (Degrees)',fontsize=14)
     ax.set_ylabel('Pixel Count',fontsize=14)
     ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field (L > {})'.format(detector, mask),fontsize=15)
     ax.set_xlim(-95,95)

@@ -264,7 +264,7 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
     norm_kde_forward = (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward
     norm_kde_cor1 = (KDE_cor1_central_deg_new/max(KDE_cor1_central_deg_new))*norm_max_cor1
     #sns.kdeplot()
-    ax.set_xlabel('Angular Difference (Degrees)',fontsize=14)
+    ax.set_xlabel(r'$\Delta \theta$ (Degrees)',fontsize=14)
     ax.set_ylabel('Pixel Count',fontsize=14)
     if masked:
         ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field {} (L > {})'.format(detector, date, mask),fontsize=15)
@@ -794,8 +794,8 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
     cax.yaxis.set_ticks_position('right')
     cax.yaxis.set_label_position('right')
     norm = mpl.colors.Normalize(vmin=-90, vmax=90)
-    cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical', norm=norm)
-    cbar.set_label('Angle Error (degrees)', fontsize=15, labelpad=0.25)
+    cbar = fig.colorbar(sc, cax=cax, label=r'$\Delta \theta$ (degrees)', orientation='vertical', norm=norm)
+    cbar.set_label(r'$\Delta \theta$ (degrees)', fontsize=15, labelpad=0.25)
     # Adjust the position of the label
     cbar.ax.yaxis.label.set_position((1.05, 0.25))  # (x, y) coordinates
     # cax.set_xlabel(' ')
@@ -1007,7 +1007,7 @@ def plot_histograms(arrays, labels, repo_path, detector='COR1_PSI'):
     for i in range(len(arrays)):
         sns.histplot(arrays[i], kde=True, label=labels[i], bins=30, ax=ax, color=colors[i % len(colors)])
 
-    ax.set_xlabel('Angular Difference (Degrees)', fontsize=14)
+    ax.set_xlabel(r'$\Delta \theta$ (Degrees)', fontsize=14)
     ax.set_ylabel('Pixel Count', fontsize=14)
     ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector), fontsize=15)
     ax.set_xlim(-95,95)
@@ -1095,9 +1095,9 @@ def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, dat
     ax.plot(height_values, probabilities, label='Corresponding Gaussian Fit', color='tab:blue')
     # plt.plot(x_1_forward_cor1_central_deg_new, gaussian_fit_pB*norm_max_pB, label='gaussian fit', color='tab:blue')
     # plt.yscale('log')
-    ax.set_xlabel('Angular Difference (Degrees)')
+    ax.set_xlabel(r'$\Delta \theta$ (Degrees)')
     ax.set_ylabel('Probability Density')
-    ax.text(0.7,0.8,"average difference: " + str(np.round(np.average(array),5)), transform=ax.transAxes)
+    ax.text(0.7,0.8,r"average $\Delta \theta$: " + str(np.round(np.average(array),5)), transform=ax.transAxes)
     ax.text(0.7,0.75,"standard deviation: " + str(np.round(np.std(abs(array)),5)), transform=ax.transAxes)
     ax.text(0.7,0.7,"Gaussian JSD: " + str(np.round(JSD_gaussain,5)), transform=ax.transAxes)
     ax.text(0.7,0.65,"kurtosis: " + str(np.round(kurtosis,5)), transform=ax.transAxes)

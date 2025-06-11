@@ -710,7 +710,7 @@ sns.histplot(combined_cor1_signed_ravel, kde=True, bins=30, label='COR1',ax=ax, 
 
 
 #sns.kdeplot()
-ax.set_xlabel('Angular Difference (Degrees)',fontsize=14)
+ax.set_xlabel(r'$\Delta \theta$ (Degrees)',fontsize=14)
 ax.set_ylabel('Pixel Count',fontsize=14)
 detector = 'COR1_PSI'
 ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
@@ -757,7 +757,7 @@ ax.set_yscale('log')
 
 axs[1].set_yscale('log')
 
-axs[0].set_xlabel('Angular Difference (Degrees)',fontsize=14)
+axs[0].set_xlabel(r'$\Delta \theta$ (Degrees)',fontsize=14)
 axs[0].set_ylabel('Pixel Count',fontsize=14)
 detector = 'COR1_PSI'
 axs[0].set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
@@ -765,7 +765,7 @@ axs[0].set_xlim(-95,95)
 #ax.set_ylim(0,0.07)
 axs[0].legend(fontsize=13)
 
-axs[1].set_xlabel('Angular Difference (Degrees)',fontsize=14)
+axs[1].set_xlabel(r'$\Delta \theta$ (Degrees)',fontsize=14)
 axs[1].set_ylabel('Log Pixel Count',fontsize=14)
 detector = 'COR1_PSI'
 axs[1].set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
@@ -793,7 +793,7 @@ ax.plot(x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new, colo
 ax.plot(height_values, probabilities, label='Corresponding Gaussian Fit', color='tab:blue')
 # plt.plot(x_1_forward_cor1_central_deg_new, gaussian_fit_pB*norm_max_pB, label='gaussian fit', color='tab:blue')
 # plt.yscale('log')
-ax.set_xlabel('Angular Difference (Degrees)')
+ax.set_xlabel(r'$\Delta \theta$ (Degrees)')
 ax.set_ylabel('Probability Density')
 ax.text(25,0.008,"average difference: " + str(np.round(np.average(combined_pB_signed_ravel_arr),5)))
 ax.text(25,0.007,"standard deviation: " + str(np.round(np.std(abs(combined_pB_signed_ravel_arr)),5)))
@@ -873,7 +873,7 @@ for i, date in enumerate(dates):
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
-plt.ylabel('Mean Angular Difference (Degrees)')
+plt.ylabel(r'$\overline{\Delta\theta}$ (Degrees)')
 plt.title('PSI COR-1 Projection Angular Difference by Date')
 plt.legend()
 plt.ylim(0,20)
@@ -1185,7 +1185,7 @@ max_upper_tail = max(x for x in combined_cor1_ravel_arr if x <= upper_tail_limit
 
 upper_quartile_cor1 = np.percentile(combined_cor1_ravel_arr, 75)
 ax.set_ylim(0, max_upper_tail + 10)
-ax.set_ylabel("Mean Angular Difference (Degrees)") 
+ax.set_ylabel(r"$\Delta \theta$ (Degrees)") 
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.eps'), format='eps')
@@ -1623,7 +1623,7 @@ sns.histplot(combined_kcor_signed_ravel, kde=True, bins=30, label='KCor l2 avg',
 
 
 #sns.kdeplot()
-ax.set_xlabel('Angular Difference (Degrees)',fontsize=14)
+ax.set_xlabel(r'$\Delta \theta$ (Degrees)',fontsize=14)
 ax.set_ylabel('Pixel Count',fontsize=14)
 detector = 'KCor_PSI'
 ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
@@ -1681,7 +1681,7 @@ for i, date in enumerate(dates):
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
-plt.ylabel('Mean Angular Difference (Degrees)')
+plt.ylabel(r'$\overline{\Delta\theta}$ (Degrees)')
 plt.title('PSI K-COR Projection Angular Difference by Date')
 plt.legend()
 plt.ylim(0,30)

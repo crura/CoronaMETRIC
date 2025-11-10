@@ -54,6 +54,8 @@ import sqlite3
 from scipy.stats import f_oneway
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from scipy.stats import tukey_hsd
+from matplotlib.ticker import PercentFormatter
+
 
 
 con = sqlite3.connect("tutorial.db")
@@ -729,52 +731,40 @@ plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_T
 
 fig, axs = plt.subplots(1, 2, figsize=(20, 8))
 
-# # Combine all the data into one array
-# all_data = np.concatenate([combined_ne_signed_ravel_arr, 
-#                            combined_pB_signed_ravel_arr, 
-#                            combined_ne_signed_LOS_ravel_arr, 
-#                            combined_cor1_signed_ravel_arr])
+# Shared binning so curves line up
+bins = 30
+binrange = (-95, 95)
 
+for ax in axs:
+    sns.histplot(combined_ne_signed_ravel_arr, kde=True, label='MAS ne',
+                 bins=bins, stat='probability', ax=ax, color='tab:blue')
+    sns.histplot(combined_pB_signed_ravel_arr, kde=True, label='FORWARD pB',
+                 bins=bins, stat='probability', ax=ax, color='tab:orange')
+    sns.histplot(combined_ne_signed_LOS_ravel_arr, kde=True, label='MAS ne_LOS',
+                 bins=bins, stat='probability', ax=ax, color='tab:green')
+    sns.histplot(combined_cor1_signed_ravel_arr, kde=True, label='COR1 pB',
+                 bins=bins, stat='probability', ax=ax, color='tab:red')
+    ax.set_xlim(*binrange)
+    ax.yaxis.set_major_formatter(PercentFormatter(1.0))
 
-# # Calculate the weights for each dataset
-# weights_ne = np.ones_like(combined_ne_signed_ravel_arr) / all_data.max()
-# weights_pB = np.ones_like(combined_pB_signed_ravel_arr) / all_data.max()
-# weights_ne_LOS = np.ones_like(combined_ne_signed_LOS_ravel_arr) / all_data.max()
-# weights_COR1 = np.ones_like(combined_cor1_signed_ravel_arr) / all_data.max()
-
-
-sns.histplot(combined_ne_signed_ravel_arr, kde=True,label='MAS ne',bins=30,ax=axs[0],color='tab:blue')
-sns.histplot(combined_pB_signed_ravel_arr, kde=True,label='FORWARD pB',bins=30,ax=axs[0],color='tab:orange')
-sns.histplot(combined_ne_signed_LOS_ravel_arr, kde=True, bins=30, label='MAS ne_LOS',ax=axs[0], color='tab:green')
-sns.histplot(combined_cor1_signed_ravel_arr, kde=True, bins=30, label='COR1 pB',ax=axs[0], color='tab:red')
-
-sns.histplot(combined_ne_signed_ravel_arr,kde=True,label='MAS ne',bins=30,ax=axs[1],color='tab:blue')
-sns.histplot(combined_pB_signed_ravel_arr,kde=True,label='FORWARD pB',bins=30,ax=axs[1],color='tab:orange')
-sns.histplot(combined_ne_signed_LOS_ravel_arr,kde=True, bins=30, label='MAS ne_LOS',ax=axs[1], color='tab:green')
-sns.histplot(combined_cor1_signed_ravel_arr, kde=True, bins=30, label='COR1 pB',ax=axs[1], color='tab:red')
-ax.set_yscale('log')
-
-
+# Log scale works, but beware bins with 0% (they can’t be shown on a log axis)
 axs[1].set_yscale('log')
-
-axs[0].set_xlabel(r'$\Delta \theta$ (Degrees)',fontsize=14)
-axs[0].set_ylabel('Pixel Count',fontsize=14)
+axs[0].set_xlabel(r'$\Delta \theta$ (Degrees)', fontsize=14)
+axs[0].set_ylabel('Percent of pixels', fontsize=14)
 detector = 'COR1_PSI'
-axs[0].set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
-axs[0].set_xlim(-95,95)
-#ax.set_ylim(0,0.07)
+axs[0].set_title('QRaFT {} Feature Tracing Performance vs. Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
 axs[0].legend(fontsize=13)
+axs[0].set_xlim(-95,95)
 
-axs[1].set_xlabel(r'$\Delta \theta$ (Degrees)',fontsize=14)
-axs[1].set_ylabel('Log Pixel Count',fontsize=14)
+axs[1].set_xlabel(r'$\Delta \theta$ (Degrees)', fontsize=14)
+axs[1].set_ylabel('Percent of pixels (log scale)', fontsize=14)
 detector = 'COR1_PSI'
-axs[1].set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
+axs[1].set_title('QRaFT {} Feature Tracing Performance vs. Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
 axs[1].set_xlim(-95,95)
-#ax.set_ylim(0,0.07)
-axs[1].legend(fontsize=13)
 
 plt.tight_layout()
 plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_Performance_Fig.eps'), format='eps')
+plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_Performance_Fig.png'), format='png')
 
 x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new = calculate_KDE(combined_pB_signed_ravel_arr)
 gaussian_fit_pB = np.random.normal(np.mean(combined_pB_signed_ravel_arr), np.std(abs(combined_pB_signed_ravel_arr)), 1000)

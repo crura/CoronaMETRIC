@@ -751,14 +751,14 @@ for ax in axs:
 # Log scale works, but beware bins with 0% (they can’t be shown on a log axis)
 axs[1].set_yscale('log')
 axs[0].set_xlabel(r'$\Delta \theta$ (Degrees)', fontsize=14)
-axs[0].set_ylabel('Percent of pixels', fontsize=14)
+axs[0].set_ylabel('Percent of Pixels', fontsize=14)
 detector = 'COR1_PSI'
 axs[0].set_title('QRaFT {} Feature Tracing Performance vs. Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
 axs[0].legend(fontsize=13)
 axs[0].set_xlim(-95,95)
 
 axs[1].set_xlabel(r'$\Delta \theta$ (Degrees)', fontsize=14)
-axs[1].set_ylabel('Percent of pixels (log scale)', fontsize=14)
+axs[1].set_ylabel('Percent of Pixels (Log Scale)', fontsize=14)
 detector = 'COR1_PSI'
 axs[1].set_title('QRaFT {} Feature Tracing Performance vs. Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
 axs[1].legend(fontsize=13)

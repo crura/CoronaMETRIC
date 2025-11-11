@@ -1177,7 +1177,7 @@ max_upper_tail = max(x for x in combined_cor1_ravel_arr if x <= upper_tail_limit
 
 upper_quartile_cor1 = np.percentile(combined_cor1_ravel_arr, 75)
 ax.set_ylim(0, max_upper_tail + 10)
-ax.set_ylabel(r"$\overline{\left|\Delta\theta\right|}$ (Degrees)") 
+ax.set_ylabel(r"$\left|\Delta\theta\right|$ (Degrees)") 
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.eps'), format='eps')

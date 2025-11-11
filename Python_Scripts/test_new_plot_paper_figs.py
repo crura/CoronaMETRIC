@@ -428,7 +428,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, PSI=True
     cax.yaxis.set_ticks_position('right')
     cax.yaxis.set_label_position('right')
     norm = mpl.colors.Normalize(vmin=0, vmax=90)
-    cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical', norm=norm)
+    cbar = fig.colorbar(sc, cax=cax, label=r'$\Delta \theta$ (Degrees)', orientation='vertical', norm=norm)
     # cax.set_xlabel(' ')
     # cax.grid(axis='y')
     lat = cax.coords[0]
@@ -501,7 +501,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, PSI=True
     cax.yaxis.set_ticks_position('right')
     cax.yaxis.set_label_position('right')
     norm = mpl.colors.Normalize(vmin=-90, vmax=90)
-    cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical', norm=norm)
+    cbar = fig.colorbar(sc, cax=cax, label=r'$\Delta \theta$ (Degrees)', orientation='vertical', norm=norm)
     # cax.set_xlabel(' ')
     # cax.grid(axis='y')
     lat = cax.coords[0]

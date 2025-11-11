@@ -647,9 +647,10 @@ data_stats_2_combined.append((None, data_type_cor1_combined, data_source, date_c
                                n_cor1_combined, JSD_cor1_combined, KLD_cor1_combined, kurtosis_cor1_combined, skewness_cor1_combined, foreign_key_cor1, ''))
 
 avg_n = int((len(combined_pB_signed_ravel_arr) + len(combined_ne_signed_ravel_arr) + len(combined_ne_signed_LOS_ravel_arr) + len(combined_cor1_signed_ravel_arr)) / 4)
+random_generator = np.random.default_rng(seed=54)
 for i in range(avg_n):
-    combined_random.append(np.random.uniform(0, 90))
-    combined_random_signed.append(np.random.uniform(-90, 90))
+    combined_random.append(random_generator.uniform(0, 90))
+    combined_random_signed.append(random_generator.uniform(-90, 90))
 
 
 combined_random_ravel_arr = np.array(combined_random)
@@ -760,6 +761,7 @@ axs[1].set_xlabel(r'$\Delta \theta$ (Degrees)', fontsize=14)
 axs[1].set_ylabel('Percent of pixels (log scale)', fontsize=14)
 detector = 'COR1_PSI'
 axs[1].set_title('QRaFT {} Feature Tracing Performance vs. Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
+axs[1].legend(fontsize=13)
 axs[1].set_xlim(-95,95)
 
 plt.tight_layout()
@@ -767,7 +769,7 @@ plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_Performance_Fig.
 plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_Performance_Fig.png'), format='png')
 
 x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new = calculate_KDE(combined_pB_signed_ravel_arr)
-gaussian_fit_pB = np.random.normal(np.mean(combined_pB_signed_ravel_arr), np.std(abs(combined_pB_signed_ravel_arr)), 1000)
+gaussian_fit_pB = random_generator.normal(np.mean(combined_pB_signed_ravel_arr), np.std(abs(combined_pB_signed_ravel_arr)), 1000)
 hi = sci.stats.norm(np.mean(combined_pB_signed_ravel_arr), np.std(abs(combined_pB_signed_ravel_arr)))
 
 min_height = min(combined_pB_signed_ravel_arr)
@@ -863,7 +865,7 @@ for i, date in enumerate(dates):
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
-plt.ylabel(r'$\overline{\Delta\theta}$ (Degrees)')
+plt.ylabel(r'$\overline{\left|\Delta\theta\right|}$ (Degrees)')
 plt.title('PSI COR-1 Projection Angular Difference by Date')
 plt.legend()
 plt.ylim(0,20)
@@ -1175,7 +1177,7 @@ max_upper_tail = max(x for x in combined_cor1_ravel_arr if x <= upper_tail_limit
 
 upper_quartile_cor1 = np.percentile(combined_cor1_ravel_arr, 75)
 ax.set_ylim(0, max_upper_tail + 10)
-ax.set_ylabel(r"$\Delta \theta$ (Degrees)") 
+ax.set_ylabel(r"$\overline{\left|\Delta\theta\right|}$ (Degrees)") 
 ax.set_xlabel("Data Type") 
 ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.eps'), format='eps')
@@ -1671,7 +1673,7 @@ for i, date in enumerate(dates):
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
-plt.ylabel(r'$\overline{\Delta\theta}$ (Degrees)')
+plt.ylabel(r'$\overline{\left|\Delta\theta\right|}$ (Degrees)')
 plt.title('PSI K-COR Projection Angular Difference by Date')
 plt.legend()
 plt.ylim(0,30)

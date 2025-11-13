@@ -50,8 +50,8 @@ plt.savefig(os.path.join(repo_path, 'Output/Plots/QRaFT_Figures/Test_Combined_Qr
 
 # plot a side by side figure
 # Load the images
-img1 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/QRaFT_Figures/2017-08-20_ne_COR1_fig_5.png'))
-img2 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/QRaFT_Figures/2017-08-20_COR1_fig_5.png'))
+img1 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/QRaFT_Figures/2017-08-29_ne_COR1_fig_5.png'))
+img2 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/QRaFT_Figures/2017-08-29_COR1_fig_5.png'))
 
 # Create a figure and two subplots
 fig, axs = plt.subplots(1, 2, figsize=(12, 6))
@@ -60,12 +60,18 @@ fig, axs = plt.subplots(1, 2, figsize=(12, 6))
 axs[0].imshow(img1)
 axs[1].imshow(img2)
 
-# Remove the x and y ticks
 for ax in axs:
-    ax.set_xticks([])
-    ax.set_yticks([])
-plt.tight_layout()
-plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_QraFT_Fig.eps'), format='eps')
+    ax.axis('off')   # turn off  ticks, labels, and borders
+
+plt.subplots_adjust(wspace=0, hspace=0) # remove padding between images
+
+plt.savefig(
+    os.path.join(repo_path, 'Output/Plots/Test_Combined_QraFT_Fig.eps'),
+    format='eps',
+    bbox_inches='tight',
+    pad_inches=0
+)
+plt.close()
 
 
 def Create1x2Figure(image1, image2, output_file):

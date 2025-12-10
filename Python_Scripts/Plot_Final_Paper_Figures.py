@@ -102,3 +102,41 @@ image_path_1 = os.path.join(repo_path, 'Output/Plots/Features_Angle_Error_2017_0
 image_path_2 = os.path.join(repo_path, 'Output/Plots/Features_Angle_Error_2017_08_20_COR1_COR1.eps')
 output_file = os.path.join(repo_path, 'Output/Plots/Test_Combined_Angle_Error_Fig.eps')
 Create1x2Figure(image_path_1, image_path_2, output_file)
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def rot_POS_misalignment(alpha_deg):
+    """
+    Compute the angular distortion in the plane-of-sky (POS) projection
+    due to solar rotation over a specified angle.
+
+    Parameters:
+    - alpha_deg: rotation angle in degrees (e.g., 4.4 for 8 hours of rotation)
+
+    Returns:
+    - theta_deg: array of latitudes (0 to 89 degrees)
+    - dtheta_deg: array of angular distortions in degrees
+    """
+    alpha = np.radians(alpha_deg)
+    theta_arr = np.radians(np.arange(90))  # 0° to 89° in radians
+
+    dtheta = np.arctan(np.tan(theta_arr) / np.cos(alpha)) - theta_arr
+    dtheta_deg = np.degrees(dtheta)
+    theta_deg = np.degrees(theta_arr)
+
+    return theta_deg, dtheta_deg
+
+# Calculate rotation misalignment
+theta_deg, dtheta_deg = rot_POS_misalignment(4.4)
+
+# Plot
+plt.figure(figsize=(8, 5))
+plt.plot(theta_deg, dtheta_deg)
+plt.title(r'Change in POS angle $\Delta \theta$ due to solar rotation ($\alpha = 4.4^\circ$)')
+plt.xlabel('Colatitude, degrees')
+plt.ylabel(r'Change in $\Delta \theta$, degrees')
+plt.grid(True, color='gray', linestyle='--', alpha=0.3)
+plt.tight_layout()
+plt.show()

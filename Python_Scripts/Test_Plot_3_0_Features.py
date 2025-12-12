@@ -737,13 +737,13 @@ bins = 30
 binrange = (-95, 95)
 
 for ax in axs:
-    sns.histplot(combined_ne_signed_ravel_arr, kde=True, label='MAS ne',
+    sns.histplot(combined_ne_signed_ravel_arr, kde=True, label=r'MAS $n_e$ POS',
                  bins=bins, stat='probability', ax=ax, color='tab:blue')
     sns.histplot(combined_pB_signed_ravel_arr, kde=True, label='FORWARD pB',
                  bins=bins, stat='probability', ax=ax, color='tab:orange')
-    sns.histplot(combined_ne_signed_LOS_ravel_arr, kde=True, label='MAS ne_LOS',
+    sns.histplot(combined_ne_signed_LOS_ravel_arr, kde=True, label=r'MAS $n_e$ LOS',
                  bins=bins, stat='probability', ax=ax, color='tab:green')
-    sns.histplot(combined_cor1_signed_ravel_arr, kde=True, label='COR1 pB',
+    sns.histplot(combined_cor1_signed_ravel_arr, kde=True, label='COR-1 pB',
                  bins=bins, stat='probability', ax=ax, color='tab:red')
     ax.set_xlim(*binrange)
     ax.yaxis.set_major_formatter(PercentFormatter(1.0))
@@ -752,15 +752,17 @@ for ax in axs:
 axs[1].set_yscale('log')
 axs[0].set_xlabel(r'$\Delta \theta$ (Degrees)', fontsize=14)
 axs[0].set_ylabel('Percent of Pixels', fontsize=14)
-detector = 'COR1_PSI'
+detector = 'COR-1_PSI'
 axs[0].set_title('QRaFT {} Feature Tracing Performance vs. Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
+detector = 'COR1_PSI'
 axs[0].legend(fontsize=13)
 axs[0].set_xlim(-95,95)
 
 axs[1].set_xlabel(r'$\Delta \theta$ (Degrees)', fontsize=14)
 axs[1].set_ylabel('Percent of Pixels (Log Scale)', fontsize=14)
-detector = 'COR1_PSI'
+detector = 'COR-1_PSI'
 axs[1].set_title('QRaFT {} Feature Tracing Performance vs. Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
+detector = 'COR1_PSI'
 axs[1].legend(fontsize=13)
 axs[1].set_xlim(-95,95)
 
@@ -822,13 +824,13 @@ data_types = sorted(list(set(data_by_date[dates[0]]['data_type'])))  # Assuming 
 data_types_original = data_types.copy()
 for j in range(len(data_types)):
     if data_types[j] == 'ne':
-        data_types[j] = 'MAS ne'
+        data_types[j] = r'MAS $n_e$ POS'
     elif data_types[j] == 'ne_LOS':
-        data_types[j] = 'MAS ne LOS'
+        data_types[j] = r'MAS $n_e$ LOS'
     elif data_types[j] == 'pB':
         data_types[j] = 'FORWARD pB'
     elif data_types[j] == 'COR1':
-        data_types[j] = 'COR1 pB'
+        data_types[j] = 'COR-1 pB'
 
 fig = plt.figure(figsize=(8, 8))
 # Create a scatter plot for each date
@@ -847,13 +849,13 @@ for i, date in enumerate(dates):
     data_type_to_plot = [data_by_date[date]['data_type'][j] for j in range(len(data_by_date[date]['data_type']))]
     for j in range(len(data_to_plot)):
         if data_type_to_plot[j] == 'ne':
-            data_type_to_plot[j] = 'MAS ne'
+            data_type_to_plot[j] = r'MAS $n_e$ POS'
         elif data_type_to_plot[j] == 'ne_LOS':
-            data_type_to_plot[j] = 'MAS ne LOS'
+            data_type_to_plot[j] = r'MAS $n_e$ LOS'
         elif data_type_to_plot[j] == 'pB':
             data_type_to_plot[j] = 'FORWARD pB'
         elif data_type_to_plot[j] == 'COR1':
-            data_type_to_plot[j] = 'COR1 pB'
+            data_type_to_plot[j] = 'COR-1 pB'
         if data_type_to_plot[j] == data_types[0]:
             plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C0' ,label=data_type_to_plot[j] if i == 0 else "")
         elif data_type_to_plot[j] == data_types[1]:
@@ -1125,17 +1127,17 @@ print(tukey_result)
 
 for i in range (len(tukey_result.summary().data[0])):
     if tukey_result.summary().data[i][0] == 'COR1':
-        tukey_result.summary().data[i][0] = 'COR1 pB'
+        tukey_result.summary().data[i][0] = 'COR-1 pB'
     if tukey_result.summary().data[i][1] == 'COR1':
-        tukey_result.summary().data[i][1] = 'COR1 pB'
+        tukey_result.summary().data[i][1] = 'COR-1 pB'
     if tukey_result.summary().data[i][0] == 'ne':
-        tukey_result.summary().data[i][0] = 'MAS ne'
+        tukey_result.summary().data[i][0] = r'MAS $n_e$ POS'
     if tukey_result.summary().data[i][1] == 'ne':
-        tukey_result.summary().data[i][1] = 'MAS ne'
+        tukey_result.summary().data[i][1] = r'MAS $n_e$ POS'
     if tukey_result.summary().data[i][0] == 'ne_LOS':
-        tukey_result.summary().data[i][0] = 'MAS ne LOS'
+        tukey_result.summary().data[i][0] = r'MAS $n_e$ LOS'
     if tukey_result.summary().data[i][1] == 'ne_LOS':
-        tukey_result.summary().data[i][1] = 'MAS ne LOS'
+        tukey_result.summary().data[i][1] = r'MAS $n_e$ LOS'
     if tukey_result.summary().data[i][0] == 'pB':
         tukey_result.summary().data[i][0] = 'FORWARD pB'
     if tukey_result.summary().data[i][1] == 'pB':
@@ -1160,7 +1162,7 @@ else:
 
 fig, ax = plt.subplots(1, 1)
 ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr], showfliers=False)
-ax.set_xticklabels(["ne", "ne_LOS", "pB", "COR1"]) 
+ax.set_xticklabels([r'MAS $n_e$ POS', r'MAS $n_e$ LOS', "FORWARD pB", "COR-1 pB"]) 
 
 # Calculate the first (Q1) and third quartile (Q3)
 Q1 = np.percentile(combined_cor1_ravel_arr, 25)
@@ -1179,7 +1181,7 @@ upper_quartile_cor1 = np.percentile(combined_cor1_ravel_arr, 75)
 ax.set_ylim(0, max_upper_tail + 10)
 ax.set_ylabel(r"$\left|\Delta\theta\right|$ (Degrees)") 
 ax.set_xlabel("Data Type") 
-ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
+ax.set_title('Box Plot Comparison of Data Types for Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.eps'), format='eps')
 #plt.show()
 plt.close()

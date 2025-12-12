@@ -14,6 +14,10 @@
 @startuml framework diagram
 !define RECTANGLE class
 skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam math {
+    fontName Arial
+}
 
 RECTANGLE "Component 1: Image Processing" {
     <color:red>*</color> Input: Coronagraph Observations
@@ -37,7 +41,7 @@ RECTANGLE "Component 2: Synthetic Image Generation" {
   - Generate Synthetic pB Image using FORWARD
   - Coalignment using .fits headers
 --
-  <color:red>*</color> Outputs: Synthetic Images (Coaligned) and MHD Model Outputs (B, ne parameters)
+  <color:red>*</color> Outputs: Synthetic Images (Coaligned) and MHD Model Outputs <math>( B , n_e  " parameters")</math>
 }
 ' "Component 1: Image Processing" --> "Component 2: Synthetic Image Generation" : Output representative pB image
 "Component 2: Synthetic Image Generation" --> "Component 3: Image Segmentation" : Output synthetic pB image
@@ -56,7 +60,7 @@ RECTANGLE "Component 3: Image Segmentation" {
 }
 
 "Component 3: Image Segmentation" --> "Component 4: Comparative Analysis" : Output feature geometry parameters
-"Component 2: Synthetic Image Generation" --> "Component 4: Comparative Analysis" : Output MHD\n Model Parameters\n (B, ne parameters)
+"Component 2: Synthetic Image Generation" --> "Component 4: Comparative Analysis" : Output MHD\n Model Parameters\n <math>( B , n_e  " parameters")</math>
 
 RECTANGLE "Component 4: Comparative Analysis" {
   <color:red>*</color> Inputs: MHD Model B Field and Detected Features

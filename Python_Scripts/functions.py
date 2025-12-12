@@ -810,7 +810,23 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
     cbar.ax.tick_params(labelsize=12)  # Adjust the font size of cbar
     if PSI:
         if data_type:
-            axes.set_title('MAS {} Corresponding to {} {} Observation'.format(data_type, date, data_source.strip('_PSI')), fontsize=20)
+            if data_type == 'ne':
+                data_type = r'MAS $n_e$'
+            if data_type == 'ne_LOS':
+                data_type = r'MAS $n_e$ LOS'
+            if data_type == 'pB':
+                data_type = 'FORWARD pB'
+            if data_type == 'COR1':
+                data_type = 'COR-1'
+            axes.set_title('{} Corresponding to {} {} Observation'.format(data_type, date, data_source.strip('_PSI')), fontsize=20)
+            if data_type == 'MAS $n_e$':
+                data_type = 'ne'
+            if data_type == 'MAS $n_e$ LOS':
+                data_type = r'ne_LOS'
+            if data_type == 'FORWARD pB':
+                data_type = 'pB'
+            if data_type == 'COR-1':
+                data_type = 'COR1'
             plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}_PSI.eps'.format(string_print, detector, data_type)), format='eps')
             plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}_PSI.png'.format(string_print, detector, data_type)), format='png')
         else:
@@ -818,7 +834,11 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
             plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.eps'.format(string_print, detector)), format='eps')
             plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.png'.format(string_print, detector)), format='png')
     else:
+        if detector == 'COR1':
+            detector = 'COR-1'
         axes.set_title('{} Observation {}'.format(detector, str_strip), fontsize=20)
+        if detector == 'COR-1':
+            detector = 'COR1'
         if data_type:
             plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}.eps'.format(string_print, detector, data_type)), format='eps')
             plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}.png'.format(string_print, detector, data_type)), format='png')
@@ -1188,6 +1208,14 @@ def heatmap_sql_query(dbName, query, output_file=None, print_to_file=False, late
     # Set diagonal values to 0 as by definition the JSD between the same group is 0
     for i in symmetric_df.index:
         symmetric_df.at[i, i] = 0
+
+    rename_map = {
+    'COR1': 'COR-1',
+    'ne': r'$n_e$ POS',
+    'ne_LOS': r'$n_e$ LOS',
+    'pB': 'pB'
+    }
+    symmetric_df = symmetric_df.rename(index=rename_map, columns=rename_map)
     plt.close()
     heatmap = sns.heatmap(symmetric_df, annot=True)
     heatmap.set_title(title)

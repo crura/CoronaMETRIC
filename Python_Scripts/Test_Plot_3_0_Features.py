@@ -49,7 +49,7 @@ from functions import display_fits_image_with_3_0_features_and_B_field
 from scipy.stats import norm
 from matplotlib import pyplot as plt
 import seaborn as sns
-from functions import calculate_KDE_statistics, determine_paths, get_files_from_pattern, calculate_KDE, plot_histogram_with_JSD_Gaussian_Analysis, correct_fits_header, heatmap_sql_query
+from functions import calculate_KDE_statistics, determine_paths, get_files_from_pattern, calculate_KDE, plot_histogram_with_JSD_Gaussian_Analysis, correct_fits_header, heatmap_sql_query, int_heatmap_sql_query
 import sqlite3
 from scipy.stats import f_oneway
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
@@ -1198,6 +1198,21 @@ query = "SELECT group1, group2, JSD from tukey_hsd_stats_cor1 inner join central
 dbName = "tutorial.db"
 heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_no_random_heatmap.eps'), title='JSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='JSD')
 
+query = "SELECT group1, group2, mean_diff from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined';"
+dbName = "tutorial.db"
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_mean_diff_heatmap.eps'), title='Mean Difference Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='Mean Difference')
+
+query = "SELECT group1, group2, mean_diff from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined' and group1 != 'random' and group2 != 'random';"
+dbName = "tutorial.db"
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_mean_diff_no_random_heatmap.eps'), title='Mean Difference Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='Mean Difference')
+
+query = "SELECT group1, group2, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined';"
+dbName = "tutorial.db"
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_reject_heatmap.eps'), title='Tukey HSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label=r'Reject $H_0$?')
+
+query = "SELECT group1, group2, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined' and group1 != 'random' and group2 != 'random';"
+dbName = "tutorial.db"
+int_heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_reject_no_random_heatmap.eps'), title='Tukey HSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label=r'Reject $H_0$?')
 # # Read SQL Query File
 # with open(os.path.join(repo_path, 'Python_Scripts', 'Test_SQL_Queries.sql'), 'r') as file:
 #     script = file.read()

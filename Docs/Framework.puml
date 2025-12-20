@@ -14,10 +14,6 @@
 @startuml framework diagram
 !define RECTANGLE class
 skinparam linetype ortho
-skinparam defaultFontName Arial
-skinparam math {
-    fontName Arial
-}
 
 RECTANGLE "Component 1: Image Processing" {
     <color:red>*</color> Input: Coronagraph Observations

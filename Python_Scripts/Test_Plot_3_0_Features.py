@@ -1192,27 +1192,27 @@ print(res)
 
 query = "SELECT group1, group2, JSD from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined';"
 dbName = "tutorial.db"
-heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_heatmap.eps'), title='JSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='JSD')
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_heatmap.eps'), title='JSD Evaluation for Aggregated Data', x_label='Group 1', y_label='Group 2', colorbar_label='JSD')
 
 query = "SELECT group1, group2, JSD from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined' and group1 != 'random' and group2 != 'random';"
 dbName = "tutorial.db"
-heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_no_random_heatmap.eps'), title='JSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='JSD')
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_no_random_heatmap.eps'), title='JSD Evaluation for Aggregated Data', x_label='Group 1', y_label='Group 2', colorbar_label='JSD')
 
 query = "SELECT group1, group2, mean_diff from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined';"
 dbName = "tutorial.db"
-heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_mean_diff_heatmap.eps'), title='Mean Difference Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='Mean Difference')
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_mean_diff_heatmap.eps'), title='Mean Difference Evaluation for Aggregated Data', x_label='Group 1', y_label='Group 2', colorbar_label='Mean Difference')
 
 query = "SELECT group1, group2, mean_diff from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined' and group1 != 'random' and group2 != 'random';"
 dbName = "tutorial.db"
-heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_mean_diff_no_random_heatmap.eps'), title='Mean Difference Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='Mean Difference')
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_mean_diff_no_random_heatmap.eps'), title='Mean Difference Evaluation for Aggregated Data', x_label='Group 1', y_label='Group 2', colorbar_label='Mean Difference')
 
 query = "SELECT group1, group2, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined';"
 dbName = "tutorial.db"
-heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_reject_heatmap.eps'), title='Tukey HSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label=r'Reject $H_0$?')
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_reject_heatmap.eps'), title='Tukey HSD Evaluation for Aggregated Data', x_label='Group 1', y_label='Group 2', colorbar_label=r'Reject $H_0$?')
 
 query = "SELECT group1, group2, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined' and group1 != 'random' and group2 != 'random';"
 dbName = "tutorial.db"
-int_heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_reject_no_random_heatmap.eps'), title='Tukey HSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label=r'Reject $H_0$?')
+int_heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_reject_no_random_heatmap.eps'), title='Tukey HSD Evaluation for Aggregated Data', x_label='Group 1', y_label='Group 2', colorbar_label=r'Reject $H_0$?')
 # # Read SQL Query File
 # with open(os.path.join(repo_path, 'Python_Scripts', 'Test_SQL_Queries.sql'), 'r') as file:
 #     script = file.read()
@@ -1222,7 +1222,7 @@ int_heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.joi
 
 # query = "SELECT group1, group2, mean_diff from tukey_hsd_mean_diff_combined_cor1;"
 # dbName = "tutorial.db"
-# heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Test_COR1_Combined_HSD_mean_diff_heatmap.png'), colorbar_label='Absolute Mean Difference (Degrees)', title='Heatmap of Mean Differences by Population', x_label='group 1', y_label='group 2')
+# heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Test_COR1_Combined_HSD_mean_diff_heatmap.png'), colorbar_label='Absolute Mean Difference (Degrees)', title='Heatmap of Mean Differences by Population', x_label='Group 1', y_label='Group 2')
 
 fits_path = os.path.join(repo_path, 'Output/QRaFT_Results')
 fits_input_path = os.path.join(repo_path, config['kcor_data_path'])

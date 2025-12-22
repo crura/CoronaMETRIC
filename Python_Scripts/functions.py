@@ -796,8 +796,8 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
     cax.yaxis.set_ticks_position('right')
     cax.yaxis.set_label_position('right')
     norm = mpl.colors.Normalize(vmin=-90, vmax=90)
-    cbar = fig.colorbar(sc, cax=cax, label=r'$\Delta \theta$ (degrees)', orientation='vertical', norm=norm)
-    cbar.set_label(r'$\Delta \theta$ (degrees)', fontsize=15, labelpad=0.25)
+    cbar = fig.colorbar(sc, cax=cax, label=r'$\Delta \theta$ (Degrees)', orientation='vertical', norm=norm)
+    cbar.set_label(r'$\Delta \theta$ (Degrees)', fontsize=15, labelpad=0.25)
     # Adjust the position of the label
     cbar.ax.yaxis.label.set_position((1.05, 0.25))  # (x, y) coordinates
     # cax.set_xlabel(' ')

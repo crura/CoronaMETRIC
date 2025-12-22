@@ -193,6 +193,7 @@ jobs:
           python Python_Scripts/forward_model_db_cleanup.py
           cp tutorial.db Output/Plots
           find Output/Plots/ -iname "*.eps" -exec epstopdf {} \;
+          python Python_Scripts/custom_figures.py
           deactivate
 
       - uses: actions/upload-artifact@v4

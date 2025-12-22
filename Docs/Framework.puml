@@ -16,57 +16,57 @@
 skinparam linetype ortho
 
 RECTANGLE "Component 1: Image Processing" {
-    <color:red>*</color> Input: Coronagraph Observations
+    <color:red>*</color> Input: coronagraph observations
     --
 '   - Use `secchi_prep` routine:
   - Download sequential polarized images
   - Apply calibration
   - Perform background subtraction
   - Combine sequential images to generate pB images
-  - Stacking & Median Filtering
+  - Stacking & median filtering
 --
-  <color:red>*</color> Output: Representative pB Image
+  <color:red>*</color> Output: representative pB image
 }
 
 
 RECTANGLE "Component 2: Synthetic Image Generation" {
-    <color:red>*</color> Input: Coronagraph Observation Headers
+    <color:red>*</color> Input: coronagraph observation headers
     --
   - Generate MHD model solution
-  - Coordinate Transformation
-  - Generate Synthetic pB Image using FORWARD
+  - Coordinate transformation
+  - Generate synthetic pB image using FORWARD
   - Coalignment using .fits headers
 --
-  <color:red>*</color> Outputs: Synthetic Images (Coaligned) and MHD Model Outputs <math>( B , n_e  " parameters")</math>
+  <color:red>*</color> Outputs: synthetic images (coaligned) and MHD model outputs <math>(B , n_e " parameters")</math>
 }
 ' "Component 1: Image Processing" --> "Component 2: Synthetic Image Generation" : Output representative pB image
-"Component 2: Synthetic Image Generation" --> "Component 3: Image Segmentation" : Output synthetic pB image
+"Component 2: Synthetic Image Generation" --> "Component 3: Image Segmentation" : output synthetic pB image
 
 
-"Component 1: Image Processing" --> "Component 3: Image Segmentation" : Output representative pB image
+"Component 1: Image Processing" --> "Component 3: Image Segmentation" : output representative pB image
 RECTANGLE "Component 3: Image Segmentation" {
-    <color:red>*</color> Inputs: Representative Image and Synthetic Image
+    <color:red>*</color> Inputs: representative image and synthetic image
     --
-  - Preprocessing & Noise Reduction
-  - Transform to Plane Polar Coordinates
-  - Detrending & Thresholding
-  - Measure Detected Features as Polynomials
+  - Preprocessing & noise reduction
+  - Transform to plane polar coordinates
+  - Detrending & thresholding
+  - Measure detected features as polynomials
 --
-  <color:red>*</color> Outputs: Detected Features & Geometry Parameters
+  <color:red>*</color> Outputs: detected features & geometry parameters
 }
 
-"Component 3: Image Segmentation" --> "Component 4: Comparative Analysis" : Output feature geometry parameters
-"Component 2: Synthetic Image Generation" --> "Component 4: Comparative Analysis" : Output MHD\n Model Parameters\n <math>( B , n_e  " parameters")</math>
+"Component 3: Image Segmentation" --> "Component 4: Comparative Analysis" : output feature geometry parameters
+"Component 2: Synthetic Image Generation" --> "Component 4: Comparative Analysis" : output MHD\n model parameters\n <math>( B , n_e  " parameters")</math>
 
 RECTANGLE "Component 4: Comparative Analysis" {
-  <color:red>*</color> Inputs: MHD Model B Field and Detected Features
+  <color:red>*</color> Inputs: MHD model <math>B</math> field and detected features
 --
-  - Compare Orientation Angles (Real vs Synthetic) vs Model B Field Orienation
-  - Calculate Angle Differences
-  - Perform Statistical Analysis on Angle Differences
-  - Generate Metrics and Global Statistics
+  - Compare orientation angles (real vs synthetic) vs model <math>B</math> field orienation
+  - Calculate angle differences
+  - Perform statistical analysis on angle differences
+  - Generate metrics and global statistics
 --
-  <color:red>*</color> Outputs: Comprehensive Metrics and Statistics
+  <color:red>*</color> Outputs: comprehensive metrics and statistics
 }
 
 

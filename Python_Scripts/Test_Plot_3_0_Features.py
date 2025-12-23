@@ -49,11 +49,13 @@ from functions import display_fits_image_with_3_0_features_and_B_field
 from scipy.stats import norm
 from matplotlib import pyplot as plt
 import seaborn as sns
-from functions import calculate_KDE_statistics, determine_paths, get_files_from_pattern, calculate_KDE, plot_histogram_with_JSD_Gaussian_Analysis, correct_fits_header, heatmap_sql_query
+from functions import calculate_KDE_statistics, determine_paths, get_files_from_pattern, calculate_KDE, plot_histogram_with_JSD_Gaussian_Analysis, correct_fits_header, heatmap_sql_query, int_heatmap_sql_query
 import sqlite3
 from scipy.stats import f_oneway
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from scipy.stats import tukey_hsd
+from matplotlib.ticker import PercentFormatter
+
 
 
 con = sqlite3.connect("tutorial.db")
@@ -645,9 +647,10 @@ data_stats_2_combined.append((None, data_type_cor1_combined, data_source, date_c
                                n_cor1_combined, JSD_cor1_combined, KLD_cor1_combined, kurtosis_cor1_combined, skewness_cor1_combined, foreign_key_cor1, ''))
 
 avg_n = int((len(combined_pB_signed_ravel_arr) + len(combined_ne_signed_ravel_arr) + len(combined_ne_signed_LOS_ravel_arr) + len(combined_cor1_signed_ravel_arr)) / 4)
+random_generator = np.random.default_rng(seed=54)
 for i in range(avg_n):
-    combined_random.append(np.random.uniform(0, 90))
-    combined_random_signed.append(np.random.uniform(-90, 90))
+    combined_random.append(random_generator.uniform(0, 90))
+    combined_random_signed.append(random_generator.uniform(-90, 90))
 
 
 combined_random_ravel_arr = np.array(combined_random)
@@ -710,7 +713,7 @@ sns.histplot(combined_cor1_signed_ravel, kde=True, bins=30, label='COR1',ax=ax, 
 
 
 #sns.kdeplot()
-ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
+ax.set_xlabel(r'$\Delta \theta$ (Degrees)',fontsize=14)
 ax.set_ylabel('Pixel Count',fontsize=14)
 detector = 'COR1_PSI'
 ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
@@ -718,66 +721,57 @@ ax.set_xlim(-95,95)
 #ax.set_ylim(0,0.07)
 ax.legend(fontsize=13)
 
-# plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
-# plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
-# plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
-plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
+# plt.text(20,0.045,"COR1 average difference: " + str(np.round(np.average(err_cor1_central_deg),5)))
+# plt.text(20,0.04,"FORWARD average difference: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
+# plt.text(20,0.035,"Random average difference: " + str(np.round(np.average(err_random_deg),5)))
+plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.eps'.format(detector.replace('-',''))), format='eps')
 ax.set_yscale('log')
-plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_Log.png'.format(detector.replace('-',''))))
+plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_Log.eps'.format(detector.replace('-',''))), format='eps')
 # #plt.show()
 #plt.close()
 
 fig, axs = plt.subplots(1, 2, figsize=(20, 8))
 
-# # Combine all the data into one array
-# all_data = np.concatenate([combined_ne_signed_ravel_arr, 
-#                            combined_pB_signed_ravel_arr, 
-#                            combined_ne_signed_LOS_ravel_arr, 
-#                            combined_cor1_signed_ravel_arr])
+# Shared binning so curves line up
+bins = 30
+binrange = (-95, 95)
 
+for ax in axs:
+    sns.histplot(combined_ne_signed_ravel_arr, kde=True, label=r'MAS $n_e$ POS',
+                 bins=bins, stat='probability', ax=ax, color='tab:blue')
+    sns.histplot(combined_pB_signed_ravel_arr, kde=True, label='FORWARD pB',
+                 bins=bins, stat='probability', ax=ax, color='tab:orange')
+    sns.histplot(combined_ne_signed_LOS_ravel_arr, kde=True, label=r'MAS $n_e$ LOS',
+                 bins=bins, stat='probability', ax=ax, color='tab:green')
+    sns.histplot(combined_cor1_signed_ravel_arr, kde=True, label='COR-1 pB',
+                 bins=bins, stat='probability', ax=ax, color='tab:red')
+    ax.set_xlim(*binrange)
+    ax.yaxis.set_major_formatter(PercentFormatter(1.0))
 
-# # Calculate the weights for each dataset
-# weights_ne = np.ones_like(combined_ne_signed_ravel_arr) / all_data.max()
-# weights_pB = np.ones_like(combined_pB_signed_ravel_arr) / all_data.max()
-# weights_ne_LOS = np.ones_like(combined_ne_signed_LOS_ravel_arr) / all_data.max()
-# weights_COR1 = np.ones_like(combined_cor1_signed_ravel_arr) / all_data.max()
-
-
-sns.histplot(combined_ne_signed_ravel_arr, kde=True,label='MAS ne',bins=30,ax=axs[0],color='tab:blue')
-sns.histplot(combined_pB_signed_ravel_arr, kde=True,label='FORWARD pB',bins=30,ax=axs[0],color='tab:orange')
-sns.histplot(combined_ne_signed_LOS_ravel_arr, kde=True, bins=30, label='MAS ne_LOS',ax=axs[0], color='tab:green')
-sns.histplot(combined_cor1_signed_ravel_arr, kde=True, bins=30, label='COR1 pB',ax=axs[0], color='tab:red')
-
-sns.histplot(combined_ne_signed_ravel_arr,kde=True,label='MAS ne',bins=30,ax=axs[1],color='tab:blue')
-sns.histplot(combined_pB_signed_ravel_arr,kde=True,label='FORWARD pB',bins=30,ax=axs[1],color='tab:orange')
-sns.histplot(combined_ne_signed_LOS_ravel_arr,kde=True, bins=30, label='MAS ne_LOS',ax=axs[1], color='tab:green')
-sns.histplot(combined_cor1_signed_ravel_arr, kde=True, bins=30, label='COR1 pB',ax=axs[1], color='tab:red')
-ax.set_yscale('log')
-
-
+# Log scale works, but beware bins with 0% (they can’t be shown on a log axis)
 axs[1].set_yscale('log')
-
-axs[0].set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
-axs[0].set_ylabel('Pixel Count',fontsize=14)
+axs[0].set_xlabel(r'$\Delta \theta$ (Degrees)', fontsize=14)
+axs[0].set_ylabel('Percent of Pixels', fontsize=14)
+detector = 'COR-1_PSI'
+axs[0].set_title('QRaFT {} Feature Tracing Performance vs. Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
 detector = 'COR1_PSI'
-axs[0].set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
-axs[0].set_xlim(-95,95)
-#ax.set_ylim(0,0.07)
 axs[0].legend(fontsize=13)
+axs[0].set_xlim(-95,95)
 
-axs[1].set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
-axs[1].set_ylabel('Log Pixel Count',fontsize=14)
+axs[1].set_xlabel(r'$\Delta \theta$ (Degrees)', fontsize=14)
+axs[1].set_ylabel('Percent of Pixels (Log Scale)', fontsize=14)
+detector = 'COR-1_PSI'
+axs[1].set_title('QRaFT {} Feature Tracing Performance vs. Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
 detector = 'COR1_PSI'
-axs[1].set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector.strip('_PSI')),fontsize=14)
-axs[1].set_xlim(-95,95)
-#ax.set_ylim(0,0.07)
 axs[1].legend(fontsize=13)
+axs[1].set_xlim(-95,95)
 
 plt.tight_layout()
 plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_Performance_Fig.eps'), format='eps')
+plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_Performance_Fig.png'), format='png')
 
 x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new = calculate_KDE(combined_pB_signed_ravel_arr)
-gaussian_fit_pB = np.random.normal(np.mean(combined_pB_signed_ravel_arr), np.std(abs(combined_pB_signed_ravel_arr)), 1000)
+gaussian_fit_pB = random_generator.normal(np.mean(combined_pB_signed_ravel_arr), np.std(abs(combined_pB_signed_ravel_arr)), 1000)
 hi = sci.stats.norm(np.mean(combined_pB_signed_ravel_arr), np.std(abs(combined_pB_signed_ravel_arr)))
 
 min_height = min(combined_pB_signed_ravel_arr)
@@ -793,12 +787,12 @@ ax.plot(x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new, colo
 ax.plot(height_values, probabilities, label='Corresponding Gaussian Fit', color='tab:blue')
 # plt.plot(x_1_forward_cor1_central_deg_new, gaussian_fit_pB*norm_max_pB, label='gaussian fit', color='tab:blue')
 # plt.yscale('log')
-ax.set_xlabel('Angle Discrepancy (Degrees)')
+ax.set_xlabel(r'$\Delta \theta$ (Degrees)')
 ax.set_ylabel('Probability Density')
-ax.text(25,0.008,"average discrepancy: " + str(np.round(np.average(combined_pB_signed_ravel_arr),5)))
+ax.text(25,0.008,"average difference: " + str(np.round(np.average(combined_pB_signed_ravel_arr),5)))
 ax.text(25,0.007,"standard deviation: " + str(np.round(np.std(abs(combined_pB_signed_ravel_arr)),5)))
 ax.text(25,0.006,"Gaussian JSD: " + str(np.round(JSD_pB_gaussain,5)))
-ax.set_title('PSI/FORWARD pB Angle Discrepancy Probability Density vs Corresponding Gaussian Fit')
+ax.set_title('PSI/FORWARD pB Angular Difference Probability Density vs Corresponding Gaussian Fit')
 ax.legend()
 plt.savefig(os.path.join(repo_path,'Output/Plots/Test_Comparison_Fig.png'))
 ax.set_yscale('log')
@@ -830,13 +824,13 @@ data_types = sorted(list(set(data_by_date[dates[0]]['data_type'])))  # Assuming 
 data_types_original = data_types.copy()
 for j in range(len(data_types)):
     if data_types[j] == 'ne':
-        data_types[j] = 'MAS ne'
+        data_types[j] = r'MAS $n_e$ POS'
     elif data_types[j] == 'ne_LOS':
-        data_types[j] = 'MAS ne LOS'
+        data_types[j] = r'MAS $n_e$ LOS'
     elif data_types[j] == 'pB':
         data_types[j] = 'FORWARD pB'
     elif data_types[j] == 'COR1':
-        data_types[j] = 'COR1 pB'
+        data_types[j] = 'COR-1 pB'
 
 fig = plt.figure(figsize=(8, 8))
 # Create a scatter plot for each date
@@ -855,13 +849,13 @@ for i, date in enumerate(dates):
     data_type_to_plot = [data_by_date[date]['data_type'][j] for j in range(len(data_by_date[date]['data_type']))]
     for j in range(len(data_to_plot)):
         if data_type_to_plot[j] == 'ne':
-            data_type_to_plot[j] = 'MAS ne'
+            data_type_to_plot[j] = r'MAS $n_e$ POS'
         elif data_type_to_plot[j] == 'ne_LOS':
-            data_type_to_plot[j] = 'MAS ne LOS'
+            data_type_to_plot[j] = r'MAS $n_e$ LOS'
         elif data_type_to_plot[j] == 'pB':
             data_type_to_plot[j] = 'FORWARD pB'
         elif data_type_to_plot[j] == 'COR1':
-            data_type_to_plot[j] = 'COR1 pB'
+            data_type_to_plot[j] = 'COR-1 pB'
         if data_type_to_plot[j] == data_types[0]:
             plt.errorbar(x=[i], y=data_to_plot[j], yerr=confidence_to_plot[j], fmt='o', color='C0' ,label=data_type_to_plot[j] if i == 0 else "")
         elif data_type_to_plot[j] == data_types[1]:
@@ -873,8 +867,8 @@ for i, date in enumerate(dates):
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
-plt.ylabel('Mean Angle Discrepancy (Degrees)')
-plt.title('PSI COR-1 Projection Angle Discrepancy by Date')
+plt.ylabel(r'$\overline{\left|\Delta\theta\right|}$ (Degrees)')
+plt.title('PSI COR-1 Projection Angular Difference by Date')
 plt.legend()
 plt.ylim(0,20)
 
@@ -1096,10 +1090,6 @@ for i in range(len(JSD_input_values)):
         cur.execute("INSERT INTO KLD_JSD_no_random VALUES(?, ?, ?, ?, ?)", (None, KLD, JSD, matching_id1, matching_id2))
         con.commit()
 
-query = "SELECT group_1_central_tendency_stats_cor1_id, group_2_central_tendency_stats_cor1_id, JSD from KLD_JSD_no_random;"
-dbName = "tutorial.db"
-heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_no_random_heatmap.eps'), title='JSD Evaluation for Aggregated Data', x_label='group 1', y_label='group 2', colorbar_label='JSD')
-
 JSD_data_types = ['ne', 'ne_LOS', 'pB', 'COR1', 'random']
 JSD_input_values = [kde0_x_ne, kde0_x_ne_LOS, kde0_x_pB, kde0_x_cor1, kde0_x_random]
 for i in range(len(JSD_input_values)):
@@ -1137,17 +1127,17 @@ print(tukey_result)
 
 for i in range (len(tukey_result.summary().data[0])):
     if tukey_result.summary().data[i][0] == 'COR1':
-        tukey_result.summary().data[i][0] = 'COR1 pB'
+        tukey_result.summary().data[i][0] = 'COR-1 pB'
     if tukey_result.summary().data[i][1] == 'COR1':
-        tukey_result.summary().data[i][1] = 'COR1 pB'
+        tukey_result.summary().data[i][1] = 'COR-1 pB'
     if tukey_result.summary().data[i][0] == 'ne':
-        tukey_result.summary().data[i][0] = 'MAS ne'
+        tukey_result.summary().data[i][0] = r'MAS $n_e$ POS'
     if tukey_result.summary().data[i][1] == 'ne':
-        tukey_result.summary().data[i][1] = 'MAS ne'
+        tukey_result.summary().data[i][1] = r'MAS $n_e$ POS'
     if tukey_result.summary().data[i][0] == 'ne_LOS':
-        tukey_result.summary().data[i][0] = 'MAS ne LOS'
+        tukey_result.summary().data[i][0] = r'MAS $n_e$ LOS'
     if tukey_result.summary().data[i][1] == 'ne_LOS':
-        tukey_result.summary().data[i][1] = 'MAS ne LOS'
+        tukey_result.summary().data[i][1] = r'MAS $n_e$ LOS'
     if tukey_result.summary().data[i][0] == 'pB':
         tukey_result.summary().data[i][0] = 'FORWARD pB'
     if tukey_result.summary().data[i][1] == 'pB':
@@ -1172,7 +1162,7 @@ else:
 
 fig, ax = plt.subplots(1, 1)
 ax.boxplot([combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ravel_arr, combined_cor1_ravel_arr], showfliers=False)
-ax.set_xticklabels(["ne", "ne_LOS", "pB", "COR1"]) 
+ax.set_xticklabels([r'MAS $n_e$ POS', r'MAS $n_e$ LOS', "FORWARD pB", "COR-1 pB"]) 
 
 # Calculate the first (Q1) and third quartile (Q3)
 Q1 = np.percentile(combined_cor1_ravel_arr, 25)
@@ -1189,9 +1179,9 @@ max_upper_tail = max(x for x in combined_cor1_ravel_arr if x <= upper_tail_limit
 
 upper_quartile_cor1 = np.percentile(combined_cor1_ravel_arr, 75)
 ax.set_ylim(0, max_upper_tail + 10)
-ax.set_ylabel("Mean Angle Discrepancy (Degrees)") 
+ax.set_ylabel(r"$\left|\Delta\theta\right|$ (Degrees)") 
 ax.set_xlabel("Data Type") 
-ax.set_title('Box Plot Comparison of Data Types for PSI_COR1 Combined Results')
+ax.set_title('Box Plot Comparison of Data Types for Combined Results')
 plt.savefig(os.path.join(repo_path, 'Output/Plots/testfig2.eps'), format='eps')
 #plt.show()
 plt.close()
@@ -1200,6 +1190,29 @@ res = tukey_hsd(combined_ne_ravel_arr, combined_ne_LOS_ravel_arr, combined_pB_ra
 print(res)
 
 
+query = "SELECT group1, group2, JSD from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined';"
+dbName = "tutorial.db"
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_heatmap.eps'), title='JSD Evaluation for Aggregated Data', x_label='Group 1', y_label='Group 2', colorbar_label='JSD')
+
+query = "SELECT group1, group2, JSD from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined' and group1 != 'random' and group2 != 'random';"
+dbName = "tutorial.db"
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_JSD_no_random_heatmap.eps'), title='JSD Evaluation for Aggregated Data', x_label='Group 1', y_label='Group 2', colorbar_label='JSD')
+
+query = "SELECT group1, group2, mean_diff from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined';"
+dbName = "tutorial.db"
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_mean_diff_heatmap.eps'), title='Mean Difference Evaluation for Aggregated Data', x_label='Group 1', y_label='Group 2', colorbar_label='Mean Difference')
+
+query = "SELECT group1, group2, mean_diff from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined' and group1 != 'random' and group2 != 'random';"
+dbName = "tutorial.db"
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_mean_diff_no_random_heatmap.eps'), title='Mean Difference Evaluation for Aggregated Data', x_label='Group 1', y_label='Group 2', colorbar_label='Mean Difference')
+
+query = "SELECT group1, group2, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined';"
+dbName = "tutorial.db"
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_reject_heatmap.eps'), title='Tukey HSD Evaluation for Aggregated Data', x_label='Group 1', y_label='Group 2', colorbar_label=r'Reject $H_0$?')
+
+query = "SELECT group1, group2, reject from tukey_hsd_stats_cor1 inner join central_tendency_stats_cor1_new on central_tendency_stats_cor1_new.id = tukey_hsd_stats_cor1.group_1_central_tendency_stats_cor1_id where date='combined' and group1 != 'random' and group2 != 'random';"
+dbName = "tutorial.db"
+int_heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/COR1_Combined_reject_no_random_heatmap.eps'), title='Tukey HSD Evaluation for Aggregated Data', x_label='Group 1', y_label='Group 2', colorbar_label=r'Reject $H_0$?')
 # # Read SQL Query File
 # with open(os.path.join(repo_path, 'Python_Scripts', 'Test_SQL_Queries.sql'), 'r') as file:
 #     script = file.read()
@@ -1209,7 +1222,7 @@ print(res)
 
 # query = "SELECT group1, group2, mean_diff from tukey_hsd_mean_diff_combined_cor1;"
 # dbName = "tutorial.db"
-# heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Test_COR1_Combined_HSD_mean_diff_heatmap.png'), colorbar_label='Absolute Mean Difference (Degrees)', title='Heatmap of Mean Differences by Population', x_label='group 1', y_label='group 2')
+# heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Test_COR1_Combined_HSD_mean_diff_heatmap.png'), colorbar_label='Absolute Mean Difference (Degrees)', title='Heatmap of Mean Differences by Population', x_label='Group 1', y_label='Group 2')
 
 fits_path = os.path.join(repo_path, 'Output/QRaFT_Results')
 fits_input_path = os.path.join(repo_path, config['kcor_data_path'])
@@ -1619,7 +1632,7 @@ sns.histplot(combined_kcor_signed_ravel, kde=True, bins=30, label='KCor l2 avg',
 
 
 #sns.kdeplot()
-ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
+ax.set_xlabel(r'$\Delta \theta$ (Degrees)',fontsize=14)
 ax.set_ylabel('Pixel Count',fontsize=14)
 detector = 'KCor_PSI'
 ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector),fontsize=15)
@@ -1627,9 +1640,9 @@ ax.set_xlim(-95,95)
 #ax.set_ylim(0,0.07)
 ax.legend(fontsize=13)
 
-# plt.text(20,0.045,"kcor average discrepancy: " + str(np.round(np.average(err_kcor_central_deg),5)))
-# plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_kcor_central_deg),5)))
-# plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
+# plt.text(20,0.045,"kcor average difference: " + str(np.round(np.average(err_kcor_central_deg),5)))
+# plt.text(20,0.04,"FORWARD average difference: " + str(np.round(np.average(err_forward_kcor_central_deg),5)))
+# plt.text(20,0.035,"Random average difference: " + str(np.round(np.average(err_random_deg),5)))
 plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance.png'.format(detector.replace('-',''))))
 ax.set_yscale('log')
 plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_log.png'.format(detector.replace('-',''))))
@@ -1677,8 +1690,8 @@ for i, date in enumerate(dates):
 
 # Customize the plot
 plt.xlabel('Date of Corresponding Observation')
-plt.ylabel('Mean Angle Discrepancy (Degrees)')
-plt.title('PSI K-COR Projection Angle Discrepancy by Date')
+plt.ylabel(r'$\overline{\left|\Delta\theta\right|}$ (Degrees)')
+plt.title('PSI K-COR Projection Angular Difference by Date')
 plt.legend()
 plt.ylim(0,30)
 

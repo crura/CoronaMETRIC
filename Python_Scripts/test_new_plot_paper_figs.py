@@ -428,7 +428,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, PSI=True
     cax.yaxis.set_ticks_position('right')
     cax.yaxis.set_label_position('right')
     norm = mpl.colors.Normalize(vmin=0, vmax=90)
-    cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical', norm=norm)
+    cbar = fig.colorbar(sc, cax=cax, label=r'$\Delta \theta$ (Degrees)', orientation='vertical', norm=norm)
     # cax.set_xlabel(' ')
     # cax.grid(axis='y')
     lat = cax.coords[0]
@@ -501,7 +501,7 @@ def display_fits_image_with_features_and_B_field(fits_file, qraft_file, PSI=True
     cax.yaxis.set_ticks_position('right')
     cax.yaxis.set_label_position('right')
     norm = mpl.colors.Normalize(vmin=-90, vmax=90)
-    cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical', norm=norm)
+    cbar = fig.colorbar(sc, cax=cax, label=r'$\Delta \theta$ (Degrees)', orientation='vertical', norm=norm)
     # cax.set_xlabel(' ')
     # cax.grid(axis='y')
     lat = cax.coords[0]
@@ -569,32 +569,32 @@ def plot_model_data_comparison_with_features(data_fits_file, data_qraft_file, mo
     psimap.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
 
     fig1 = plt.figure(figsize=(15, 8))
-    ax1 = fig1.add_subplot(1, 2, 1, projection=datamap)
+    ax2 = fig1.add_subplot(1, 2, 1, projection=datamap)
     datamap.plot_settings['cmap'] = matplotlib.colormaps['Greys_r']
-    datamap.plot(axes=ax1,title=False)
+    datamap.plot(axes=ax2,title=False)
     for i, feature in enumerate(FEATURES):
-        ax1.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
+        ax2.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors[i], linewidth=3)
 
     # R_SUN = occlt * (head2['rsun'] / head2['cdelt1'])
-    # ax1.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
+    # ax2.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
 
 
 
-    ax2 = fig1.add_subplot(1, 2, 2, projection=datamap)
+    ax1 = fig1.add_subplot(1, 2, 2, projection=datamap)
     psimap.plot_settings['norm'] = plt.Normalize(datamap.min(), datamap.max())
 
-    psimap.plot(axes=ax2,title=False,norm=matplotlib.colors.LogNorm())
+    psimap.plot(axes=ax1,title=False,norm=matplotlib.colors.LogNorm())
     for i, feature in enumerate(FEATURES_model):
-        ax2.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors_model[i], linewidth=3)
+        ax1.plot(feature['xx_r'][:feature['n_nodes']], feature['yy_r'][:feature['n_nodes']], color=colors_model[i], linewidth=3)
     # R_SUN = occlt * (head1['rsun'] / head1['cdelt1'])
-    # ax2.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
     # ax1.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
-    ax1.set_xlabel('Helioprojective Longitude (Solar-X)',fontsize=18)
+    # ax2.add_patch(Circle((int(shape/2),int(shape/2)), R_SUN, color='black',zorder=100))
     ax2.set_xlabel('Helioprojective Longitude (Solar-X)',fontsize=18)
-    ax1.set_ylabel('Helioprojective Latitude (Solar-Y)',fontsize=18)
+    ax1.set_xlabel('Helioprojective Longitude (Solar-X)',fontsize=18)
     ax2.set_ylabel('Helioprojective Latitude (Solar-Y)',fontsize=18)
-    ax1.set_title('{} Observation {}'.format(detector, str_strip), fontsize=18)
-    ax2.set_title('Corresponding PSI/FORWARD pB Eclipse Model', fontsize=18)
+    ax1.set_ylabel('Helioprojective Latitude (Solar-Y)',fontsize=18)
+    ax2.set_title('{} Observation {}'.format(detector, str_strip), fontsize=18)
+    ax1.set_title('Corresponding PSI/FORWARD pB Eclipse Model', fontsize=18)
 
     string_print = date_obs.split('T')[0].replace('-','_')
 

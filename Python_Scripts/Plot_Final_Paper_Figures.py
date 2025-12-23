@@ -48,35 +48,10 @@ plt.savefig(os.path.join(repo_path, 'Output/Plots/QRaFT_Figures/Test_Combined_Qr
 
 
 
-
-# Plot a side by side figure with two png files 
-# Load the images
-img1 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/Updated_COR1_PSI_vs_FORWARD_Feature_Tracing_Performance.png'))
-img2 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/Updated_COR1_PSI_vs_FORWARD_Feature_Tracing_Performance_Log.png'))
-
-# Create a figure and two subplots
-fig, axs = plt.subplots(1, 2, figsize=(12, 6))
-
-# Display each image in a subplot
-axs[0].imshow(img1)
-axs[1].imshow(img2)
-
-# Remove the x and y ticks
-for ax in axs:
-    ax.set_xticks([])
-    ax.set_yticks([])
-
-# Adjust the spacing between subplots
-# plt.subplots_adjust(hspace=0, wspace=0)
-plt.tight_layout()
-plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_Performance_Fig.png'))
-
-
-
 # plot a side by side figure
 # Load the images
-img1 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/QRaFT_Figures/2017-08-20_ne_COR1_fig_5.png'))
-img2 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/QRaFT_Figures/2017-08-20_COR1_fig_5.png'))
+img1 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/QRaFT_Figures/2017-08-29_ne_COR1_fig_5.png'))
+img2 = mpimg.imread(os.path.join(repo_path, 'Output/Plots/QRaFT_Figures/2017-08-29_COR1_fig_5.png'))
 
 # Create a figure and two subplots
 fig, axs = plt.subplots(1, 2, figsize=(12, 6))
@@ -85,12 +60,18 @@ fig, axs = plt.subplots(1, 2, figsize=(12, 6))
 axs[0].imshow(img1)
 axs[1].imshow(img2)
 
-# Remove the x and y ticks
 for ax in axs:
-    ax.set_xticks([])
-    ax.set_yticks([])
-plt.tight_layout()
-plt.savefig(os.path.join(repo_path, 'Output/Plots/Test_Combined_QraFT_Fig.eps'), format='eps')
+    ax.axis('off')   # turn off  ticks, labels, and borders
+
+plt.subplots_adjust(wspace=0, hspace=0) # remove padding between images
+
+plt.savefig(
+    os.path.join(repo_path, 'Output/Plots/Test_Combined_QraFT_Fig.eps'),
+    format='eps',
+    bbox_inches='tight',
+    pad_inches=0
+)
+plt.close()
 
 
 def Create1x2Figure(image1, image2, output_file):
@@ -117,7 +98,45 @@ def Create1x2Figure(image1, image2, output_file):
     plt.tight_layout()
     plt.savefig(output_file, format='eps')
 
-image_path_1 = os.path.join(repo_path, 'Output/Plots/Features_Angle_Error_2017_08_20_COR1_ne_PSI.png')
-image_path_2 = os.path.join(repo_path, 'Output/Plots/Features_Angle_Error_2017_08_20_COR1_COR1.png')
+image_path_1 = os.path.join(repo_path, 'Output/Plots/Features_Angle_Error_2017_08_20_COR1_ne_PSI.eps')
+image_path_2 = os.path.join(repo_path, 'Output/Plots/Features_Angle_Error_2017_08_20_COR1_COR1.eps')
 output_file = os.path.join(repo_path, 'Output/Plots/Test_Combined_Angle_Error_Fig.eps')
 Create1x2Figure(image_path_1, image_path_2, output_file)
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def rot_POS_misalignment(alpha_deg):
+    """
+    Compute the angular distortion in the plane-of-sky (POS) projection
+    due to solar rotation over a specified angle.
+
+    Parameters:
+    - alpha_deg: rotation angle in degrees (e.g., 4.4 for 8 hours of rotation)
+
+    Returns:
+    - theta_deg: array of latitudes (0 to 89 degrees)
+    - dtheta_deg: array of angular distortions in degrees
+    """
+    alpha = np.radians(alpha_deg)
+    theta_arr = np.radians(np.arange(90))  # 0° to 89° in radians
+
+    dtheta = np.arctan(np.tan(theta_arr) / np.cos(alpha)) - theta_arr
+    dtheta_deg = np.degrees(dtheta)
+    theta_deg = np.degrees(theta_arr)
+
+    return theta_deg, dtheta_deg
+
+# Calculate rotation misalignment
+theta_deg, dtheta_deg = rot_POS_misalignment(4.4)
+
+# Plot
+plt.figure(figsize=(8, 5))
+plt.plot(theta_deg, dtheta_deg)
+plt.title(r'Change in POS angle $\Delta \theta$ due to solar rotation ($\alpha = 4.4^\circ$)')
+plt.xlabel('Colatitude, degrees')
+plt.ylabel(r'Change in $\Delta \theta$, degrees')
+plt.grid(True, color='gray', linestyle='--', alpha=0.3)
+plt.tight_layout()
+# plt.show()

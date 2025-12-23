@@ -219,7 +219,7 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
 
 
 
-    combined_dict = dict(metric=['average discrepancy', 'median discrepancy'],
+    combined_dict = dict(metric=['average difference', 'median difference'],
                         cor1=['{} +- {}'.format(str(cor1_avg_rounded), str(cor1_confidence_interval_rounded)), cor1_med],
                        psi=['{} +- {}'.format(str(forward_avg_rounded), str(forward_confidence_interval_rounded)), forward_med],
                        random=['{} +- {}'.format(str(random_avg_rounded), str(random_confidence_interval_rounded)), random_med])
@@ -264,7 +264,7 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
     norm_kde_forward = (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward
     norm_kde_cor1 = (KDE_cor1_central_deg_new/max(KDE_cor1_central_deg_new))*norm_max_cor1
     #sns.kdeplot()
-    ax.set_xlabel('Angle Discrepancy (Degrees)',fontsize=14)
+    ax.set_xlabel(r'$\Delta \theta$ (Degrees)',fontsize=14)
     ax.set_ylabel('Pixel Count',fontsize=14)
     if masked:
         ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field {} (L > {})'.format(detector, date, mask),fontsize=15)
@@ -274,16 +274,18 @@ def create_results_dictionary(input_dict, date, detector, file, masked=False):
     #ax.set_ylim(0,0.07)
     ax.legend(fontsize=13)
 
-    # plt.text(20,0.045,"COR1 average discrepancy: " + str(np.round(np.average(err_cor1_central_deg),5)))
-    # plt.text(20,0.04,"FORWARD average discrepancy: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
-    # plt.text(20,0.035,"Random average discrepancy: " + str(np.round(np.average(err_random_deg),5)))
+    # plt.text(20,0.045,"COR1 average difference: " + str(np.round(np.average(err_cor1_central_deg),5)))
+    # plt.text(20,0.04,"FORWARD average difference: " + str(np.round(np.average(err_forward_cor1_central_deg),5)))
+    # plt.text(20,0.035,"Random average difference: " + str(np.round(np.average(err_random_deg),5)))
     if masked:
         plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_{}_L_gt_{}.png'.format(detector.replace('-',''), date, mask)))
     else:
         plt.savefig(os.path.join(repo_path,'Output/Plots/Updated_{}_vs_FORWARD_Feature_Tracing_Performance_{}.png'.format(detector.replace('-',''), date)))
     #plt.show()
+
+    random_generator = np.random.default_rng(seed=54)
         
-    gaussian_fit_pB = np.random.normal(forward_avg, forward_std, 1000)
+    gaussian_fit_pB = random_generator.normal(forward_avg, forward_std, 1000)
     plt.plot(x_1_forward_cor1_central_deg_new, (KDE_forward_cor1_central_deg_new/max(KDE_forward_cor1_central_deg_new))*norm_max_forward, color='tab:orange', label='PSI/FORWARD pB')
     plt.plot(gaussian_fit_pB, label='gaussian fit', color='tab:blue')
     plt.yscale('log')
@@ -772,6 +774,12 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
         map.plot(axes=axes,title=False,clip_interval=(1, 99.99)*u.percent)
     else:
         map.plot(axes=axes,title=False)
+    # Update the font size of the x and y labels while retaining their WCS-specific text
+    axes.coords[0].set_axislabel(axes.coords[0].get_axislabel(), fontsize=15)  # X-axis
+    axes.coords[1].set_axislabel(axes.coords[1].get_axislabel(), fontsize=15)  # Y-axis
+    # Update the font size of the tick labels
+    axes.coords[0].set_ticklabel(size=12)  # X-axis tick labels
+    axes.coords[1].set_ticklabel(size=12)  # Y-axis tick labels
     # axes.add_patch(Circle((int(data.shape[0]/2),int(data.shape[1]/2)), rsun, color='black',zorder=100))
 
     colors = plt.cm.jet(np.linspace(0, 1, len(FEATURES)))
@@ -788,7 +796,10 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
     cax.yaxis.set_ticks_position('right')
     cax.yaxis.set_label_position('right')
     norm = mpl.colors.Normalize(vmin=-90, vmax=90)
-    cbar = fig.colorbar(sc, cax=cax, label='Angle Error (degrees)', orientation='vertical', norm=norm)
+    cbar = fig.colorbar(sc, cax=cax, label=r'$\Delta \theta$ (Degrees)', orientation='vertical', norm=norm)
+    cbar.set_label(r'$\Delta \theta$ (Degrees)', fontsize=15, labelpad=0.25)
+    # Adjust the position of the label
+    cbar.ax.yaxis.label.set_position((1.05, 0.25))  # (x, y) coordinates
     # cax.set_xlabel(' ')
     # cax.grid(axis='y')
     lat = cax.coords[0]
@@ -796,19 +807,44 @@ def display_fits_image_with_3_0_features_and_B_field(fits_file, qraft_file, corr
     lat.set_ticks_visible(False)
     lat.set_ticklabel_visible(False)
     lat.set_axislabel('')
+    cbar.ax.tick_params(labelsize=12)  # Adjust the font size of cbar
     if PSI:
         if data_type:
-            axes.set_title('PSI/FORWARD {} Eclipse Model Corresponding to {} {} Observation'.format(data_type, date, data_source.strip('_PSI')))
-            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}_PSI.png'.format(string_print, detector, data_type)))
+            if data_type == 'ne':
+                data_type = r'MAS $n_e$'
+            if data_type == 'ne_LOS':
+                data_type = r'MAS $n_e$ LOS'
+            if data_type == 'pB':
+                data_type = 'FORWARD pB'
+            if data_type == 'COR1':
+                data_type = 'COR-1'
+            axes.set_title('{} Corresponding to {} {} Observation'.format(data_type, date, data_source.strip('_PSI')), fontsize=20)
+            if data_type == 'MAS $n_e$':
+                data_type = 'ne'
+            if data_type == 'MAS $n_e$ LOS':
+                data_type = r'ne_LOS'
+            if data_type == 'FORWARD pB':
+                data_type = 'pB'
+            if data_type == 'COR-1':
+                data_type = 'COR1'
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}_PSI.eps'.format(string_print, detector, data_type)), format='eps')
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}_PSI.png'.format(string_print, detector, data_type)), format='png')
         else:
-            axes.set_title('Corresponding PSI/FORWARD pB Eclipse Model')
-            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.png'.format(string_print, detector)))
+            axes.set_title('Corresponding PSI/FORWARD pB Eclipse Model', fontsize=20)
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.eps'.format(string_print, detector)), format='eps')
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_PSI.png'.format(string_print, detector)), format='png')
     else:
-        axes.set_title('{} Observation {}'.format(detector, str_strip))
+        if detector == 'COR1':
+            detector = 'COR-1'
+        axes.set_title('{} Observation {}'.format(detector, str_strip), fontsize=20)
+        if detector == 'COR-1':
+            detector = 'COR1'
         if data_type:
-            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}.png'.format(string_print, detector, data_type)))
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}.eps'.format(string_print, detector, data_type)), format='eps')
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}_{}.png'.format(string_print, detector, data_type)), format='png')
         else:
-            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)))
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.eps'.format(string_print, detector)), format='eps')
+            plt.savefig(os.path.join(repo_path,'Output/Plots/Features_Angle_Error_{}_{}.png'.format(string_print, detector)), format='png')
     # #plt.show()
     plt.close()
 
@@ -997,7 +1033,7 @@ def plot_histograms(arrays, labels, repo_path, detector='COR1_PSI'):
     for i in range(len(arrays)):
         sns.histplot(arrays[i], kde=True, label=labels[i], bins=30, ax=ax, color=colors[i % len(colors)])
 
-    ax.set_xlabel('Angle Discrepancy (Degrees)', fontsize=14)
+    ax.set_xlabel(r'$\Delta \theta$ (Degrees)', fontsize=14)
     ax.set_ylabel('Pixel Count', fontsize=14)
     ax.set_title('QRaFT {} Feature Tracing Performance Against Central POS $B$ Field'.format(detector), fontsize=15)
     ax.set_xlim(-95,95)
@@ -1066,7 +1102,8 @@ def correct_fits_header(filepath):
 
 def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, date):
     x_1_forward_cor1_central_deg_new, KDE_forward_cor1_central_deg_new = calculate_KDE(array)
-    gaussian_fit = np.random.normal(np.mean(array), np.std(abs(array)), 1000)
+    random_generator = np.random.default_rng(seed=54)
+    gaussian_fit = random_generator.normal(np.mean(array), np.std(abs(array)), 1000)
     hi = sci.stats.norm(np.mean(array), np.std(abs(array)))
     label = data_type
     min_height = min(array)
@@ -1085,9 +1122,9 @@ def plot_histogram_with_JSD_Gaussian_Analysis(array, data_type, data_source, dat
     ax.plot(height_values, probabilities, label='Corresponding Gaussian Fit', color='tab:blue')
     # plt.plot(x_1_forward_cor1_central_deg_new, gaussian_fit_pB*norm_max_pB, label='gaussian fit', color='tab:blue')
     # plt.yscale('log')
-    ax.set_xlabel('Angle Discrepancy (Degrees)')
+    ax.set_xlabel(r'$\Delta \theta$ (Degrees)')
     ax.set_ylabel('Probability Density')
-    ax.text(0.7,0.8,"average discrepancy: " + str(np.round(np.average(array),5)), transform=ax.transAxes)
+    ax.text(0.7,0.8,r"average $\Delta \theta$: " + str(np.round(np.average(array),5)), transform=ax.transAxes)
     ax.text(0.7,0.75,"standard deviation: " + str(np.round(np.std(abs(array)),5)), transform=ax.transAxes)
     ax.text(0.7,0.7,"Gaussian JSD: " + str(np.round(JSD_gaussain,5)), transform=ax.transAxes)
     ax.text(0.7,0.65,"kurtosis: " + str(np.round(kurtosis,5)), transform=ax.transAxes)
@@ -1168,15 +1205,120 @@ def heatmap_sql_query(dbName, query, output_file=None, print_to_file=False, late
 
     pivot_df = df.pivot_table(index=index_1, columns=index_2, values=value)
     symmetric_df = pivot_df.add(pivot_df.T, fill_value=0)
-    sns.heatmap(symmetric_df, annot=True)
-    plt.title(title)
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
+    # Set diagonal values to 0 as by definition the JSD between the same group is 0
+    for i in symmetric_df.index:
+        symmetric_df.at[i, i] = 0
+
+    rename_map = {
+    'ne': r'$n_e$ POS',
+    'ne_LOS': r'$n_e$ LOS',
+    'pB': 'pB',
+    'COR1': 'COR-1'
+    }
+    symmetric_df = symmetric_df.rename(index=rename_map, columns=rename_map)
+    plt.close()
+    heatmap = sns.heatmap(symmetric_df, annot=True, fmt=".3f")
+    heatmap.set_title(title)
+    heatmap.set_xlabel(x_label)
+    heatmap.set_ylabel(y_label)
     # set colorbar label
-    cbar = plt.gca().collections[0].colorbar
+    cbar = heatmap.collections[0].colorbar
     cbar.set_label(colorbar_label)
     if print_to_file:
         plt.savefig(output_file, format='eps')
     else:
         plt.show()
+    heatmap.clear()
+    plt.close()
+
+
+def int_heatmap_sql_query(dbName, query, output_file=None, print_to_file=False, latex=False, caption=False, caption_text=None, colorbar_label=None, title=None, x_label=None, y_label=None):
+    import sqlite3
+    import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    conn = sqlite3.connect(dbName)
+    df = pd.read_sql_query(query, conn)
+    parameters = query.split('from')[0].strip('SELECT').strip().split(',')
+    index_1 = parameters[0].strip()
+    index_2 = parameters[1].strip()
+    value = parameters[2].strip()
+    # df = df.pivot(index='group1', columns='group2', values='JSD')
+
+    # group1 = df['group1'].unique()
+    # group2 = df['group2'].unique()
+    # JSD = df['JSD'].values
+
+
+    # try:
+    #     for i in range(len(df)):
+    #         if df['group_1_central_tendency_stats_cor1_id'][i] == 'ne':
+    #             df['group_1_central_tendency_stats_cor1_id'][i] = 'MAS ne'
+    #         if df['group_2_central_tendency_stats_cor1_id'][i] == 'ne':
+    #             df['group_2_central_tendency_stats_cor1_id'][i] = 'MAS ne'
+    #         if df['group_1_central_tendency_stats_cor1_id'][i] == 'ne_LOS':
+    #             df['group_1_central_tendency_stats_cor1_id'][i] = 'MAS ne_LOS'
+    #         if df['group_2_central_tendency_stats_cor1_id'][i] == 'ne_LOS':
+    #             df['group_2_central_tendency_stats_cor1_id'][i] = 'MAS ne_LOS'
+    #         if df['group_1_central_tendency_stats_cor1_id'][i] == 'pB':
+    #             df['group_1_central_tendency_stats_cor1_id'][i] = 'FORWARD pB'
+    #         if df['group_2_central_tendency_stats_cor1_id'][i] == 'pB':
+    #             df['group_2_central_tendency_stats_cor1_id'][i] = 'FORWARD pB'
+    #         if df['group_1_central_tendency_stats_cor1_id'][i] == 'COR1':
+    #             df['group_1_central_tendency_stats_cor1_id'][i] = 'COR1 pB'
+    #         if df['group_2_central_tendency_stats_cor1_id'][i] == 'COR1':
+    #             df['group_2_central_tendency_stats_cor1_id'][i] = 'COR1 pB'
+    # except KeyError:
+    #     pass
+
+    # try:
+    #     for i in range(len(df)):
+    #         if df[index_1][i] == 'ne':
+    #             df[index_1][i] = 'MAS ne'
+    #         if df[index_2][i] == 'ne':
+    #             df[index_2][i] = 'MAS ne'
+    #         if df[index_1][i] == 'ne_LOS':
+    #             df[index_2][i] = 'MAS ne_LOS'
+    #         if df[index_2][i] == 'ne_LOS':
+    #             df[index_2][i] = 'MAS ne_LOS'
+    #         if df[index_1][i] == 'pB':
+    #             df[index_1][i] = 'FORWARD pB'
+    #         if df[index_2][i] == 'pB':
+    #             df[index_2][i] = 'FORWARD pB'
+    #         if df[index_1][i] == 'COR1':
+    #             df[index_1][i] = 'COR1 pB'
+    #         if df[index_2][i] == 'COR1':
+    #             df[index_2][i] = 'COR1 pB'
+    # except KeyError:
+    #     pass
+
+    df[value] = abs(df[value])
+
+
+    pivot_df = df.pivot_table(index=index_1, columns=index_2, values=value)
+    symmetric_df = pivot_df.add(pivot_df.T, fill_value=0)
+    # Set diagonal values to 0 as by definition the JSD between the same group is 0
+    for i in symmetric_df.index:
+        symmetric_df.at[i, i] = 0
+
+    rename_map = {
+    'ne': r'$n_e$ POS',
+    'ne_LOS': r'$n_e$ LOS',
+    'pB': 'pB',
+    'COR1': 'COR-1'
+    }
+    symmetric_df = symmetric_df.rename(index=rename_map, columns=rename_map)
+    plt.close()
+    heatmap = sns.heatmap(symmetric_df.astype(int), annot=True, fmt="d")
+    heatmap.set_title(title)
+    heatmap.set_xlabel(x_label)
+    heatmap.set_ylabel(y_label)
+    # set colorbar label
+    cbar = heatmap.collections[0].colorbar
+    cbar.set_label(colorbar_label)
+    if print_to_file:
+        plt.savefig(output_file, format='eps')
+    else:
+        plt.show()
+    heatmap.clear()
     plt.close()

@@ -32,8 +32,8 @@ con.commit()
 
 query = "SELECT group1, group2, mean_diff from tukey_hsd_mean_diff_combined_cor1;"
 dbName = "tutorial.db"
-heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Test_COR1_Combined_HSD_mean_diff_heatmap.png'), colorbar_label='Absolute Mean Difference (Degrees)', title='Heatmap of Mean Differences by Population', x_label='group 1', y_label='group 2')
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Test_COR1_Combined_HSD_mean_diff_heatmap.png'), colorbar_label='Absolute Mean Difference (Degrees)', title='Heatmap of Mean Differences by Population', x_label='Group 1', y_label='Group 2')
 
 query = "SELECT group1, group2, reject from tukey_hsd_reject_combined_cor1;"
 dbName = "tutorial.db"
-heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Test_COR1_Combined_HSD_reject_heatmap.png'), colorbar_label='Reject Null Hypothesis?', title='Heatmap of Reject Value by Population', x_label='group 1', y_label='group 2')
+heatmap_sql_query(dbName, query, print_to_file=True, output_file=os.path.join(repo_path, 'Output/Plots/Test_COR1_Combined_HSD_reject_heatmap.png'), colorbar_label='Reject Null Hypothesis?', title='Heatmap of Reject Value by Population', x_label='Group 1', y_label='Group 2')
